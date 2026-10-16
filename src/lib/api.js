@@ -270,5 +270,5 @@ export const Groups = {
 };
 
 export const NewsLive = {
-  get: () => api('/api/news/live', { auth: false }),
+  get: () => api('/api/news/live', { auth: 'optional' }),
 };

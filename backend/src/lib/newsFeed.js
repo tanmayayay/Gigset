@@ -14,6 +14,8 @@ import Parser from 'rss-parser';
 // and reported by GET /api/news/health, it never breaks the others.
 // ---------------------------------------------------------------------------
 
+import { rateText } from './contentRating.js';
+
 export const CATEGORIES = {
   bollywood: 'Bollywood & Regional',
   indie: 'Indie & Hip-hop',
@@ -172,6 +174,8 @@ export function normalizeItem(it, feed) {
     image: feed.google ? '' : pickImage(it),
     region: feed.region,
     category: classify(`${title} ${excerpt}`, feed.category),
+    // family | sensitive | mature: decides who sees it (see contentRating.js)
+    rating: rateText(`${title} ${excerpt}`),
   };
 }
 

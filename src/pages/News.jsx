@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Bookmark, ExternalLink, Layers, LayoutList, Clock, Newspaper } from 'lucide-react';
 import { EmptyState } from '../components/ui';
 import SwipeDeck from '../components/news/SwipeDeck';
@@ -24,7 +25,7 @@ function defaultMode() {
 }
 
 export default function News() {
-  const { isBookmarked, toggleBookmark, pushToast } = useStore();
+  const { isBookmarked, toggleBookmark, pushToast, user } = useStore();
   const [mode, setModeState] = useState(() => {
     try {
       const saved = localStorage.getItem(MODE_KEY);
@@ -117,6 +118,10 @@ export default function News() {
           </button>
         </div>
       </header>
+
+      {user && user.content && !user.content.hasBirthDate && (
+        <div className="news-age-note">Add your date of birth so stories suit your age. <Link to="/settings">Add it in Settings</Link></div>
+      )}
 
       <div className="news-region" role="tablist" aria-label="Region">
         {REGIONS.map((r) => (

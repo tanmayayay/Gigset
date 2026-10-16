@@ -1,5 +1,6 @@
 import '../auth.css';
 import { useEffect, useState } from 'react';
+import { birthError } from '../lib/age';
 import { useNavigate, Link, Navigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -88,6 +89,7 @@ export default function Onboarding() {
   const [name, setName] = useState('');
   const [city, setCity] = useState('Mumbai');
   const [role, setRole] = useState('');
+  const [birth, setBirth] = useState('');
   const [tags, setTags] = useState([]);
   const [busy, setBusy] = useState(false);
   const [quoteIdx, setQuoteIdx] = useState(0);
@@ -109,6 +111,7 @@ export default function Onboarding() {
 
   const finish = async () => {
     if (!userId || busy) return;
+    if (!birth || birthError(birth)) { setStep(2); pushToast(birthError(birth) || 'Please add your birth date to continue.', 'error'); return; }
     setBusy(true);
     try {
       await Profiles.update(userId, {
@@ -117,6 +120,7 @@ export default function Onboarding() {
         city,
         bio: role.trim() ? `${role.trim()} · ${city}` : null,
         detail: { role: role.trim() || type, interests: tags },
+        birthDate: birth,
       });
       await refreshProfile();
       pushToast('Welcome to Strings — your profile is live.');
@@ -300,6 +304,20 @@ export default function Onboarding() {
                           placeholder="e.g. Vocalist"
                         />
                       </div>
+                    </div>
+                    <div className="field">
+                      <label htmlFor="onb-birth">Date of birth</label>
+                      <input
+                        id="onb-birth"
+                        type="date"
+                        value={birth}
+                        max={new Date().toISOString().slice(0, 10)}
+                        onChange={(e) => setBirth(e.target.value)}
+                        autoComplete="bday"
+                      />
+                      <small style={{ color: birthError(birth) ? 'var(--danger, #ff6b6b)' : 'var(--text-faint)' }}>
+                        {birthError(birth) || 'Never shown on your profile. We use it to keep what you see suited to your age.'}
+                      </small>
                     </div>
                     <p className="field-hint">
                       This is how bookers and collaborators will see you. You can edit it anytime from your profile.

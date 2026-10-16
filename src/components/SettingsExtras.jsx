@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Copy, Share2, Bell, Mail, Ban } from 'lucide-react';
+import { Copy, Share2, Bell, Mail, Ban, SlidersHorizontal } from 'lucide-react';
+import { Profiles } from '../lib/api';
+import { birthError } from '../lib/age';
 import { Avatar } from './ui';
 import { Account, Safety } from '../lib/api';
 import { inviteLink } from '../lib/ref';
@@ -98,6 +100,50 @@ export function BlockedBlock() {
           <button className="btn btn-ghost btn-sm" style={{ marginLeft: 'auto' }} onClick={() => unblock(p)}>Unblock</button>
         </div>
       ))}
+    </div>
+  );
+}
+
+const LEVEL_TEXT = {
+  gentle: 'Your stories are picked to be suitable for all ages.',
+  teen: 'Your stories are picked to suit your age.',
+  standard: 'Your stories are picked to suit a general audience.',
+  open: 'You are seeing every story.',
+};
+
+export function ContentBlock() {
+  const { user, refreshProfile, pushToast } = useStore();
+  const c = user?.content;
+  const [birth, setBirth] = useState('');
+  const [busy, setBusy] = useState(false);
+  if (!user || !c) return null;
+  const save = async (body, msg) => {
+    setBusy(true);
+    try { await Profiles.update(user.id, body); await refreshProfile(); pushToast(msg); }
+    catch (e) { pushToast(e.message || 'Could not save.', 'error'); }
+    finally { setBusy(false); }
+  };
+  const err = birthError(birth);
+  return (
+    <div className="settings-block">
+      <h4 style={{ display: 'flex', alignItems: 'center', gap: 8 }}><SlidersHorizontal size={15} /> Content comfort</h4>
+      <p className="set-note" style={{ marginTop: 0 }}>{LEVEL_TEXT[c.level] || LEVEL_TEXT.standard}</p>
+      {!c.hasBirthDate ? (
+        <div className="field">
+          <label htmlFor="set-birth">Add your date of birth</label>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <input id="set-birth" type="date" value={birth} max={new Date().toISOString().slice(0, 10)} onChange={(e) => setBirth(e.target.value)} />
+            <button className="btn btn-blue btn-sm" disabled={!birth || !!err || busy} onClick={() => save({ birthDate: birth }, 'Saved. Your stories now suit your age.')}>Save</button>
+          </div>
+          <small style={{ color: err ? 'var(--danger, #ff6b6b)' : 'var(--text-faint)' }}>{err || 'It can only be set once and is never shown to anyone.'}</small>
+        </div>
+      ) : c.adult ? (
+        <div className="toggle-row">
+          <span>Show all stories, including strong language and mature themes</span>
+          <button className={`switch${c.open ? ' on' : ''}`} aria-label="Show all stories" disabled={busy}
+            onClick={() => save({ contentOpen: !c.open }, c.open ? 'Back to the general selection.' : 'Showing all stories.')} />
+        </div>
+      ) : null}
     </div>
   );
 }

@@ -5,6 +5,13 @@ import { asyncHandler, bad, notFound, pagination, tooLong, jsonTooBig, isOwnMedi
 import { cleanDetail } from '../lib/profileDetail.js';
 import { notify } from '../lib/notify.js';
 import { isBlockedBetween } from '../lib/blocks.js';
+import { contentInfo, parseBirthDate } from '../lib/contentRating.js';
+
+// The caller's own content settings (computed; the birth date itself is never sent back).
+async function withContent(user) {
+  const c = await prisma.user.findUnique({ where: { id: user.id }, select: { birthDate: true, contentOpen: true } });
+  return { ...user, content: contentInfo(c || {}) };
+}
 
 // Shared field limits for create + edit.
 function checkProfileFields({ name, bio, city, detail }) {
@@ -189,7 +196,7 @@ router.get(
       select: publicUser,
     });
     if (!user) return notFound(res, 'Profile');
-    res.json(user);
+    res.json(await withContent(user));
   })
 );
 
@@ -363,7 +370,7 @@ router.patch(
       return bad(res, 403, 'You can only edit your own profile.');
     }
 
-    const { name, stakeholderType, bio, city, visibility, detail, avatarUrl } = req.body ?? {};
+    const { name, stakeholderType, bio, city, visibility, detail, avatarUrl, birthDate, contentOpen } = req.body ?? {};
     const fieldError = checkProfileFields({ name, bio, city, detail });
     if (fieldError) return bad(res, 400, fieldError);
     const data = {};
@@ -385,6 +392,22 @@ router.patch(
       if (avatarUrl !== null && !isOwnMediaUrl(avatarUrl)) return bad(res, 400, 'Field "avatarUrl" must be a photo uploaded to Strings.');
       data.avatarUrl = avatarUrl;
     }
+    if (birthDate !== undefined || contentOpen !== undefined) {
+      const cur = await prisma.user.findUnique({ where: { id: req.user.id }, select: { birthDate: true } });
+      let born = cur?.birthDate || null;
+      if (birthDate !== undefined) {
+        // Set once: changing it later would let a young person simply re-enter an older date.
+        if (born) return bad(res, 409, 'Your birth date is already saved. Contact support if it needs correcting.');
+        const b = parseBirthDate(birthDate);
+        if (b.error) return bad(res, 400, b.error);
+        data.birthDate = born = b.value;
+      }
+      if (contentOpen !== undefined) {
+        if (typeof contentOpen !== 'boolean') return bad(res, 400, 'Invalid setting.');
+        const info = contentInfo({ birthDate: born });
+        data.contentOpen = contentOpen && info.adult; // only ever on for verified-by-date adults
+      }
+    }
     if (detail !== undefined) {
       const d = cleanDetail(detail);
       if (d.error) return bad(res, 400, d.error);
@@ -403,7 +426,7 @@ router.patch(
         data,
         select: publicUser,
       });
-      res.json(user);
+      res.json(await withContent(user));
     } catch {
       return notFound(res, 'Profile');
     }

@@ -1,5 +1,8 @@
 import { Router } from 'express';
 import { asyncHandler } from '../lib/http.js';
+import { optionalAuth } from '../middleware/auth.js';
+import { prisma } from '../lib/prisma.js';
+import { allowedRatings, levelFor } from '../lib/contentRating.js';
 import { CATEGORIES, FEEDS, collect, enrichImages } from '../lib/newsFeed.js';
 
 const router = Router();
@@ -35,6 +38,7 @@ const stale = () => Date.now() - cache.updatedAt > TTL_MS;
 // GET /api/news/live — public. Optional ?region=india|world & ?category=slug
 router.get(
   '/live',
+  optionalAuth,
   asyncHandler(async (req, res) => {
     if (cache.items.length === 0) await refresh();
     else if (stale()) refresh(); // background
@@ -43,6 +47,14 @@ router.get(
     const { region, category } = req.query;
     if (region === 'india' || region === 'world') items = items.filter((i) => i.region === region);
     if (typeof category === 'string' && CATEGORIES[category]) items = items.filter((i) => i.category === category);
+
+    // Age-aware filtering: signed-in people get a level from their birth date; visitors get the standard one.
+    let who = {};
+    if (req.user) {
+      who = (await prisma.user.findUnique({ where: { id: req.user.id }, select: { birthDate: true, contentOpen: true } })) || {};
+    }
+    const allowed = new Set(allowedRatings(levelFor(who)));
+    items = items.filter((i) => allowed.has(i.rating || 'family'));
 
     res.json({
       updatedAt: cache.updatedAt ? new Date(cache.updatedAt).toISOString() : null,

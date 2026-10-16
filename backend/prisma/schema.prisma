@@ -94,6 +94,9 @@ model User {
   foundingMember     Boolean            @default(false)
   // Contact + preferences for email / push alerts.
   email              String?
+  // Age: used only to tune what we show (news filtering). Never returned to other people.
+  birthDate          DateTime?
+  contentOpen        Boolean            @default(false)
   emailAlerts        Boolean            @default(true)
   weeklyDigest       Boolean            @default(true)
   lastDigestAt       DateTime?

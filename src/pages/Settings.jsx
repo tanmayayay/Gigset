@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { PageHead, Avatar } from '../components/ui';
 import { Profiles } from '../lib/api';
 import { useStore } from '../store/store';
-import { InviteBlock, AlertsBlock, BlockedBlock } from '../components/SettingsExtras';
+import { InviteBlock, AlertsBlock, BlockedBlock, ContentBlock } from '../components/SettingsExtras';
 
 const VISIBILITY = [
   ['public', 'Public — anyone can view and message you', 'PUBLIC'],
@@ -77,6 +77,7 @@ export default function Settings() {
         </div>
       </div>
 
+      <ContentBlock />
       <InviteBlock />
       <AlertsBlock />
 

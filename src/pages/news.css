@@ -155,3 +155,6 @@
 .news-region button.on{background:var(--blue); color:#fff;}
 .news-topics{overflow-x:auto; flex-wrap:nowrap; scrollbar-width:none;}
 .news-topics .filter-chip{flex-shrink:0; white-space:nowrap;}
+
+.news-age-note{margin:0 0 12px; padding:9px 13px; border-radius:10px; background:rgba(255,255,255,.05); border:1px solid var(--border,rgba(255,255,255,.1)); font-size:13px; color:var(--text-dim,#b5b8c5);}
+.news-age-note a{color:var(--blue,#6aa3ff); font-weight:600; margin-left:4px;}
