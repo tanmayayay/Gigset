@@ -1,6 +1,7 @@
 // Lists how the live news feeds are being rated, so the keyword lists can be tuned.
 //   node scripts/audit-news.mjs            counts + every non-family headline
 //   node scripts/audit-news.mjs mature     only the "mature" ones
+import { matchedTerm } from '../src/lib/contentRating.js';
 import { FEEDS, collect } from '../src/lib/newsFeed.js';
 
 const only = process.argv[2];
@@ -11,5 +12,5 @@ console.log(`${items.length} stories`, by, '\n');
 for (const i of items) {
   if (i.rating === 'family') continue;
   if (only && i.rating !== only) continue;
-  console.log(`[${i.rating.toUpperCase()}] ${i.source}: ${i.title}`);
+  console.log(`[${i.rating.toUpperCase()}: ${matchedTerm(`${i.title} ${i.excerpt}`)}] ${i.source}: ${i.title}`);
 }

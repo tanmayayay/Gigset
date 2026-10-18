@@ -30,12 +30,18 @@ const SENSITIVE = new RegExp(
   '\\b(' + [
     'rape\\w*', 'raped', 'sexual(ly)? (assault\\w*|abuse\\w*|harass\\w*|misconduct|violence)', 'molest\\w*', 'predator',
     'suicid\\w*', 'self-?harm', 'overdos\\w*', 'found dead', 'murder\\w*', 'killed', 'shot dead', 'stabb\\w*',
-    'shooting', 'massacre', 'terror\\w*', 'domestic (violence|abuse)', 'abus\\w+', 'gore', 'graphic (violence|content)',
+    'mass shooting', 'shooting (incident|spree|victims?)', 'massacre', 'terror(ism|ist|ists|ist attacks?|ised)\\b|terror attacks?', 'domestic (violence|abuse)', 'abus\\w+', 'gore', 'graphic (violence|content)',
     'drugs?', 'cocaine', 'heroin', 'narcotic\\w*', 'rehab', 'addict\\w*', 'alcoholi\\w+', 'arrested',
     'fuck\\w*', 'shit\\w*', 'bitch\\w*', 'bastard', 'asshole', 'motherfuck\\w*',
   ].join('|') + ')\\b',
   'i',
 );
+
+/** The word that triggered a non-family rating (for tuning with scripts/audit-news.mjs). */
+export function matchedTerm(text) {
+  const t = String(text || '');
+  return (t.match(MATURE) || t.match(SENSITIVE) || [])[0] || '';
+}
 
 export function rateText(text) {
   const t = String(text || '');
