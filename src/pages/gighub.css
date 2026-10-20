@@ -1,0 +1,76 @@
+/* Gighub: reels + posts */
+.gh-bar{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin:4px 0 14px;}
+.gh-mode{display:inline-flex; padding:3px; border-radius:999px; background:var(--panel-2); border:1px solid var(--border);}
+.gh-mode button{display:inline-flex; align-items:center; gap:7px; border:none; background:none; padding:8px 16px; border-radius:999px; font-weight:600; font-size:13.5px; color:var(--text-dim); cursor:pointer;}
+.gh-mode button.on{background:var(--gradient-brand); color:#fff; box-shadow:0 6px 18px -6px rgba(42,99,238,.6);}
+.gh-filters{display:flex; gap:6px; flex-wrap:wrap;}
+.gh-filters button{display:inline-flex; align-items:center; gap:5px; padding:6px 12px; border-radius:999px; border:1px solid var(--border); background:var(--panel); color:var(--text-dim); font-size:12.5px; font-weight:600; cursor:pointer;}
+.gh-filters button.on{color:var(--blue); border-color:var(--blue); background:var(--blue-dim);}
+.gh-skel{display:flex; justify-content:center; padding:80px 0;}
+
+/* reels: one screen at a time, snap scrolling */
+.gh-reels{height:calc(100dvh - var(--topbar-h) - 170px); min-height:520px; overflow-y:auto; scroll-snap-type:y mandatory; scrollbar-width:none; outline:none; border-radius:22px;
+  background:radial-gradient(80% 60% at 50% 0%,color-mix(in srgb,var(--blue) 22%,transparent),transparent 70%),#050a18;}
+.gh-reels::-webkit-scrollbar{display:none;}
+.gh-reel{height:100%; scroll-snap-align:start; scroll-snap-stop:always; display:flex; align-items:center; justify-content:center; gap:14px; padding:12px;}
+.gh-screen{position:relative; height:100%; aspect-ratio:9/16; max-width:calc(100% - 80px); border-radius:24px; overflow:hidden; background:#000; color:#fff;
+  box-shadow:0 30px 80px -20px rgba(0,0,0,.8), 0 0 0 1px rgba(130,180,255,.25), 0 0 40px -6px rgba(80,140,255,.35);}
+.gh-screen video,.gh-screen img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover;}
+.gh-reel.active .gh-screen.t-photo img{animation:drift 14s ease-in-out infinite alternate;}
+@keyframes drift{from{transform:scale(1.02)}to{transform:scale(1.12) translate(-1.5%,-1%)}}
+.gh-shade{position:absolute; inset:0; pointer-events:none; background:linear-gradient(180deg,rgba(0,0,0,.35),transparent 25%,transparent 55%,rgba(0,0,0,.82));}
+.gh-caption{position:absolute; left:16px; right:16px; bottom:18px; z-index:2;}
+.gh-caption b{display:inline-flex; align-items:center; gap:5px; font-size:15px; cursor:pointer; font-family:var(--font-display);}
+.gh-caption p{margin:6px 0 0; font-size:14px; line-height:1.45; text-shadow:0 1px 8px rgba(0,0,0,.7); display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;}
+.gh-hud{position:absolute; width:18px; height:18px; border:2px solid rgba(140,210,255,.85); pointer-events:none; z-index:3;}
+.gh-hud.tl{left:12px; top:12px; border-right:none; border-bottom:none; border-radius:6px 0 0 0;}
+.gh-hud.br{right:12px; bottom:12px; border-left:none; border-top:none; border-radius:0 0 6px 0;}
+.gh-sound{position:absolute; top:14px; right:14px; z-index:4; width:34px; height:34px; border-radius:50%; border:1px solid rgba(255,255,255,.3); background:rgba(6,12,28,.55); color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; backdrop-filter:blur(6px);}
+.gh-chip{display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:999px; font-size:11px; font-weight:700; letter-spacing:.5px; text-transform:uppercase; background:rgba(6,12,28,.55); border:1px solid rgba(140,210,255,.45); color:#cfe9ff; backdrop-filter:blur(6px);}
+
+.gh-actions{display:flex; flex-direction:column; align-items:center; gap:16px; align-self:flex-end; padding-bottom:20px;}
+.gh-act{display:flex; flex-direction:column; align-items:center; gap:4px; background:none; border:none; color:#dfe9ff; cursor:pointer; font-size:11.5px; font-weight:600;}
+.gh-act svg{padding:0; filter:drop-shadow(0 2px 8px rgba(0,0,0,.5));}
+.gh-act:hover{color:#fff;}
+.gh-act.on{color:#ff6b8b;}
+.gh-act.av{margin-bottom:4px; border-radius:50%; box-shadow:0 0 0 2px rgba(120,190,255,.9), 0 0 16px rgba(80,140,255,.6);}
+
+/* audio screens */
+.gh-audio{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:22px; padding:24px;}
+.gh-audio.sq{position:relative; inset:auto; aspect-ratio:1/1; border-radius:18px; overflow:hidden;}
+.gh-audio .gh-chip{position:absolute; top:14px; left:14px;}
+.gh-disc{width:150px; height:150px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:rgba(255,255,255,.9); background:radial-gradient(circle,rgba(255,255,255,.18) 0 22%,rgba(0,0,0,.45) 23% 100%); border:1px solid rgba(255,255,255,.3); box-shadow:0 0 40px rgba(0,0,0,.4), inset 0 0 30px rgba(255,255,255,.1);}
+.gh-disc.spin{animation:discspin 5s linear infinite;}
+@keyframes discspin{to{transform:rotate(360deg)}}
+.gh-viz{display:flex; align-items:flex-end; gap:3px; height:64px; width:80%;}
+.gh-viz i{flex:1; border-radius:3px; background:rgba(255,255,255,.75); transform-origin:bottom; transform:scaleY(.25);}
+.gh-viz.on i{animation:viz .9s ease-in-out infinite alternate;}
+@keyframes viz{from{transform:scaleY(.2)}to{transform:scaleY(1)}}
+.gh-play{width:62px; height:62px; border-radius:50%; border:none; background:#fff; color:#0a1230; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 10px 30px -6px rgba(0,0,0,.6);}
+.gh-dur{position:absolute; top:16px; right:16px; font-family:ui-monospace,Menlo,monospace; font-size:12px; color:#dbe9ff;}
+.gh-audio + .gh-shade{background:linear-gradient(180deg,transparent 55%,rgba(0,0,0,.7));}
+
+.gh-poster{position:absolute; inset:0; display:flex; flex-direction:column; justify-content:flex-end; gap:14px; padding:26px 22px; background-size:cover;}
+.gh-poster .gh-chip{align-self:flex-start; position:absolute; top:16px; left:16px;}
+.gh-poster h2{font-size:30px; line-height:1.1; margin:0; letter-spacing:-.02em; text-shadow:0 2px 20px rgba(0,0,0,.5);}
+.gh-poster-meta{display:flex; flex-direction:column; gap:6px; font-size:13.5px; color:#e6f0ff;}
+.gh-poster-meta span{display:inline-flex; align-items:center; gap:7px;}
+.gh-end{height:120px; scroll-snap-align:end; display:flex; align-items:center; justify-content:center; color:#6f86b8; font-size:13px; font-family:ui-monospace,Menlo,monospace;}
+
+/* posts: big cards at reading pace */
+.gh-posts{display:flex; flex-direction:column; gap:18px; max-width:620px; margin:0 auto;}
+.gh-post{background:var(--panel); border:1px solid var(--border); border-radius:20px; box-shadow:var(--shadow-card); overflow:hidden;}
+.gh-post > header{display:flex; align-items:center; gap:10px; padding:14px 16px;}
+.gh-post > header b{display:flex; align-items:center; gap:4px; font-size:14.5px;}
+.gh-post > header span{font-size:12px; color:var(--text-faint);}
+.gh-post .gh-audio.sq{border-radius:0;}
+.gh-post > footer{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:12px 16px;}
+.gh-post > footer b{font-family:var(--font-display); font-size:15px;}
+.gh-post > footer div{display:flex; gap:6px;}
+.gh-post > footer button{display:inline-flex; align-items:center; gap:5px; background:none; border:1px solid var(--border); color:var(--text-dim); border-radius:999px; padding:6px 11px; cursor:pointer; font-size:13px;}
+.gh-post > footer button.on{color:#e11d48; border-color:#e11d48;}
+.gh-post.ev{min-height:340px; position:relative; border:none;}
+.gh-post.ev .gh-poster{border-radius:20px;}
+
+@media (max-width:700px){ .gh-reels{height:calc(100dvh - var(--topbar-h) - 150px); border-radius:0; margin:0 -16px;} .gh-screen{max-width:calc(100% - 56px);} }
+@media (prefers-reduced-motion:reduce){ .gh-reel.active .gh-screen.t-photo img,.gh-disc.spin,.gh-viz.on i{animation:none;} }

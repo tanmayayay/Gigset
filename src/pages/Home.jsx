@@ -8,7 +8,7 @@ import NewsPost from '../components/home/NewsPost';
 import NewsReader from '../components/news/NewsReader';
 import { topicOf } from '../components/news/NewsCover';
 import { fromLive, snapshotOf } from '../lib/news';
-import VaultRail from '../components/home/Vault';
+import NotesWheel from '../components/home/Notes';
 import {
   MeCard, NewsCard, OppsCard, PeopleCard, NearbyCard, TrendingCard, RailFooter, OppsStrip, PeopleStrip,
 } from '../components/home/HomeRail';
@@ -213,7 +213,7 @@ export default function Home() {
           </div>
         </div>
 
-        <VaultRail />
+        <NotesWheel />
 
         <div className="home-composer">
           <div className="home-composer-top">

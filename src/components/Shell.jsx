@@ -172,9 +172,6 @@ export default function Shell({ onOpenPalette, onNewPost, onNewOpp }) {
             </button>
           </div>
           <div className="topbar-actions">
-            <button className="icon-btn" onClick={toggleTheme} aria-label="Toggle dark mode" title="Toggle dark mode">
-              {theme === 'light' ? <Moon size={16} /> : <Sun size={16} />}
-            </button>
             <button className="icon-btn" onClick={onNewPost} aria-label="Create a post" title="Create a post">
               <Plus size={17} />
             </button>
@@ -221,6 +218,11 @@ export default function Shell({ onOpenPalette, onNewPost, onNewOpp }) {
                     </div>
                   </div>
                   <div style={{ padding: 8 }}>
+                    <button className="nav-item theme-row" style={{ width: '100%' }} onClick={toggleTheme} role="switch" aria-checked={theme === 'dark'}>
+                      {theme === 'light' ? <Moon size={17} strokeWidth={1.9} /> : <Sun size={17} strokeWidth={1.9} />}
+                      <span style={{ flex: 1, textAlign: 'left' }}>{theme === 'light' ? 'Dark mode' : 'Light mode'}</span>
+                      <span className={`switch${theme === 'dark' ? ' on' : ''}`} aria-hidden="true" />
+                    </button>
                     <button className="nav-item" style={{ width: '100%' }} onClick={() => { setProfileOpen(false); navigate(`/profile/${userId}`); }}>
                       <User size={17} strokeWidth={1.9} /> Edit profile
                     </button>

@@ -1,6 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './theme.css'
+import './future.css'
 import App from './App.jsx'
 import { warmUpApi, prefetchBoot } from './lib/api'
 import { captureRef } from './lib/ref'
