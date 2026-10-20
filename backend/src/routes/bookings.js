@@ -108,7 +108,7 @@ router.post(
       type: 'booking',
       title: 'New booking request',
       body: `${booking.requester.name} asked to book you for ${day}.`,
-      link: `/profile/${hostId}?tab=requests`,
+      link: '/collab?tab=bookings',
       from: req.user.id,
       email: { subject: `${booking.requester.name} wants to book you on ${day}`, cta: 'Review the request' },
     });
@@ -152,7 +152,7 @@ router.patch(
         type: 'booking',
         title: status === 'CONFIRMED' ? 'Booking confirmed' : 'Booking cancelled',
         body: `${who} ${status === 'CONFIRMED' ? 'confirmed' : 'cancelled'} the booking for ${updated.date.slice(0, 10)}.`,
-        link: `/profile/${req.user.id}?tab=requests`,
+        link: '/collab?tab=bookings',
         from: req.user.id,
         email: { subject: status === 'CONFIRMED' ? `${who} confirmed your booking` : `${who} cancelled the booking`, cta: 'Open booking' },
       });

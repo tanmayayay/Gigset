@@ -1,5 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useNavigate, useOutletContext } from 'react-router-dom';
+import { useNavigate, useOutletContext, useSearchParams } from 'react-router-dom';
+import BookingsPanel from '../components/collab/BookingsPanel';
+import BookPanel from '../components/collab/BookPanel';
+import { useBookings } from '../lib/useBookings';
 import { Plus, MapPin, Wallet, Users as UsersIcon, Check, Bookmark, Briefcase, Search as SearchIcon } from 'lucide-react';
 import { PageHead, Avatar, Tag, EmptyState, Verified } from '../components/ui';
 import { MatchScore, computeMatchScore } from '../components/widgets';
@@ -36,7 +39,13 @@ export default function Collab() {
   const { isBookmarked, toggleBookmark, pushToast, user, userId } = useStore();
   const { openOpp } = useOutletContext();
   const navigate = useNavigate();
-  const [tab, setTab] = useState('discover');
+  const [params, setParams] = useSearchParams();
+  const withId = params.get('with');
+  const [tab, setTab] = useState(params.get('tab') === 'bookings' ? 'bookings' : 'discover');
+  const tabParam = params.get('tab');
+  useEffect(() => { if (tabParam === 'bookings') setTab('bookings'); }, [tabParam]);
+  const bookings = useBookings(!!userId);
+  const closeWith = () => setParams((p) => { const n = new URLSearchParams(p); n.delete('with'); return n; }, { replace: true });
   const [cityF, setCityF] = useState('all');
   const [genreF, setGenreF] = useState('all');
   const [radiusF, setRadiusF] = useState('any'); // 'any' | '25' | '50' | '100' | '250'
@@ -198,16 +207,20 @@ export default function Collab() {
     <div>
       <PageHead
         title="Collab"
-        sub="Find or post opportunities — gigs, session work, and crew requirements. Sorted by your AI match."
+        sub="Find or post opportunities, collaborate and book people. Gigs, session work and crew requirements, sorted by your AI match."
         action={<button className="btn btn-blue btn-sm" onClick={openOpp}><Plus size={14} /> Post an opportunity</button>}
       />
       <div className="two-col">
         <div>
           <div className="filter-row">
-            {[['discover', 'Discover'], ['mine', 'My gigs']].map(([v, l]) => (
-              <button key={v} className={`filter-chip${tab === v ? ' active' : ''}`} onClick={() => { setTab(v); setExpandedOppId(null); }}>{l}</button>
+            {[['discover', 'Discover'], ['mine', 'My gigs'], ['bookings', 'Bookings']].map(([v, l]) => (
+              <button key={v} className={`filter-chip${tab === v ? ' active' : ''}`} onClick={() => { setTab(v); setExpandedOppId(null); }}>
+                {l}{v === 'bookings' && bookings.pending > 0 && <span className="dot" style={{ marginLeft: 6 }}>{bookings.pending}</span>}
+              </button>
             ))}
           </div>
+          {withId && <BookPanel id={withId} onClose={closeWith} />}
+          {tab === 'bookings' ? <BookingsPanel data={bookings} /> : (<>
           <div className="filter-row">
             <select className="filter-select" value={genreF} onChange={(e) => setGenreF(e.target.value)}>
               <option value="all">All genres</option>{genreOptions.map((g) => <option key={g} value={g}>{g}</option>)}
@@ -232,7 +245,7 @@ export default function Collab() {
               <SearchIcon size={14} style={{ position: 'absolute', left: 10, opacity: 0.5, pointerEvents: 'none' }} />
               <input
                 className="filter-select"
-                placeholder="Search gigs\u2026"
+                placeholder="Search gigs…"
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
                 style={{ paddingLeft: 30, minWidth: 150 }}
@@ -313,7 +326,7 @@ export default function Collab() {
                 {tab === 'mine' && expandedOppId === o.id && (
                   <div style={{ marginTop: 12, borderTop: '1px solid var(--border)', paddingTop: 12 }}>
                     {appsLoadingId === o.id ? (
-                      <p style={{ fontSize: 12.5, color: 'var(--text-faint)' }}>Loading applications\u2026</p>
+                      <p style={{ fontSize: 12.5, color: 'var(--text-faint)' }}>Loading applications…</p>
                     ) : apps.length === 0 ? (
                       <p style={{ fontSize: 12.5, color: 'var(--text-faint)' }}>No applications yet.</p>
                     ) : (
@@ -348,6 +361,7 @@ export default function Collab() {
               </div>
             );
           })}
+          </>)}
         </div>
 
         <div>

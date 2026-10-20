@@ -6,7 +6,7 @@ import { isBlockedBetween } from './blocks.js';
 
 /**
  * notify(userId, { type, title, body, link, from, email: { subject, intro, cta } })
- * `link` is an in-app route like "/profile/abc?tab=requests".
+ * `link` is an in-app route like "/collab?tab=bookings".
  * `from` (user id) lets us skip people who blocked each other.
  */
 export async function notify(userId, { type, title, body, link, from, email }) {

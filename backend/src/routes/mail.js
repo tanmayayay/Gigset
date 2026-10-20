@@ -66,7 +66,7 @@ router.post('/digest', asyncHandler(async (req, res) => {
           intro: `Here's what happened on your Strings profile.${gigs}`,
           rows,
           cta: pending ? 'Review requests' : 'Open Strings',
-          ctaUrl: appUrl(pending ? `/profile/${u.id}?tab=requests` : '/home'),
+          ctaUrl: appUrl(pending ? '/collab?tab=bookings' : '/home'),
           unsubscribe: unsubUrl(u.id, 'digest'),
         }),
       });

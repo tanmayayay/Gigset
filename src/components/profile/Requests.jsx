@@ -64,7 +64,7 @@ export default function Requests({ received, sent, onStatus, loading, onShare })
       <div className="pf-reqgroup">
         <h4>Requests you sent</h4>
         {sent.length === 0 ? (
-          <p style={{ fontSize: 13.5, color: 'var(--text-faint)', margin: 0 }}>Open someone&apos;s profile, pick a free day on their calendar and send a request.</p>
+          <p style={{ fontSize: 13.5, color: 'var(--text-faint)', margin: 0 }}>Open someone&apos;s profile and tap Collab / Book to pick a free day and send a request.</p>
         ) : sent.map((b) => <Row key={b.id} b={b} who={b.host?.name || 'Unknown'} onStatus={onStatus} />)}
       </div>
 

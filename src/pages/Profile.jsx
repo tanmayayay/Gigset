@@ -1,22 +1,19 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
+import { useParams, useNavigate, useSearchParams, Navigate } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import {
-  CalendarCheck, MessageCircle, UserPlus, UserCheck, Pencil, UserX, MapPin, Camera, Inbox, Image as ImageIcon, Check, Share2, Star,
+  Handshake, MessageCircle, UserPlus, UserCheck, Pencil, UserX, MapPin, Camera, Image as ImageIcon, Check, Share2, Star,
 } from 'lucide-react';
 import { Avatar, Verified, EmptyState } from '../components/ui';
-import BookingModal from '../components/BookingModal';
 import PostCard from '../components/PostCard';
-import Availability from '../components/profile/Availability';
 import RoleDetails from '../components/profile/RoleDetails';
 import EditProfile from '../components/profile/EditProfile';
 import Insights from '../components/profile/Insights';
-import Requests from '../components/profile/Requests';
 import ShareModal from '../components/ShareModal';
 import SafetyMenu from '../components/SafetyMenu';
 import ReviewsTab, { Stars } from '../components/profile/Reviews';
 import Samples from '../components/profile/Samples';
-import { Profiles, Posts, Bookings, Convos, Reviews, Safety } from '../lib/api';
+import { Profiles, Posts, Convos, Reviews, Safety } from '../lib/api';
 import { useStore } from '../store/store';
 import { uploadAvatar } from '../lib/uploadImage';
 import { metaFor, glanceFacts, headlineOf, completeness } from '../lib/profileSchema';
@@ -58,11 +55,7 @@ export default function Profile() {
   const [feedPosts, setFeedPosts] = useState([]);
   const [following, setFollowing] = useState(false);
   const [editing, setEditing] = useState(false);
-  const [bookingDay, setBookingDay] = useState(null);
   const [uploading, setUploading] = useState(false);
-  const [received, setReceived] = useState([]);
-  const [sent, setSent] = useState([]);
-  const [reqLoading, setReqLoading] = useState(false);
   const [shareCard, setShareCard] = useState(null);
   const [rv, setRv] = useState(null);
   const [iBlocked, setIBlocked] = useState(false);
@@ -121,22 +114,6 @@ export default function Profile() {
     return () => { alive = false; };
   }, [id, userId, isSelf]);
 
-  const loadRequests = async () => {
-    setReqLoading(true);
-    try {
-      const [h, r] = await Promise.all([Bookings.list({ role: 'host', take: 50 }), Bookings.list({ role: 'requester', take: 50 })]);
-      setReceived(h.items || []);
-      setSent(r.items || []);
-    } catch (e) {
-      pushToast(e.message, 'error');
-    } finally {
-      setReqLoading(false);
-    }
-  };
-  useEffect(() => { if (isSelf) loadRequests(); }, [isSelf]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const pending = useMemo(() => received.filter((b) => b.status === 'PENDING').length, [received]);
-
   const toggleFollow = async () => {
     try {
       if (following) { await Profiles.unfollow(id); setFollowing(false); pushToast(`Unfollowed ${person.name}.`); }
@@ -153,19 +130,6 @@ export default function Profile() {
     kind: 'profile', person, facts: facts.map((f) => f.value), headline,
     founding: !!person.foundingMember, rating: rv?.count ? rv.average : null,
   });
-  const shareBooking = (b) => {
-    const when = new Date(`${String(b.date).slice(0, 10)}T00:00:00`).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
-    setShareCard({ kind: 'booked', person, founding: !!person.foundingMember, booked: { date: when, withName: b.requester?.name } });
-  };
-
-  const onStatus = async (booking, status) => {
-    try {
-      await Bookings.setStatus(booking.id, status);
-      pushToast(status === 'CONFIRMED' ? 'Booking confirmed — the day is now blocked on your calendar.' : 'Request updated.');
-      loadRequests();
-    } catch (e) { pushToast(e.message, 'error'); }
-  };
-
   const quickPhoto = async (file) => {
     if (!file) return;
     setUploading(true);
@@ -179,7 +143,9 @@ export default function Profile() {
     finally { setUploading(false); }
   };
 
-  const gotoAvailability = () => document.getElementById('pf-availability')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+  // Old links (emails, notifications) used to open the Requests tab here; bookings now live in Collab.
+  if (tab === 'requests') return <Navigate to="/collab?tab=bookings" replace />;
 
   if (loading) {
     return <div className="pf"><div className="pf-head"><div className="shimmer-strip" style={{ height: 170, borderRadius: 14 }} /></div></div>;
@@ -207,7 +173,7 @@ export default function Profile() {
     { id: 'posts', label: 'Posts' },
     { id: 'media', label: 'Media' },
     { id: 'reviews', label: 'Reviews', badge: 0, count: rv?.count || 0 },
-    ...(isSelf ? [{ id: 'insights', label: 'Insights' }, { id: 'requests', label: 'Requests', badge: pending }] : []),
+    ...(isSelf ? [{ id: 'insights', label: 'Insights' }] : []),
   ];
 
   return (
@@ -249,17 +215,13 @@ export default function Profile() {
         <div className="pf-actions">
           {isSelf ? (
             <>
-              <button className={`btn pf-req btn-sm${pending > 0 ? ' has' : ''}`} style={{ padding: '9px 16px' }} onClick={() => setTab('requests')} aria-label={`Requests, ${pending} waiting`}>
-                <Inbox size={15} /> Requests
-                {pending > 0 && <span className="pf-req-n">{pending}</span>}
-              </button>
               <button className="btn btn-ghost btn-sm" onClick={() => setEditing(true)}><Pencil size={14} /> Edit profile</button>
               <button className="btn btn-ghost btn-sm" onClick={openShare}><Share2 size={14} /> Share</button>
             </>
           ) : (
             <>
-              {meta.bookable && <button className="btn btn-blue btn-sm" onClick={gotoAvailability}><CalendarCheck size={14} /> Check availability</button>}
-              <button className={`btn btn-sm ${following ? 'btn-ghost' : meta.bookable ? 'btn-ghost' : 'btn-blue'}`} onClick={toggleFollow}>
+              <button className="btn btn-blue btn-sm" onClick={() => navigate(`/collab?with=${person.id}`)}><Handshake size={14} /> Collab / Book</button>
+              <button className="btn btn-sm btn-ghost" onClick={toggleFollow}>
                 {following ? <><UserCheck size={14} /> Following</> : <><UserPlus size={14} /> Follow</>}
               </button>
               <button className="btn btn-ghost btn-sm" onClick={openChat}><MessageCircle size={14} /> Message</button>
@@ -295,9 +257,6 @@ export default function Profile() {
                     {isSelf ? <>Tell people who you are. <button className="btn btn-ghost btn-xs" onClick={() => setEditing(true)}>Write your bio</button></> : `${first} hasn't written a bio yet.`}
                   </p>}
               </div>
-              {meta.bookable && (
-                <Availability person={person} isSelf={isSelf} tint={meta.tint} onPick={userId ? (d) => setBookingDay(d) : () => pushToast('Sign in to request a booking.', 'error')} />
-              )}
               <Samples data={person.detail?.data} />
               <RoleDetails person={person} onEdit={isSelf ? () => setEditing(true) : undefined} />
             </>
@@ -322,7 +281,6 @@ export default function Profile() {
 
           {tab === 'reviews' && <ReviewsTab personId={id} isSelf={isSelf} data={rv} onChanged={loadReviews} />}
           {tab === 'insights' && isSelf && <Insights />}
-          {tab === 'requests' && isSelf && <Requests received={received} sent={sent} loading={reqLoading} onStatus={onStatus} onShare={shareBooking} />}
         </div>
 
         <aside style={{ minWidth: 0 }}>
@@ -342,8 +300,7 @@ export default function Profile() {
 
       <AnimatePresence>
         {editing && <EditProfile person={person} onClose={() => setEditing(false)} onSaved={async () => { await load(); await refreshProfile(); setEditing(false); }} />}
-        {shareCard && <ShareModal card={shareCard} title={shareCard.kind === 'booked' ? 'Share your booking' : isSelf ? 'Share your profile' : `Share ${first}`} onClose={() => setShareCard(null)} />}
-        {bookingDay && <BookingModal person={person} day={bookingDay} onClose={() => { setBookingDay(null); }} />}
+        {shareCard && <ShareModal card={shareCard} title={isSelf ? 'Share your profile' : `Share ${first}`} onClose={() => setShareCard(null)} />}
       </AnimatePresence>
     </div>
   );
