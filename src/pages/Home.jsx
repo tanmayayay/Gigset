@@ -285,11 +285,11 @@ export default function Home() {
 
       <aside className="home-rail" aria-label="Highlights">
         <MeCard user={user} postCount={myCounts?.posts} followingCount={myCounts?.following ?? following.size} />
-        <OppsCard opps={opps} user={user} />
         <NewsCard items={news} />
-        <PeopleCard people={people} following={following} onFollow={onFollow} />
         <TrendingCard posts={posts} onPick={(t) => { setTag(t); setTab('foryou'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} />
         <NearbyCard events={events} venues={venues} city={user?.city} />
+        <OppsCard opps={opps} user={user} />
+        <PeopleCard people={people} following={following} onFollow={onFollow} />
         <RailFooter />
       </aside>
       {reading && (

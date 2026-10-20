@@ -35,50 +35,31 @@ function fmtBudget(o) {
 export function MeCard({ user, followingCount, postCount }) {
   const navigate = useNavigate();
   const { pct, next } = profileCompleteness(user);
-  const R = 22;
-  const C = 2 * Math.PI * R;
   return (
     <div className="rail-card me-card">
-      <div className="me-cover" />
-      <div className="me-body">
-        <button className="me-avatar" onClick={() => navigate(`/profile/${user?.id}`)} aria-label="Open your profile">
-          <Avatar name={user?.name || 'You'} src={user?.avatarUrl} size={64} />
-        </button>
-        <b className="me-name">{user?.name}{user?.verificationStatus === 'VERIFIED' && <Verified size={14} />}</b>
-        <span className="me-sub">{typeLabel(user?.stakeholderType)}{user?.city ? ` · ${user.city}` : ''}</span>
-        <div className="me-stats">
-          <div><b>{postCount ?? '—'}</b><span>Posts</span></div>
-          <div><b>{followingCount ?? '—'}</b><span>Following</span></div>
-        </div>
-        <div className="me-progress">
-          <svg width="56" height="56" viewBox="0 0 56 56" aria-hidden="true">
-            <circle cx="28" cy="28" r={R} fill="none" stroke="var(--border)" strokeWidth="5" />
-            <circle
-              cx="28" cy="28" r={R} fill="none" stroke="url(#meGrad)" strokeWidth="5" strokeLinecap="round"
-              strokeDasharray={C} strokeDashoffset={C * (1 - pct / 100)} transform="rotate(-90 28 28)"
-            />
-            <defs>
-              <linearGradient id="meGrad" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stopColor="#2A63EE" /><stop offset="100%" stopColor="#0EA5E9" />
-              </linearGradient>
-            </defs>
-            <text x="28" y="32" textAnchor="middle" fontSize="12" fontWeight="700" fill="var(--text)">{pct}%</text>
-          </svg>
-          <div>
-            <b>{pct === 100 ? 'Gig-ready profile' : 'Get gig-ready'}</b>
-            {next ? (
-              <Link to={next.to}>Next: {next.label} <ChevronRight size={12} /></Link>
-            ) : (
-              <span>Bookers see you first.</span>
-            )}
-          </div>
-        </div>
+      <button className="me-row" onClick={() => navigate(`/profile/${user?.id}`)} aria-label="Open your profile">
+        <Avatar name={user?.name || 'You'} src={user?.avatarUrl} size={44} />
+        <span className="me-id">
+          <b className="me-name">{user?.name}{user?.verificationStatus === 'VERIFIED' && <Verified size={13} />}</b>
+          <span className="me-sub">{typeLabel(user?.stakeholderType)}{user?.city ? ` · ${user.city}` : ''}</span>
+        </span>
+        <ChevronRight size={16} className="me-go" />
+      </button>
+      <div className="me-meta">
+        <span><b>{postCount ?? '—'}</b> posts</span>
+        <i aria-hidden="true" />
+        <span><b>{followingCount ?? '—'}</b> following</span>
+      </div>
+      <div className="me-bar" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100} aria-label="Profile completeness">
+        <span style={{ width: `${pct}%` }} />
+      </div>
+      <div className="me-hint">
+        {next ? <Link to={next.to}>{pct}% · Next: {next.label} <ChevronRight size={11} /></Link> : <span>{pct === 100 ? 'Gig-ready profile' : `${pct}% complete`}</span>}
       </div>
     </div>
   );
 }
 
-/* ---------- 2. Today's headlines → swipe deck ---------- */
 export function NewsCard({ items }) {
   const navigate = useNavigate();
   if (!items?.length) return null;

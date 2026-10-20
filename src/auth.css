@@ -358,3 +358,9 @@
   .onb-type-grid{gap:10px;}
   .onb-type-card{padding:14px 12px;}
 }
+
+.onb-photo{display:flex; align-items:center; gap:14px; margin-bottom:16px;}
+.onb-photo small{display:block; margin-top:6px; color:var(--text-faint); font-size:12px;}
+.onb-sections{display:flex; flex-direction:column; gap:22px; margin-top:18px;}
+.onb-sections .pf-sec{border:none; padding:0; background:none;}
+.onb-fields textarea{width:100%; resize:vertical; font-family:inherit;}

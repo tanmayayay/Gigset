@@ -1,14 +1,18 @@
 import '../auth.css';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { birthError } from '../lib/age';
 import { useNavigate, Link, Navigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  ArrowLeft, ArrowRight, Check, Quote,
+  ArrowLeft, ArrowRight, Quote, Camera,
   Mic, Landmark, Briefcase, SlidersHorizontal, GraduationCap,
 } from 'lucide-react';
 import { Logo } from '../components/ui';
-import { ONBOARD_TYPES, INTEREST_TAGS, CITIES } from '../data/demo';
+import { ONBOARD_TYPES, CITIES } from '../data/demo';
+import { Field, withHttps } from '../components/profile/FieldInputs';
+import { sectionsFor, metaFor } from '../lib/profileSchema';
+import { uploadAvatar } from '../lib/uploadImage';
+import { Avatar } from '../components/ui';
 import { useStore } from '../store/store';
 import { Profiles } from '../lib/api';
 
@@ -30,12 +34,14 @@ const TYPE_ICONS = {
   Institution: GraduationCap,
 };
 
-const TITLES = ['Choose your stakeholder type', 'Build your profile', 'What are you here for?'];
+const TITLES = ['Choose your stakeholder type', 'Tell us about you', 'Your details', 'Almost there'];
+const STEPS = TITLES.length;
 
 const SUBS = [
-  'Every Strings profile starts here — this decides which fields and filters apply to you.',
-  'Tell us who you are — this is how bookers and collaborators will see you.',
-  'Pick a few interest tags — these shape your Home and Gighub feeds.',
+  'Every Strings profile starts here. This decides which fields and filters apply to you.',
+  'This is how bookers and collaborators will see you. You can change it anytime.',
+  'Everything here is optional, but the more you add the better your matches. It is the same form as Edit profile.',
+  'Choose who can see your profile, then you are in.',
 ];
 
 const TESTIMONIALS = [
@@ -61,7 +67,7 @@ const STATS = [
 
 const NEXT_STEPS = [
   { title: 'Verify your profile', desc: 'A quick check that builds trust with bookers and collaborators.' },
-  { title: 'Get AI-matched gigs', desc: 'Your type and interest tags are matched to the right opportunities automatically.' },
+  { title: 'Get AI-matched gigs', desc: 'Your role, genres and details are matched to the right opportunities automatically.' },
   { title: 'Get booked & paid', desc: 'Accept gigs, do great work, and get paid through Strings.' },
 ];
 
@@ -88,9 +94,14 @@ export default function Onboarding() {
   const [type, setType] = useState('Performer');
   const [name, setName] = useState('');
   const [city, setCity] = useState('Mumbai');
-  const [role, setRole] = useState('');
+  const [headline, setHeadline] = useState('');
+  const [bio, setBio] = useState('');
+  const [avatarUrl, setAvatarUrl] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const [visibility, setVisibility] = useState('PUBLIC');
+  const [data, setData] = useState({});
+  const fileRef = useRef(null);
   const [birth, setBirth] = useState('');
-  const [tags, setTags] = useState([]);
   const [busy, setBusy] = useState(false);
   const [quoteIdx, setQuoteIdx] = useState(0);
 
@@ -106,24 +117,47 @@ export default function Onboarding() {
     setStep(n);
   };
 
-  const toggleTag = (t) =>
-    setTags((s) => (s.includes(t) ? s.filter((x) => x !== t) : [...s, t]));
+  const roleEnum = TYPE_MAP[type] ?? 'PERFORMER';
+  const meta = metaFor(roleEnum);
+  const setField = (key) => (v) => setData((d) => ({ ...d, [key]: v }));
+
+  const pickPhoto = async (file) => {
+    if (!file) return;
+    setUploading(true);
+    try { setAvatarUrl(await uploadAvatar(file, userId)); }
+    catch (e) { pushToast(e.message || 'Photo upload failed.', 'error'); }
+    finally { setUploading(false); }
+  };
+
+  const next = () => {
+    if (step === 2) {
+      if (!name.trim()) { pushToast('Please add your name.', 'error'); return; }
+      if (!birth) { pushToast('Please add your date of birth.', 'error'); return; }
+      if (birthError(birth)) { pushToast(birthError(birth), 'error'); return; }
+    }
+    go(step + 1);
+  };
 
   const finish = async () => {
     if (!userId || busy) return;
-    if (!birth || birthError(birth)) { setStep(2); pushToast(birthError(birth) || 'Please add your birth date to continue.', 'error'); return; }
+    if (!name.trim() || !birth || birthError(birth)) { setStep(2); pushToast(birthError(birth) || 'Please add your name and date of birth.', 'error'); return; }
     setBusy(true);
     try {
+      const detail = { ...data };
+      if (headline.trim()) detail.headline = headline.trim();
+      for (const sec of sectionsFor(roleEnum)) for (const f of sec.fields) if (f.type === 'url') detail[f.key] = withHttps(detail[f.key]);
       await Profiles.update(userId, {
-        name: name.trim() || 'Strings user',
-        stakeholderType: TYPE_MAP[type] ?? 'PERFORMER',
-        city,
-        bio: role.trim() ? `${role.trim()} · ${city}` : null,
-        detail: { role: role.trim() || type, interests: tags },
+        name: name.trim(),
+        stakeholderType: roleEnum,
+        city: city.trim() || null,
+        bio: bio.trim() || null,
+        visibility,
+        avatarUrl,
+        detail,
         birthDate: birth,
       });
       await refreshProfile();
-      pushToast('Welcome to Strings — your profile is live.');
+      pushToast('Welcome to Strings. Your profile is live.');
       navigate('/home');
     } catch (e) {
       pushToast(e.message || 'Could not save your profile.', 'error');
@@ -207,11 +241,11 @@ export default function Onboarding() {
             <Link to="/" className="onb-logo-link" style={{ display: 'inline-flex' }} aria-label="Back to landing">
               <Logo size={26} />
             </Link>
-            <span className="onb-step-label">Step {step} of 3</span>
+            <span className="onb-step-label">Step {step} of {STEPS}</span>
           </div>
 
           <div className="onb-progress" aria-hidden="true">
-            {[0, 1, 2].map((i) => (
+            {Array.from({ length: STEPS }, (_, i) => i).map((i) => (
               <div className="onb-seg" key={i}>
                 <motion.div
                   className="onb-seg-fill"
@@ -268,84 +302,69 @@ export default function Onboarding() {
 
                 {step === 2 && (
                   <div className="onb-fields">
+                    <div className="onb-photo">
+                      <Avatar name={name || 'You'} src={avatarUrl} size={72} />
+                      <div>
+                        <input ref={fileRef} type="file" accept="image/*" hidden onChange={(e) => { pickPhoto(e.target.files?.[0]); e.target.value = ''; }} />
+                        <button type="button" className="btn btn-ghost btn-sm" onClick={() => fileRef.current?.click()} disabled={uploading}>
+                          <Camera size={14} /> {uploading ? 'Uploading…' : avatarUrl ? 'Change photo' : 'Add photo'}
+                        </button>
+                        <small>Square photos look best.</small>
+                      </div>
+                    </div>
                     <div className="field">
-                      <label htmlFor="onb-name">Your name</label>
-                      <input
-                        id="onb-name"
-                        type="text"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        placeholder="e.g. Meera Iyer"
-                        autoComplete="name"
-                      />
+                      <label htmlFor="onb-name">{type === 'Performer' ? 'Artist / stage name' : type === 'Venue' ? 'Venue name' : type === 'Institution' ? 'Institution name' : 'Your name'}</label>
+                      <input id="onb-name" type="text" value={name} maxLength={80} onChange={(e) => setName(e.target.value)} placeholder="e.g. Meera Iyer" autoComplete="name" />
                     </div>
                     <div className="onb-field-row">
                       <div className="field">
-                        <label htmlFor="onb-city">City</label>
-                        <div className="select-wrap">
-                          <select
-                            id="onb-city"
-                            value={city}
-                            onChange={(e) => setCity(e.target.value)}
-                          >
-                            {CITIES.map((c) => (
-                              <option key={c} value={c}>{c}</option>
-                            ))}
-                          </select>
-                        </div>
+                        <label htmlFor="onb-birth">Date of birth</label>
+                        <input id="onb-birth" type="date" value={birth} max={new Date().toISOString().slice(0, 10)} onChange={(e) => setBirth(e.target.value)} autoComplete="bday" />
                       </div>
                       <div className="field">
-                        <label htmlFor="onb-role">What do you do?</label>
-                        <input
-                          id="onb-role"
-                          type="text"
-                          value={role}
-                          onChange={(e) => setRole(e.target.value)}
-                          placeholder="e.g. Vocalist"
-                        />
+                        <label htmlFor="onb-city">City</label>
+                        <input id="onb-city" type="text" list="onb-cities" value={city} maxLength={80} onChange={(e) => setCity(e.target.value)} placeholder="e.g. Mumbai" />
+                        <datalist id="onb-cities">{CITIES.map((c) => <option key={c} value={c} />)}</datalist>
                       </div>
                     </div>
+                    <small style={{ display: 'block', margin: '-6px 0 12px', color: birthError(birth) ? 'var(--danger, #ff6b6b)' : 'var(--text-faint)' }}>
+                      {birthError(birth) || 'Your birth date is never shown to anyone. We use it to keep what you see suited to your age.'}
+                    </small>
                     <div className="field">
-                      <label htmlFor="onb-birth">Date of birth</label>
-                      <input
-                        id="onb-birth"
-                        type="date"
-                        value={birth}
-                        max={new Date().toISOString().slice(0, 10)}
-                        onChange={(e) => setBirth(e.target.value)}
-                        autoComplete="bday"
-                      />
-                      <small style={{ color: birthError(birth) ? 'var(--danger, #ff6b6b)' : 'var(--text-faint)' }}>
-                        {birthError(birth) || 'Never shown on your profile. We use it to keep what you see suited to your age.'}
-                      </small>
+                      <label htmlFor="onb-headline">Headline</label>
+                      <input id="onb-headline" type="text" value={headline} maxLength={100} onChange={(e) => setHeadline(e.target.value)} placeholder={meta.headlineHint} />
                     </div>
-                    <p className="field-hint">
-                      This is how bookers and collaborators will see you. You can edit it anytime from your profile.
-                    </p>
+                    <div className="field">
+                      <label htmlFor="onb-bio">About</label>
+                      <textarea id="onb-bio" value={bio} maxLength={1000} rows={4} onChange={(e) => setBio(e.target.value)} placeholder={meta.bioHint} />
+                    </div>
                   </div>
                 )}
 
                 {step === 3 && (
+                  <div className="onb-sections" style={{ '--pf-tint': meta.tint }}>
+                    {sectionsFor(roleEnum).map((sec) => (
+                      <section className="pf-sec" key={`${roleEnum}-${sec.title}`}>
+                        <h4>{sec.title}</h4>
+                        <div className="pf-sec-grid">
+                          {sec.fields.map((f) => <Field key={f.key} f={f} value={data[f.key]} onChange={setField(f.key)} />)}
+                        </div>
+                      </section>
+                    ))}
+                  </div>
+                )}
+
+                {step === 4 && (
                   <>
-                    <div className="onb-chips" role="group" aria-label="Interest tags">
-                      {INTEREST_TAGS.map((t) => {
-                        const active = tags.includes(t);
-                        return (
-                          <motion.button
-                            key={t}
-                            type="button"
-                            layout
-                            whileTap={{ scale: 0.93 }}
-                            transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                            className={`onb-chip${active ? ' on' : ''}`}
-                            aria-pressed={active}
-                            onClick={() => toggleTag(t)}
-                          >
-                            {active && <Check size={14} strokeWidth={3} />}
-                            {t}
-                          </motion.button>
-                        );
-                      })}
+                    <div className="field">
+                      <label htmlFor="onb-vis">Who can see my profile</label>
+                      <div className="select-wrap">
+                        <select id="onb-vis" value={visibility} onChange={(e) => setVisibility(e.target.value)}>
+                          <option value="PUBLIC">Everyone on Strings (and search)</option>
+                          <option value="CONNECTIONS">Only people I connect with</option>
+                          <option value="PRIVATE">Only me</option>
+                        </select>
+                      </div>
                     </div>
                     <div className="onb-next">
                       <h3>What happens next</h3>
@@ -374,8 +393,8 @@ export default function Onboarding() {
             >
               <ArrowLeft size={14} /> Back
             </button>
-            {step < 3 ? (
-              <button type="button" className="btn btn-blue btn-sm" onClick={() => go(step + 1)}>
+            {step < STEPS ? (
+              <button type="button" className="btn btn-blue btn-sm" onClick={next}>
                 Continue <ArrowRight size={14} />
               </button>
             ) : (
