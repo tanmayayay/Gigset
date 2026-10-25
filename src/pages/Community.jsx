@@ -1,463 +1,255 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { ArrowLeft, Plus, Send, MessageCircle } from 'lucide-react';
-import { PageHead, Avatar, Tag, EmptyState, Modal, Verified } from '../components/ui';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Search, Plus, Flame, Sparkles, TrendingUp, Compass, Home as HomeIcon, Users, ArrowLeft, ShieldCheck, Pencil, Check, MessageSquarePlus } from 'lucide-react';
+import { Avatar, Verified, EmptyState } from '../components/ui';
 import { useStore } from '../store/store';
-import { Groups, Posts } from '../lib/api';
-import PostCard from '../components/PostCard';
+import { Communities } from '../lib/api';
+import Thread from '../components/community/Thread';
+import { PostComposer, NewCommunityModal } from '../components/community/Composers';
+import { CommIcon, PostItem, ReportModal, compactNum } from '../components/community/Bits';
+import { CATEGORIES, grad } from '../components/community/meta';
+import '../components/community/community.css';
 
-const POLL_MS = 5000;
+const SORTS = [['hot', 'Hot', Flame], ['new', 'New', Sparkles], ['top', 'Top', TrendingUp]];
 
-const ROLE_TAG = { ADMIN: 'amber', COADMIN: 'blue', MEMBER: 'gray' };
-const ROLE_LABEL = { ADMIN: 'Admin', COADMIN: 'Co-admin', MEMBER: 'Member' };
-
-function RoleTag({ role }) {
-  return <Tag color={ROLE_TAG[role] || 'gray'}>{ROLE_LABEL[role] || role}</Tag>;
-}
-
-function GroupSkeleton() {
+function SortBar({ sort, setSort, id }) {
   return (
-    <>
-      {[0, 1, 2].map((i) => (
-        <div className="skel-card" key={i}>
-          <div className="skel-line shimmer-strip" style={{ width: '45%' }} />
-          <div className="skel-line shimmer-strip" style={{ width: '80%' }} />
-          <div className="skel-line shimmer-strip" style={{ width: '30%' }} />
-        </div>
+    <div className="cm-sorts" role="tablist">
+      {SORTS.map(([k, label, Icon]) => (
+        <button key={k} role="tab" aria-selected={sort === k} className={sort === k ? 'on' : ''} onClick={() => setSort(k)}>
+          {sort === k && <motion.i layoutId={`sort-${id}`} className="cm-sort-bg" transition={{ type: 'spring', stiffness: 400, damping: 32 }} />}
+          <Icon size={14} /> <span>{label}</span>
+        </button>
       ))}
-    </>
-  );
-}
-
-/* ============================ LIST VIEW ============================ */
-
-function GroupCard({ group, onOpen }) {
-  const { pushToast } = useStore();
-  const [joining, setJoining] = useState(false);
-
-  const join = async (e) => {
-    e.stopPropagation();
-    setJoining(true);
-    try {
-      await Groups.join(group.id);
-      pushToast(`Joined "${group.name}" — say hello.`);
-      onOpen(group.id);
-    } catch (err) {
-      pushToast(err.message, 'error');
-    } finally {
-      setJoining(false);
-    }
-  };
-
-  return (
-    <div className="community-card" onClick={() => onOpen(group.id)} style={{ cursor: 'pointer' }}>
-      <div className="community-icon" style={{ background: 'var(--blue-dim)' }}>
-        <MessageCircle size={20} />
-      </div>
-      <h4>{group.name}</h4>
-      {group.desc && <p className="desc">{group.desc}</p>}
-      <div className="meta-row">
-        <span style={{ fontSize: 12, color: 'var(--text-faint)' }}>
-          {(group._count?.members ?? 0).toLocaleString()} members · {(group._count?.messages ?? 0).toLocaleString()} messages
-        </span>
-        {group.myRole ? (
-          <RoleTag role={group.myRole} />
-        ) : (
-          <button className="btn btn-blue btn-sm" disabled={joining} onClick={join}>
-            {joining ? 'Joining…' : 'Join'}
-          </button>
-        )}
-      </div>
     </div>
   );
 }
 
-function NewGroupModal({ onClose, onCreated }) {
-  const { pushToast } = useStore();
-  const [name, setName] = useState('');
-  const [desc, setDesc] = useState('');
-  const [saving, setSaving] = useState(false);
-
-  const create = async () => {
-    if (!name.trim()) {
-      pushToast('Give your group a name.', 'error');
-      return;
-    }
-    setSaving(true);
-    try {
-      const g = await Groups.create({ name: name.trim(), desc: desc.trim() || undefined });
-      pushToast(`"${g.name}" is live — say hello.`);
-      onCreated(g.id);
-    } catch (e) {
-      pushToast(e.message, 'error');
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  return (
-    <Modal title="New group" onClose={onClose}>
-      <label>Group name</label>
-      <input
-        type="text"
-        placeholder="e.g. Mumbai drummers"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        maxLength={80}
-        onKeyDown={(e) => e.key === 'Enter' && create()}
-      />
-      <label>What is this group about? (optional)</label>
-      <textarea
-        rows={3}
-        placeholder="Who should join, what you'll talk about…"
-        value={desc}
-        onChange={(e) => setDesc(e.target.value)}
-      />
-      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 18 }}>
-        <button className="btn btn-ghost btn-sm" onClick={onClose}>Cancel</button>
-        <button className="btn btn-blue btn-sm" disabled={saving} onClick={create}>
-          {saving ? 'Creating…' : 'Create group'}
-        </button>
-      </div>
-    </Modal>
-  );
+function PostSkeleton() {
+  return [0, 1, 2].map((i) => <div className="cm-post skel" key={i}><div className="shimmer-strip" style={{ height: 14, width: '40%' }} /><div className="shimmer-strip" style={{ height: 20, width: '85%', marginTop: 12 }} /><div className="shimmer-strip" style={{ height: 14, width: '65%', marginTop: 10 }} /></div>);
 }
 
-function LatestDiscussions() {
-  const { pushToast } = useStore();
-  const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  const load = useCallback(async () => {
-    try {
-      const res = await Posts.list({ take: 10 });
-      setPosts(res.items || []);
-    } catch (e) {
-      pushToast(e.message || 'Could not load discussions.', 'error');
-    } finally {
-      setLoading(false);
-    }
-  }, [pushToast]);
-
-  useEffect(() => {
-    load();
-    window.addEventListener('gigset:post-created', load);
-    return () => window.removeEventListener('gigset:post-created', load);
-  }, [load]);
-
+function CommunityTile({ c, onOpen, onJoin }) {
+  const joined = !!c.myRole;
   return (
-    <div style={{ marginTop: 34 }}>
-      <h3 style={{ fontSize: 17, marginBottom: 12 }}>Latest discussions</h3>
-      {loading ? (
-        <GroupSkeleton />
-      ) : posts.length === 0 ? (
-        <EmptyState
-          icon={<MessageCircle size={22} />}
-          title="No discussions yet"
-          text="Start the conversation — share an update from Home."
-        />
-      ) : (
-        posts.map((p) => <PostCard key={p.id} post={p} />)
-      )}
-    </div>
-  );
-}
-
-/* ============================ CHAT VIEW ============================ */
-
-function MembersPanel({ detail, groupId, onClose, onChanged, onLeft }) {
-  const { userId, pushToast } = useStore();
-  const myRole = detail.myRole;
-
-  const act = async (fn, confirmMsg) => {
-    if (confirmMsg && !window.confirm(confirmMsg)) return;
-    try {
-      await fn();
-      await onChanged();
-    } catch (e) {
-      pushToast(e.message, 'error');
-    }
-  };
-
-  const controlsFor = (m) => {
-    if (m.user.id === userId) return null;
-    if (myRole === 'ADMIN') {
-      return (
-        <>
-          {m.role === 'MEMBER' && (
-            <button className="btn btn-xs btn-blue" onClick={() => act(() => Groups.setRole(groupId, m.user.id, 'COADMIN'))}>
-              Make co-admin
-            </button>
-          )}
-          {m.role === 'COADMIN' && (
-            <button className="btn btn-xs btn-ghost" onClick={() => act(() => Groups.setRole(groupId, m.user.id, 'MEMBER'))}>
-              Demote
-            </button>
-          )}
-          <button
-            className="btn btn-xs btn-ghost"
-            onClick={() => act(
-              () => Groups.setRole(groupId, m.user.id, 'ADMIN'),
-              `Make ${m.user.name} the admin? You will become a co-admin.`
-            )}
-          >
-            Make admin
-          </button>
-          <button
-            className="btn btn-xs btn-ghost"
-            style={{ color: 'var(--red)' }}
-            onClick={() => act(() => Groups.removeMember(groupId, m.user.id), `Remove ${m.user.name} from the group?`)}
-          >
-            Remove
-          </button>
-        </>
-      );
-    }
-    if (myRole === 'COADMIN' && m.role === 'MEMBER') {
-      return (
-        <button
-          className="btn btn-xs btn-ghost"
-          style={{ color: 'var(--red)' }}
-          onClick={() => act(() => Groups.removeMember(groupId, m.user.id), `Remove ${m.user.name} from the group?`)}
-        >
-          Remove
-        </button>
-      );
-    }
-    return null;
-  };
-
-  const leave = () => act(
-    async () => { await Groups.leave(groupId); onLeft(); },
-    'Leave this group?'
-  );
-
-  return (
-    <Modal title={`${detail.group.name} — members`} onClose={onClose} wide>
-      {detail.members.map((m) => {
-        const controls = controlsFor(m);
-        return (
-          <div className="member-row" key={m.user.id}>
-            <div className="member-top">
-              <Avatar name={m.user.name} size={36} />
-              <div className="member-info">
-                <b>
-                  {m.user.name}{m.user.id === userId ? ' (you)' : ''}{m.user.verificationStatus === 'VERIFIED' && <Verified size={12} />}
-                </b>
-                <span>{[m.user.stakeholderType, m.user.city].filter(Boolean).join(' · ')}</span>
-              </div>
-              <RoleTag role={m.role} />
-            </div>
-            {controls && <div className="member-actions">{controls}</div>}
-          </div>
-        );
-      })}
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 16 }}>
-        <button className="btn btn-ghost btn-sm" style={{ color: 'var(--red)' }} onClick={leave}>
-          Leave group
-        </button>
-      </div>
-    </Modal>
-  );
-}
-
-function GroupChat({ id, onBack }) {
-  const { userId, pushToast } = useStore();
-  const [detail, setDetail] = useState(null);
-  const [msgs, setMsgs] = useState([]);
-  const [draft, setDraft] = useState('');
-  const [showMembers, setShowMembers] = useState(false);
-  const bodyRef = useRef(null);
-
-  const loadDetail = useCallback(async () => {
-    try {
-      setDetail(await Groups.get(id));
-    } catch (e) {
-      pushToast(e.message, 'error');
-    }
-  }, [id, pushToast]);
-
-  const loadMsgs = useCallback(async () => {
-    try {
-      const d = await Groups.messages(id, { take: 60 });
-      setMsgs(d.items || []);
-    } catch (e) {
-      pushToast(e.message, 'error');
-    }
-  }, [id, pushToast]);
-
-  useEffect(() => {
-    loadDetail();
-    loadMsgs();
-    const t = setInterval(loadMsgs, POLL_MS);
-    const onFocus = () => { loadMsgs(); loadDetail(); };
-    window.addEventListener('focus', onFocus);
-    return () => { clearInterval(t); window.removeEventListener('focus', onFocus); };
-  }, [id, loadDetail, loadMsgs]);
-
-  useEffect(() => {
-    bodyRef.current?.scrollTo({ top: bodyRef.current.scrollHeight });
-  }, [msgs.length, id]);
-
-  const send = async () => {
-    const body = draft.trim();
-    if (!body) return;
-    setDraft('');
-    try {
-      const m = await Groups.send(id, body);
-      setMsgs((prev) => [...prev, m]);
-    } catch (e) {
-      pushToast(e.message, 'error');
-      setDraft(body);
-    }
-  };
-
-  return (
-    <div>
-      <button className="wall-back" onClick={onBack} style={{ marginBottom: 14 }}>
-        <ArrowLeft size={15} /> All groups
-      </button>
-
-      <div
-        className="msg-thread-head"
-        onClick={() => setShowMembers(true)}
-        style={{ cursor: 'pointer', border: '1px solid var(--border)', borderRadius: '14px 14px 0 0' }}
-      >
-        <Avatar name={detail?.group?.name || '?'} size={38} />
-        <div>
-          <b>{detail?.group?.name || 'Loading…'}</b>
-          <div style={{ fontSize: 11.5, color: 'var(--text-faint)' }}>
-            {detail ? `${detail.members.length} member${detail.members.length === 1 ? '' : 's'} · tap to view` : '…'}
-          </div>
+    <motion.div className="cm-tile" whileHover={{ y: -4 }} onClick={() => onOpen(c.id)}>
+      <div className="cm-tile-banner" style={{ background: grad(c.color) }}><CommIcon c={c} size={48} /></div>
+      <div className="cm-tile-body">
+        <h4>{c.name}</h4>
+        <p>{c.desc || 'A place for conversation.'}</p>
+        <div className="cm-tile-foot">
+          <span><Users size={13} /> {compactNum(c.members)} · {compactNum(c.posts)} posts</span>
+          <button className={`btn btn-sm ${joined ? 'btn-ghost' : 'btn-blue'}`} onClick={(e) => { e.stopPropagation(); onJoin(c); }}>{joined ? <><Check size={13} /> Joined</> : 'Join'}</button>
         </div>
-        {detail?.myRole && (
-          <span style={{ marginLeft: 'auto' }}><RoleTag role={detail.myRole} /></span>
-        )}
       </div>
-
-      <div
-        className="msg-thread-body"
-        ref={bodyRef}
-        style={{ minHeight: 320, maxHeight: '52vh', border: '1px solid var(--border)', borderTop: 'none' }}
-      >
-        {msgs.length === 0 ? (
-          <p style={{ fontSize: 12.5, color: 'var(--text-faint)', textAlign: 'center', marginTop: 24 }}>
-            No messages yet — break the ice.
-          </p>
-        ) : (
-          msgs.map((m) => {
-            const mine = m.senderId === userId;
-            return (
-              <div key={m.id} className={`bubble ${mine ? 'me' : 'them'}`}>
-                {!mine && (
-                  <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--blue)', marginBottom: 3 }}>
-                    {m.sender?.name || 'Member'}
-                  </div>
-                )}
-                {m.body}
-              </div>
-            );
-          })
-        )}
-      </div>
-
-      <div className="msg-thread-input" style={{ border: '1px solid var(--border)', borderTop: 'none', borderRadius: '0 0 14px 14px' }}>
-        <input
-          type="text"
-          placeholder="Message the group…"
-          value={draft}
-          onChange={(e) => setDraft(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && send()}
-          maxLength={2000}
-        />
-        <button className="btn btn-blue btn-sm" onClick={send} aria-label="Send message">
-          <Send size={14} />
-        </button>
-      </div>
-
-      {showMembers && detail && (
-        <MembersPanel
-          detail={detail}
-          groupId={id}
-          onClose={() => setShowMembers(false)}
-          onChanged={loadDetail}
-          onLeft={onBack}
-        />
-      )}
-    </div>
+    </motion.div>
   );
 }
-
-/* ============================ PAGE ============================ */
 
 export default function Community() {
-  const { pushToast } = useStore();
-  const [openId, setOpenId] = useState(null);
-  const [groups, setGroups] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [showCreate, setShowCreate] = useState(false);
+  const { userId, user, pushToast } = useStore();
+  const [params, setParams] = useSearchParams();
+  const cId = params.get('c');
+  const pId = params.get('p');
+  const tabParam = params.get('tab');
 
-  const loadGroups = useCallback(async () => {
-    setLoading(true);
-    try {
-      const d = await Groups.list();
-      setGroups(d.items || []);
-    } catch (e) {
-      pushToast(e.message, 'error');
-    } finally {
-      setLoading(false);
-    }
+  const [all, setAll] = useState(null);
+  const [cur, setCur] = useState(null);
+  const [posts, setPosts] = useState(null);
+  const [sort, setSort] = useState('hot');
+  const [q, setQ] = useState('');
+  const [cat, setCat] = useState('ALL');
+  const [composer, setComposer] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [report, setReport] = useState(null);
+
+  const mine = useMemo(() => (all || []).filter((c) => c.myRole), [all]);
+  const view = cId ? 'community' : (tabParam || (all && mine.length === 0 ? 'popular' : 'home'));
+
+  const loadAll = useCallback(async () => {
+    try { setAll((await Communities.list({ take: 100 })).items); } catch (e) { pushToast(e.message || 'Could not load communities.', 'error'); setAll([]); }
   }, [pushToast]);
+  useEffect(() => { loadAll(); }, [loadAll]);
 
-  useEffect(() => { loadGroups(); }, [loadGroups]);
+  const loadCur = useCallback(async () => {
+    if (!cId) { setCur(null); return; }
+    try { setCur(await Communities.get(cId)); } catch (e) { pushToast(e.message || 'Community not found.', 'error'); setParams({}, { replace: true }); }
+  }, [cId, pushToast, setParams]);
+  useEffect(() => { loadCur(); }, [loadCur]);
 
-  const openGroup = useCallback((gid) => setOpenId(gid), []);
-  const closeChat = useCallback(() => { setOpenId(null); loadGroups(); }, [loadGroups]);
+  const loadPosts = useCallback(async () => {
+    if (view === 'explore' || !all) return;
+    setPosts(null);
+    try {
+      const res = cId ? await Communities.posts(cId, { sort }) : await Communities.feed({ scope: view === 'home' ? 'home' : 'popular', sort });
+      setPosts(res.items);
+    } catch (e) { pushToast(e.message || 'Could not load posts.', 'error'); setPosts([]); }
+  }, [view, cId, sort, all, pushToast]);
+  useEffect(() => { loadPosts(); }, [loadPosts]);
 
-  if (openId) {
-    return <GroupChat id={openId} onBack={closeChat} />;
-  }
+  const go = (next) => setParams(next, { replace: false });
+  const openCommunity = (id) => go({ c: id });
+  const openPost = (post) => { const n = new URLSearchParams(params); n.set('p', post.id); setParams(n); };
+  const closePost = () => { const n = new URLSearchParams(params); n.delete('p'); setParams(n); };
+
+  const toggleJoin = async (c) => {
+    const joined = !!c.myRole;
+    try {
+      if (joined) await Communities.leave(c.id); else await Communities.join(c.id);
+      pushToast(joined ? `Left ${c.name}.` : `Welcome to ${c.name}.`);
+      await loadAll();
+      if (cId === c.id) await loadCur();
+    } catch (e) { pushToast(e.message, 'error'); }
+  };
+
+  const vote = async (post, v) => {
+    const patch = (p) => (p.id === post.id ? { ...p, myVote: v, score: p.score + (v - p.myVote) } : p);
+    setPosts((ps) => ps.map(patch));
+    try { await Communities.votePost(post.id, v); } catch (e) { setPosts((ps) => ps.map((p) => (p.id === post.id ? post : p))); pushToast(e.message, 'error'); }
+  };
+  const syncFromThread = (next) => setPosts((ps) => (ps ? (next.removed ? ps.filter((p) => p.id !== next.id) : ps.map((p) => (p.id === next.id ? { ...p, ...next } : p))) : ps));
+
+  const roleOf = (post) => (all || []).find((c) => c.id === post.groupId)?.myRole;
+  const isMod = (r) => r === 'ADMIN' || r === 'COADMIN';
+
+  const filtered = useMemo(() => (all || []).filter((c) => (cat === 'ALL' || c.category === cat) && (!q.trim() || c.name.toLowerCase().includes(q.trim().toLowerCase()))), [all, cat, q]);
+  const trending = useMemo(() => [...(all || [])].filter((c) => !c.myRole).slice(0, 5), [all]);
+
+  const feedHeader = (
+    <>
+      <div className="cm-hero">
+        <div className="cm-hero-glow" aria-hidden="true" />
+        <div>
+          <h1>Communities</h1>
+          <p>Talk shop, find collaborators and learn from people in the scene.</p>
+        </div>
+        <button className="btn btn-blue" onClick={() => setCreating(true)}><Plus size={16} /> Create community</button>
+      </div>
+      <div className="cm-tabs" role="tablist">
+        {[['home', 'Home', HomeIcon], ['popular', 'Popular', Flame], ['explore', 'Explore', Compass]].map(([k, label, Icon]) => (
+          <button key={k} role="tab" aria-selected={view === k} className={view === k ? 'on' : ''} onClick={() => go({ tab: k })}>
+            {view === k && <motion.i layoutId="cm-tab-bg" className="cm-tab-bg" transition={{ type: 'spring', stiffness: 400, damping: 32 }} />}
+            <Icon size={15} /> <span>{label}</span>
+          </button>
+        ))}
+      </div>
+    </>
+  );
+
+  const composeBar = (
+    <div className="cm-compose">
+      <Avatar name={user?.name || 'You'} src={user?.avatarUrl} size={34} />
+      <button onClick={() => setComposer(true)}><MessageSquarePlus size={16} /> Start a conversation{cur ? ` in ${cur.name}` : ''}…</button>
+    </div>
+  );
+
+  const list = (
+    <div className="cm-list">
+      {posts === null && <PostSkeleton />}
+      {posts && posts.length === 0 && (
+        <EmptyState icon={<MessageSquarePlus size={22} />} title={view === 'home' ? 'Your home feed is empty' : 'Nothing here yet'}
+          text={view === 'home' ? 'Join a few communities and their best posts show up here.' : 'Be the first to start a conversation.'}
+          action={view === 'home' ? <button className="btn btn-blue btn-sm" onClick={() => go({ tab: 'explore' })}>Explore communities</button> : <button className="btn btn-blue btn-sm" onClick={() => setComposer(true)}>Create a post</button>} />
+      )}
+      <AnimatePresence initial={false}>
+        {posts?.map((p) => (
+          <PostItem key={p.id} post={p} showCommunity={!cId} myId={userId} canMod={isMod(cId ? cur?.myRole : roleOf(p))}
+            onOpen={openPost} onOpenCommunity={openCommunity} onVote={vote} onReport={setReport}
+            onRemoved={(id) => setPosts((ps) => ps.filter((x) => x.id !== id))}
+            onPinned={(id, pinned) => setPosts((ps) => ps.map((x) => (x.id === id ? { ...x, pinned } : x)))} />
+        ))}
+      </AnimatePresence>
+    </div>
+  );
+
+  const railMine = (
+    <div className="cm-card">
+      <h4>Your communities</h4>
+      {mine.length === 0 && <p className="cm-muted">You haven&rsquo;t joined any yet.</p>}
+      {mine.slice(0, 8).map((c) => (
+        <button key={c.id} className="cm-row" onClick={() => openCommunity(c.id)}><CommIcon c={c} size={30} /><span><b>{c.name}</b><i>{compactNum(c.members)} members</i></span></button>
+      ))}
+    </div>
+  );
+  const railTrending = trending.length > 0 && (
+    <div className="cm-card">
+      <h4>Trending communities</h4>
+      {trending.map((c) => (
+        <div key={c.id} className="cm-row"><button className="cm-row-open" onClick={() => openCommunity(c.id)}><CommIcon c={c} size={30} /><span><b>{c.name}</b><i>{compactNum(c.members)} members</i></span></button><button className="btn btn-blue btn-xs" onClick={() => toggleJoin(c)}>Join</button></div>
+      ))}
+    </div>
+  );
+  const railSafety = (
+    <div className="cm-card cm-safety">
+      <h4><ShieldCheck size={15} /> Keep it respectful</h4>
+      <p>Abusive, hateful or adult content is blocked automatically. Enough reports hide a post until our team reviews it.</p>
+    </div>
+  );
+
+  if (all === null) return <div className="cm"><div className="cm-main"><PostSkeleton /></div></div>;
 
   return (
-    <div>
-      <PageHead
-        title="Community"
-        sub="Group chats for your scene — join a crew or start your own."
-        action={(
-          <button className="btn btn-blue btn-sm" onClick={() => setShowCreate(true)}>
-            <Plus size={14} /> New group
-          </button>
-        )}
-      />
+    <div className="cm">
+      {view === 'community' && cur ? (
+        <>
+          <div className="cm-banner" style={{ background: grad(cur.color) }}>
+            <button className="cm-back" onClick={() => go({ tab: 'popular' })}><ArrowLeft size={15} /> All communities</button>
+          </div>
+          <div className="cm-head">
+            <CommIcon c={cur} size={72} />
+            <div className="cm-head-txt">
+              <h1>{cur.name}</h1>
+              <span>{CATEGORIES.find((x) => x.id === cur.category)?.label || 'General'} · {compactNum(cur.members)} members · {compactNum(cur.posts)} posts</span>
+            </div>
+            <div className="cm-head-actions">
+              {cur.myRole && <button className="btn btn-blue" onClick={() => setComposer(true)}><Plus size={15} /> Post</button>}
+              <button className={`btn ${cur.myRole ? 'btn-ghost' : 'btn-blue'}`} onClick={() => toggleJoin(cur)}>{cur.myRole ? <><Check size={15} /> Joined</> : 'Join'}</button>
+            </div>
+          </div>
+        </>
+      ) : view === 'community' ? <div className="cm-banner" style={{ background: 'var(--border)' }} /> : feedHeader}
 
-      {loading ? (
-        <GroupSkeleton />
-      ) : groups.length === 0 ? (
-        <EmptyState
-          icon={<MessageCircle size={22} />}
-          title="No groups yet"
-          text="Start the first one — gather your crew in one chat."
-          action={(
-            <button className="btn btn-blue btn-sm" onClick={() => setShowCreate(true)}>
-              <Plus size={14} /> New group
-            </button>
+      <div className="cm-grid">
+        <div className="cm-main">
+          {view === 'explore' ? (
+            <>
+              <div className="cm-search"><Search size={16} /><input type="text" placeholder="Search communities" value={q} onChange={(e) => setQ(e.target.value)} /></div>
+              <div className="cm-cats">{CATEGORIES.map((c) => <button key={c.id} className={cat === c.id ? 'on' : ''} onClick={() => setCat(c.id)}>{c.label}</button>)}</div>
+              {filtered.length === 0 ? <EmptyState icon={<Compass size={22} />} title="No communities found" text="Try another search — or start the community yourself." action={<button className="btn btn-blue btn-sm" onClick={() => setCreating(true)}>Create community</button>} />
+                : <div className="cm-tiles">{filtered.map((c) => <CommunityTile key={c.id} c={c} onOpen={openCommunity} onJoin={toggleJoin} />)}</div>}
+            </>
+          ) : (
+            <>
+              {(view !== 'community' || cur?.myRole) && composeBar}
+              <SortBar sort={sort} setSort={setSort} id={view} />
+              {list}
+            </>
           )}
-        />
-      ) : (
-        <div className="community-grid">
-          {groups.map((g) => (
-            <GroupCard key={g.id} group={g} onOpen={openGroup} />
-          ))}
         </div>
-      )}
+        <aside className="cm-rail">
+          {view === 'community' && cur ? (
+            <>
+              <div className="cm-card"><h4>About</h4><p className="cm-about">{cur.desc || 'No description yet.'}</p><div className="cm-stats"><div><b>{compactNum(cur.members)}</b><span>Members</span></div><div><b>{compactNum(cur.posts)}</b><span>Posts</span></div></div></div>
+              {cur.rules?.length > 0 && (
+                <div className="cm-card"><h4>Rules</h4><ol className="cm-rules">{cur.rules.map((r, i) => <li key={i}><b>{r.title}</b>{r.body && <span>{r.body}</span>}</li>)}</ol></div>
+              )}
+              <div className="cm-card"><h4>Moderators</h4>{cur.mods.map((m) => (
+                <div key={m.id} className="cm-row"><Avatar name={m.name} src={m.avatarUrl} size={30} /><span><b>{m.name}{m.verificationStatus === 'VERIFIED' && <Verified size={12} />}</b><i>{m.role === 'ADMIN' ? 'Admin' : 'Moderator'}</i></span></div>
+              ))}</div>
+              {isMod(cur.myRole) && <button className="btn btn-ghost btn-sm" onClick={() => pushToast('Moderators can pin or remove posts from the ⋯ menu on any post.')}><Pencil size={13} /> Moderator tools</button>}
+            </>
+          ) : (<>{railMine}{railTrending}{railSafety}</>)}
+        </aside>
+      </div>
 
-      {showCreate && (
-        <NewGroupModal
-          onClose={() => setShowCreate(false)}
-          onCreated={(gid) => { setShowCreate(false); loadGroups(); openGroup(gid); }}
-        />
-      )}
-
-      <LatestDiscussions />
+      {composer && <PostComposer communities={cur?.myRole ? [cur, ...mine.filter((c) => c.id !== cur.id)] : mine} initialId={cur?.myRole ? cur.id : undefined}
+        onClose={() => setComposer(false)} onPosted={(p) => { setComposer(false); loadAll(); if (cId || view !== 'explore') setPosts((ps) => [p, ...(ps || [])]); }} />}
+      {creating && <NewCommunityModal onClose={() => setCreating(false)} onCreated={async (c) => { setCreating(false); await loadAll(); go({ c: c.id }); pushToast(`${c.name} is live.`); }} />}
+      {report && <ReportModal target={report} onClose={() => setReport(null)} />}
+      <AnimatePresence>
+        {pId && <Thread key={pId} postId={pId} onClose={closePost} onChanged={syncFromThread} onOpenCommunity={openCommunity} />}
+      </AnimatePresence>
     </div>
   );
 }

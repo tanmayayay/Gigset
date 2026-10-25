@@ -15,7 +15,6 @@ const Community = lazy(() => import('./pages/Community'));
 const News = lazy(() => import('./pages/News'));
 const NewsArticle = lazy(() => import('./pages/NewsArticle'));
 const Messages = lazy(() => import('./pages/Messages'));
-const Live = lazy(() => import('./pages/Live'));
 const Profile = lazy(() => import('./pages/Profile'));
 const Search = lazy(() => import('./pages/Search'));
 const Notifications = lazy(() => import('./pages/Notifications'));
@@ -119,7 +118,7 @@ function AppShell() {
           <Route path="/news" element={<News />} />
           <Route path="/news/:id" element={<NewsArticle />} />
           <Route path="/messages" element={<Messages />} />
-          <Route path="/live" element={<Live />} />
+          <Route path="/live" element={<Navigate to="/home" replace />} />
           <Route path="/saved" element={<Saved />} />
           <Route path="/profile/:id" element={<Profile />} />
           <Route path="/search" element={<Search />} />

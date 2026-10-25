@@ -2,14 +2,26 @@ import { useState } from 'react';
 import { BadgeCheck } from 'lucide-react';
 import { avatarColor, initials } from '../data/demo';
 
-/* Brand logo */
+/* Brand logo: a "G" cut from a sound-wave ring, on a gradient tile. */
+export function LogoMark({ size = 28 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" aria-hidden="true" style={{ flexShrink: 0 }}>
+      <defs>
+        <linearGradient id="gsg" x1="3" y1="2" x2="29" y2="30" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#4F46E5" /><stop offset=".55" stopColor="#2A63EE" /><stop offset="1" stopColor="#0EA5E9" />
+        </linearGradient>
+      </defs>
+      <rect width="32" height="32" rx="9" fill="url(#gsg)" />
+      <path d="M22.4 11.6A8 8 0 1 0 24 16h-7" stroke="#fff" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="24" cy="9" r="1.7" fill="#fff" opacity=".9" />
+    </svg>
+  );
+}
+
 export function Logo({ size = 26, light = false }) {
   return (
-    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 10, fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 21, color: light ? '#fff' : undefined }}>
-      <svg width={size} height={size} viewBox="0 0 26 26" fill="none">
-        <path d="M4 21C4 21 6 5 13 5C20 5 22 21 22 21" stroke="#2A63EE" strokeWidth="2" strokeLinecap="round" />
-        <path d="M8 21C8 21 9 11 13 11C17 11 18 21 18 21" stroke="#0EA5E9" strokeWidth="2" strokeLinecap="round" />
-      </svg>
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 10, fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 21, letterSpacing: '-0.02em', color: light ? '#fff' : undefined }}>
+      <LogoMark size={size + 4} />
       <span className={light ? '' : 'brand-gradient-text'}>Gigset</span>
     </span>
   );

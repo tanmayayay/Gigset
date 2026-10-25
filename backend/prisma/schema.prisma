@@ -122,6 +122,8 @@ model User {
   trackLikes              TrackLike[]
   createdGroups           CommunityGroup[]
   groupMemberships        GroupMember[]
+  communityPosts          CommunityPost[]    @relation("CommunityPostAuthor")
+  communityComments       CommunityComment[] @relation("CommunityCommentAuthor")
   groupMessages           GroupMessage[]
   busyDays                Availability[]
   reportsMade             Report[]             @relation("Reporter")
@@ -418,7 +420,7 @@ enum GroupRole {
   MEMBER
 }
 
-// Community: WhatsApp-style groups — one admin, up to 3 co-admins.
+// Community: subreddit-style communities — one admin, up to 3 co-admins (moderators).
 model CommunityGroup {
   id        String   @id @default(cuid())
   name      String
@@ -427,8 +429,15 @@ model CommunityGroup {
   creator   User     @relation(fields: [creatorId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
 
+  // Community wall (subreddit-style)
+  slug     String? @unique
+  rules    String? // JSON array of { title, body }
+  color    String? // banner colour key, e.g. "indigo"
+  category String? // ARTISTS | VENUES | CREW | CITY | GENRE | GIGS | GENERAL
+
   members  GroupMember[]
   messages GroupMessage[]
+  posts    CommunityPost[]
 }
 
 model GroupMember {
@@ -540,4 +549,58 @@ model PushSubscription {
   createdAt DateTime @default(now())
 
   @@index([userId])
+}
+
+// ------------------------------------------------- Community wall
+model CommunityPost {
+  id           String           @id @default(cuid())
+  groupId      String
+  group        CommunityGroup   @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  authorId     String
+  author       User             @relation("CommunityPostAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  title        String
+  body         String?
+  mediaUrl     String?
+  flair        String?
+  pinned       Boolean          @default(false)
+  removed      Boolean          @default(false)
+  score        Int              @default(0)
+  commentCount Int              @default(0)
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  comments CommunityComment[]
+
+  @@index([groupId, createdAt])
+  @@index([groupId, score])
+  @@index([authorId])
+}
+
+model CommunityComment {
+  id        String             @id @default(cuid())
+  postId    String
+  post      CommunityPost      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  authorId  String
+  author    User               @relation("CommunityCommentAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  parentId  String?
+  parent    CommunityComment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies   CommunityComment[] @relation("CommentReplies")
+  body      String
+  score     Int                @default(0)
+  removed   Boolean            @default(false)
+  createdAt DateTime           @default(now())
+
+  @@index([postId, createdAt])
+}
+
+// One vote per person per post/comment: value is 1 (up) or -1 (down).
+model CommunityVote {
+  userId     String
+  targetType String // POST | COMMENT
+  targetId   String
+  value      Int
+  createdAt  DateTime @default(now())
+
+  @@id([userId, targetType, targetId])
+  @@index([targetType, targetId])
 }

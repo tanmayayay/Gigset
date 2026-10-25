@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { prisma } from '../lib/prisma.js';
 import { auth } from '../middleware/auth.js';
+import { checkAll, CLEAN_MESSAGE } from '../lib/moderation.js';
 import { asyncHandler, bad, notFound, pagination } from '../lib/http.js';
 
 const router = Router();
@@ -75,6 +76,7 @@ router.post(
     if (name.trim().length > 80) {
       return bad(res, 400, 'Group name is too long (max 80 characters).');
     }
+    if (!checkAll(name, desc).ok) return bad(res, 422, CLEAN_MESSAGE);
     const group = await prisma.communityGroup.create({
       data: {
         name: name.trim(),

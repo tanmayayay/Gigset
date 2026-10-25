@@ -5,7 +5,7 @@ import { asyncHandler, bad, tooLong } from '../lib/http.js';
 
 const router = Router();
 
-const TARGETS = ['USER', 'POST', 'MESSAGE', 'OPPORTUNITY'];
+const TARGETS = ['USER', 'POST', 'MESSAGE', 'OPPORTUNITY', 'COMMUNITY_POST', 'COMMUNITY_COMMENT'];
 const REASONS = ['SPAM', 'HARASSMENT', 'FAKE', 'INAPPROPRIATE', 'SCAM', 'OTHER'];
 
 // POST /api/reports  { targetType, targetId, reason, details? }
@@ -22,6 +22,14 @@ router.post('/reports', auth, asyncHandler(async (req, res) => {
   await prisma.report.create({
     data: { reporterId: req.user.id, targetType, targetId, reason, details: typeof details === 'string' && details.trim() ? details.trim() : null },
   });
+  // Community content hides itself once three different people have reported it; the report stays open for review.
+  if (targetType === 'COMMUNITY_POST' || targetType === 'COMMUNITY_COMMENT') {
+    const who = await prisma.report.findMany({ where: { targetType, targetId, status: 'OPEN' }, select: { reporterId: true }, distinct: ['reporterId'] });
+    if (who.length >= 3) {
+      const model = targetType === 'COMMUNITY_POST' ? prisma.communityPost : prisma.communityComment;
+      await model.updateMany({ where: { id: targetId }, data: { removed: true } });
+    }
+  }
   res.status(201).json({ ok: true });
 }));
 

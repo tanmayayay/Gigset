@@ -32,31 +32,18 @@ function fmtBudget(o) {
 }
 
 /* ---------- 1. You: identity card with a progress ring ---------- */
-export function MeCard({ user, followingCount, postCount }) {
+export function MeCard({ user }) {
   const navigate = useNavigate();
   const { pct, next } = profileCompleteness(user);
   return (
-    <div className="rail-card me-card">
-      <button className="me-row" onClick={() => navigate(`/profile/${user?.id}`)} aria-label="Open your profile">
-        <Avatar name={user?.name || 'You'} src={user?.avatarUrl} size={44} />
-        <span className="me-id">
-          <b className="me-name">{user?.name}{user?.verificationStatus === 'VERIFIED' && <Verified size={13} />}</b>
-          <span className="me-sub">{typeLabel(user?.stakeholderType)}{user?.city ? ` · ${user.city}` : ''}</span>
-        </span>
-        <ChevronRight size={16} className="me-go" />
-      </button>
-      <div className="me-meta">
-        <span><b>{postCount ?? '—'}</b> posts</span>
-        <i aria-hidden="true" />
-        <span><b>{followingCount ?? '—'}</b> following</span>
-      </div>
-      <div className="me-bar" role="progressbar" aria-valuenow={pct} aria-valuemin={0} aria-valuemax={100} aria-label="Profile completeness">
-        <span style={{ width: `${pct}%` }} />
-      </div>
-      <div className="me-hint">
-        {next ? <Link to={next.to}>{pct}% · Next: {next.label} <ChevronRight size={11} /></Link> : <span>{pct === 100 ? 'Gig-ready profile' : `${pct}% complete`}</span>}
-      </div>
-    </div>
+    <button className="rail-card me-card me-mini" onClick={() => navigate(next && pct < 100 ? next.to : `/profile/${user?.id}`)} aria-label="Open your profile" title={next ? `Next: ${next.label}` : 'Open your profile'}>
+      <span className="me-ring" style={{ '--p': pct }}><Avatar name={user?.name || 'You'} src={user?.avatarUrl} size={30} /></span>
+      <span className="me-id">
+        <b className="me-name">{user?.name}{user?.verificationStatus === 'VERIFIED' && <Verified size={12} />}</b>
+        <span className="me-sub">{pct === 100 ? 'Gig-ready' : `${pct}% complete`}{user?.city ? ` · ${user.city}` : ''}</span>
+      </span>
+      <ChevronRight size={14} className="me-go" />
+    </button>
   );
 }
 

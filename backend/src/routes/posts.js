@@ -1,3 +1,4 @@
+import { checkAll, CLEAN_MESSAGE } from '../lib/moderation.js';
 import { Router } from 'express';
 import { prisma } from '../lib/prisma.js';
 import { auth, optionalAuth } from '../middleware/auth.js';
@@ -66,6 +67,7 @@ router.post(
     if (mediaUrl != null && !isOwnMediaUrl(mediaUrl)) {
       return bad(res, 400, 'Field "mediaUrl" must be a photo uploaded to Gigset.');
     }
+    if (!checkAll(body).ok) return bad(res, 422, CLEAN_MESSAGE);
     if (visibility !== undefined && !POST_VISIBILITIES.includes(visibility)) {
       return bad(res, 400, `Field "visibility" must be one of: ${POST_VISIBILITIES.join(', ')}`);
     }
@@ -173,6 +175,7 @@ router.post(
       return bad(res, 400, 'Field "body" is required.');
     }
     if (body.length > 1000) return bad(res, 400, 'Comments can be at most 1000 characters.');
+    if (!checkAll(body).ok) return bad(res, 422, CLEAN_MESSAGE);
 
     const comment = await prisma.comment.create({
       data: { postId: post.id, authorId: req.user.id, body: body.trim() },

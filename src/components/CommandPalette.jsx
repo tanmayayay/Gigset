@@ -13,7 +13,6 @@ const PAGES = [
   { label: 'Community', sub: 'Circles & walls', to: '/community' },
   { label: 'News', sub: 'Daily industry headlines', to: '/news' },
   { label: 'Messages', sub: 'Conversations', to: '/messages' },
-  { label: 'Live', sub: 'Coming soon', to: '/live' },
   { label: 'Saved', sub: 'Your bookmarks', to: '/saved' },
   { label: 'Settings', sub: 'Privacy & preferences', to: '/settings' },
   { label: 'About Gigset', sub: 'Mission & story', to: '/about' },

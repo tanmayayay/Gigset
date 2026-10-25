@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, Suspense } from 'react';
 import { NavLink, Outlet, useNavigate, useLocation, Link } from 'react-router-dom';
 import {
   Home, LayoutGrid, Handshake, Users, Newspaper, MessageCircle, Search,
-  User, Bell, Settings, Info, LifeBuoy, Plus, Moon, Sun, Bookmark, Radio, Menu, X, LogOut,
+  User, Bell, Settings, Info, LifeBuoy, Plus, Moon, Sun, Bookmark, Menu, X, LogOut,
 } from 'lucide-react';
 import { Logo, Avatar } from './ui';
 import { useStore } from '../store/store';
@@ -17,9 +17,7 @@ const NAV_MAIN = [
   { to: '/collab', label: 'Collab', icon: Handshake },
   { to: '/community', label: 'Community', icon: Users },
   { to: '/news', label: 'News', icon: Newspaper },
-  { to: '/live', label: 'Live', icon: Radio },
   { to: '/messages', label: 'Messages', icon: MessageCircle },
-  { to: '/saved', label: 'Saved', icon: Bookmark },
 ];
 const NAV_MORE = [
   { to: '/settings', label: 'Settings', icon: Settings },
@@ -174,6 +172,9 @@ export default function Shell({ onOpenPalette, onNewPost, onNewOpp }) {
           <div className="topbar-actions">
             <button className="icon-btn" onClick={onNewPost} aria-label="Create a post" title="Create a post">
               <Plus size={17} />
+            </button>
+            <button className={`icon-btn${pathname === '/saved' ? ' on' : ''}`} onClick={() => navigate('/saved')} aria-label="Saved" title="Saved">
+              <Bookmark size={16} />
             </button>
             <button className="icon-btn" onClick={(e) => { e.stopPropagation(); setProfileOpen(false); setNotifOpen((o) => !o); }} aria-label="Notifications">
               <Bell size={16} />

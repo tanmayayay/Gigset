@@ -215,6 +215,25 @@ export const Account = {
   claimReferral: (code) => api('/api/account/referral/claim', { method: 'POST', body: { code } }),
 };
 
+export const Communities = {
+  list: (params = {}) => api(`/api/communities${qs(params)}`),
+  feed: (params = {}) => api(`/api/communities/feed${qs(params)}`, { fresh: true }),
+  create: (data) => api('/api/communities', { method: 'POST', body: data }),
+  get: (id) => api(`/api/communities/${id}`, { fresh: true }),
+  update: (id, data) => api(`/api/communities/${id}`, { method: 'PATCH', body: data }),
+  join: (id) => api(`/api/communities/${id}/join`, { method: 'POST' }),
+  leave: (id) => api(`/api/communities/${id}/leave`, { method: 'POST' }),
+  posts: (id, params = {}) => api(`/api/communities/${id}/posts${qs(params)}`, { fresh: true }),
+  post: (id, data) => api(`/api/communities/${id}/posts`, { method: 'POST', body: data }),
+  thread: (postId) => api(`/api/communities/posts/${postId}`, { fresh: true }),
+  comment: (postId, body, parentId) => api(`/api/communities/posts/${postId}/comments`, { method: 'POST', body: { body, parentId } }),
+  votePost: (postId, value) => api(`/api/communities/posts/${postId}/vote`, { method: 'POST', body: { value } }),
+  voteComment: (commentId, value) => api(`/api/communities/comments/${commentId}/vote`, { method: 'POST', body: { value } }),
+  removePost: (postId) => api(`/api/communities/posts/${postId}`, { method: 'DELETE' }),
+  removeComment: (commentId) => api(`/api/communities/comments/${commentId}`, { method: 'DELETE' }),
+  pin: (postId, pinned) => api(`/api/communities/posts/${postId}/pin`, { method: 'POST', body: { pinned } }),
+};
+
 export const Safety = {
   report: ({ targetType, targetId, reason, details }) => api('/api/reports', { method: 'POST', body: { targetType, targetId, reason, details } }),
   blocks: () => api('/api/blocks', { fresh: true }),
