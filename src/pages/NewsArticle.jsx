@@ -65,7 +65,7 @@ export default function NewsArticle() {
   }
 
   const saved = isBookmarked('article', article.id);
-  const authorName = article.author?.name || 'Strings newsroom';
+  const authorName = article.author?.name || 'Gigset newsroom';
   const words = (article.body || '').split(/\s+/).filter(Boolean).length;
   const paragraphs = (article.body || '').split(/\n+/).filter((p) => p.trim());
 

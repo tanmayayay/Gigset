@@ -75,7 +75,7 @@ export default function Live() {
         </div>
         <div>
           <h4 style={{ marginBottom: 4 }}>What Live will include</h4>
-          <p style={{ fontSize: 13, color: 'var(--text-dim)' }}>One-tap going live, ticketed streams, saved broadcasts on your profile, and live Q&A with the audience — all wired into your Strings network.</p>
+          <p style={{ fontSize: 13, color: 'var(--text-dim)' }}>One-tap going live, ticketed streams, saved broadcasts on your profile, and live Q&A with the audience — all wired into your Gigset network.</p>
         </div>
       </div>
     </div>

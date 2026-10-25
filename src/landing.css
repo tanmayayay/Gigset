@@ -1,4 +1,4 @@
-/* Strings landing: Apple-style. Quiet canvas, giant type, motion that follows your scroll. */
+/* Gigset landing: Apple-style. Quiet canvas, giant type, motion that follows your scroll. */
 .ap{--ink:#1d1d1f; --mute:#6e6e73; --canvas:#fbfbfd; --line:rgba(0,0,0,.1); --a:#2a63ee; --b:#22d3ee; --c:#7c5cff;
   background:var(--canvas); color:var(--ink); font-family:'Inter',-apple-system,'SF Pro Display','Segoe UI',sans-serif; -webkit-font-smoothing:antialiased; overflow-x:clip; min-height:100vh;}
 .ap *{box-sizing:border-box;}

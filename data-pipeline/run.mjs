@@ -52,7 +52,7 @@ async function main() {
   });
 
   const row = (label, n) => console.log(label.padEnd(10) + String(n).padStart(6));
-  console.log("\n===== Strings data pipeline =====");
+  console.log("\n===== Gigset data pipeline =====");
   row("venues", venues.length);
   row("events", events.length);
   row("news", news.length);

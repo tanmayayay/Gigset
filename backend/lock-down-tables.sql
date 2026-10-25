@@ -1,5 +1,5 @@
 -- ============================================================
--- STRINGS — Close the public database API (IMPORTANT, run once)
+-- GIGSET — Close the public database API (IMPORTANT, run once)
 -- ============================================================
 -- Supabase exposes every table in the `public` schema over a REST API that
 -- anyone holding the public "anon" key (it ships inside the website) can call.

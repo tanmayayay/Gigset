@@ -29,7 +29,7 @@ export async function pushState() {
 export async function enablePush() {
   if (!pushSupported()) throw new Error('This browser does not support notifications.');
   const { key } = await Push.key();
-  if (!key) throw new Error('Browser notifications are not switched on for Strings yet.');
+  if (!key) throw new Error('Browser notifications are not switched on for Gigset yet.');
   const perm = await Notification.requestPermission();
   if (perm !== 'granted') throw new Error('Notifications are blocked. Allow them in your browser settings for this site.');
   const reg = await registration();

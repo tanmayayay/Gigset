@@ -48,7 +48,7 @@ export default function ShareModal({ card, onClose, title }) {
   }, [code]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => () => { if (url) URL.revokeObjectURL(url); }, [url]);
 
-  const fileName = `strings-${card.person.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.png`;
+  const fileName = `gigset-${card.person.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.png`;
   const download = () => {
     if (!url) return;
     const a = document.createElement('a');
@@ -60,7 +60,7 @@ export default function ShareModal({ card, onClose, title }) {
     try { await navigator.clipboard.writeText(link); pushToast('Link copied.'); } catch { pushToast('Could not copy. Long-press the link to copy it.', 'error'); }
   };
   const share = async () => {
-    const text = card.kind === 'booked' ? 'Booked on Strings' : `${card.person.name} on Strings`;
+    const text = card.kind === 'booked' ? 'Booked on Gigset' : `${card.person.name} on Gigset`;
     try {
       const file = blob ? new File([blob], fileName, { type: 'image/png' }) : null;
       if (file && navigator.canShare?.({ files: [file] })) await navigator.share({ files: [file], text, url: link });

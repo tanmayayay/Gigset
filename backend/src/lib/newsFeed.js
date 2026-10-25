@@ -2,10 +2,10 @@ import { createHash } from 'node:crypto';
 import Parser from 'rss-parser';
 
 // ---------------------------------------------------------------------------
-// Strings news collector.
+// Gigset news collector.
 //
 // Pulls headlines from public RSS feeds (no API keys), normalises them into one
-// shape, classifies each story into a Strings category, and de-duplicates.
+// shape, classifies each story into a Gigset category, and de-duplicates.
 // We only keep what a reader needs to decide whether to open the story:
 // headline, a short excerpt, the cover image the publisher itself supplies,
 // and the link back to the publisher. Full article text is never copied.
@@ -216,7 +216,7 @@ const makeParser = () =>
   new Parser({
     timeout: 12000,
     headers: {
-      'User-Agent': 'StringsNewsBot/1.0 (+https://tanmayayay.github.io/strings-web)',
+      'User-Agent': 'GigsetNewsBot/1.0 (+https://tanmayayay.github.io/gigset-web)',
       Accept: 'application/rss+xml, application/atom+xml, application/xml, text/xml, */*',
     },
     customFields: {
@@ -275,7 +275,7 @@ async function fetchOg(url, timeoutMs = 4000) {
   try {
     const res = await fetch(url, {
       signal: AbortSignal.timeout(timeoutMs),
-      headers: { 'User-Agent': 'StringsNewsBot/1.0 (+https://tanmayayay.github.io/strings-web)', Accept: 'text/html' },
+      headers: { 'User-Agent': 'GigsetNewsBot/1.0 (+https://tanmayayay.github.io/gigset-web)', Accept: 'text/html' },
       redirect: 'follow',
     });
     if (res.ok && /html/i.test(res.headers.get('content-type') || '')) {

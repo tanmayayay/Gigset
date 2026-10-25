@@ -1,7 +1,7 @@
 import { supabase } from './supabase';
 
 // ---------------------------------------------------------------------------
-// Strings API client — every request to the Express backend goes through here.
+// Gigset API client — every request to the Express backend goes through here.
 // Authenticated requests carry `Authorization: Bearer <supabase access token>`;
 // the token is read from the live Supabase session (auto-refreshed).
 // ---------------------------------------------------------------------------
@@ -107,7 +107,7 @@ async function request(path, { method = 'GET', body, auth = true } = {}) {
       body: body !== undefined ? JSON.stringify(body) : undefined,
     });
   } catch (e) {
-    throw new ApiError(`Cannot reach the Strings API at ${API_BASE}. Is the backend running?`, 0, null);
+    throw new ApiError(`Cannot reach the Gigset API at ${API_BASE}. Is the backend running?`, 0, null);
   }
   let data = null;
   try {

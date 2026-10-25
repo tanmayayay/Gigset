@@ -23,7 +23,7 @@ export async function notify(userId, { type, title, body, link, from, email }) {
           html: layout({
             title,
             intro: esc(email.intro || body || ''),
-            cta: email.cta || 'Open Strings',
+            cta: email.cta || 'Open Gigset',
             ctaUrl: appUrl(link || '/notifications'),
             unsubscribe: unsubUrl(userId, 'alerts'),
           }),

@@ -1,4 +1,4 @@
-# Strings backend — production image (Render / Railway / Fly.io)
+# Gigset backend — production image (Render / Railway / Fly.io)
 # Build context is the repo root (Render Blueprint); backend lives in backend/.
 FROM node:22-alpine
 

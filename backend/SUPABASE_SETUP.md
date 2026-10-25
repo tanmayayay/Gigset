@@ -1,4 +1,4 @@
-# Supabase setup for the Strings backend
+# Supabase setup for the Gigset backend
 
 This guide takes the backend from local SQLite + mock auth to **Supabase
 Postgres + real Supabase Auth**. No Supabase experience assumed — follow the
@@ -15,7 +15,7 @@ clicks in order. (~15 minutes, all on the free tier.)
 1. Go to **https://supabase.com** and sign in (GitHub sign-in is fastest).
 2. Click **New project**.
 3. Settings:
-   - **Name:** `strings` (or `strings-prod`)
+   - **Name:** `gigset` (or `gigset-prod`)
    - **Database password:** click **Generate**, then **copy it somewhere safe**
      (a password manager). You cannot see it again.
    - **Region:** **Southeast Asia (Mumbai)** — labelled `ap-south-1`.
@@ -60,7 +60,7 @@ clicks in order. (~15 minutes, all on the free tier.)
 ## Step 4 — Fill in `backend/.env`
 
 ```bash
-cd ~/workspace/strings-web/backend   # or wherever your strings-web lives
+cd ~/workspace/gigset-web/backend   # or wherever your gigset-web lives
 cp .env.example .env
 ```
 
@@ -110,8 +110,8 @@ npm run dev
 You should see:
 
 ```
-[strings-backend] auth mode: SUPABASE (real JWTs required)
-[strings-backend] listening on http://localhost:4000
+[gigset-backend] auth mode: SUPABASE (real JWTs required)
+[gigset-backend] listening on http://localhost:4000
 ```
 
 (The old `DEV-ONLY mock` line appears only when Supabase isn't configured —
@@ -122,7 +122,7 @@ if you see it now, one of the two values is missing or still a placeholder.)
 ```bash
 # 1. Health (no auth needed)
 curl http://localhost:4000/api/health
-# → {"ok":true,"service":"strings-backend",...}
+# → {"ok":true,"service":"gigset-backend",...}
 
 # 2. Protected route without a token → must be 401
 curl -X POST http://localhost:4000/api/posts \

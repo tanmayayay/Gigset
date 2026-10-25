@@ -38,7 +38,7 @@ const TITLES = ['Choose your stakeholder type', 'Tell us about you', 'Your detai
 const STEPS = TITLES.length;
 
 const SUBS = [
-  'Every Strings profile starts here. This decides which fields and filters apply to you.',
+  'Every Gigset profile starts here. This decides which fields and filters apply to you.',
   'This is how bookers and collaborators will see you. You can change it anytime.',
   'Everything here is optional, but the more you add the better your matches. It is the same form as Edit profile.',
   'Choose who can see your profile, then you are in.',
@@ -46,7 +46,7 @@ const SUBS = [
 
 const TESTIMONIALS = [
   {
-    quote: 'Strings got us our first paying gig within a week of signing up — the match was exactly our sound.',
+    quote: 'Gigset got us our first paying gig within a week of signing up — the match was exactly our sound.',
     name: 'Priya Sharma', role: 'Vocalist · Mumbai',
   },
   {
@@ -68,7 +68,7 @@ const STATS = [
 const NEXT_STEPS = [
   { title: 'Verify your profile', desc: 'A quick check that builds trust with bookers and collaborators.' },
   { title: 'Get AI-matched gigs', desc: 'Your role, genres and details are matched to the right opportunities automatically.' },
-  { title: 'Get booked & paid', desc: 'Accept gigs, do great work, and get paid through Strings.' },
+  { title: 'Get booked & paid', desc: 'Accept gigs, do great work, and get paid through Gigset.' },
 ];
 
 /* Deterministic equalizer bars for the brand panel */
@@ -157,7 +157,7 @@ export default function Onboarding() {
         birthDate: birth,
       });
       await refreshProfile();
-      pushToast('Welcome to Strings. Your profile is live.');
+      pushToast('Welcome to Gigset. Your profile is live.');
       navigate('/home');
     } catch (e) {
       pushToast(e.message || 'Could not save your profile.', 'error');
@@ -360,7 +360,7 @@ export default function Onboarding() {
                       <label htmlFor="onb-vis">Who can see my profile</label>
                       <div className="select-wrap">
                         <select id="onb-vis" value={visibility} onChange={(e) => setVisibility(e.target.value)}>
-                          <option value="PUBLIC">Everyone on Strings (and search)</option>
+                          <option value="PUBLIC">Everyone on Gigset (and search)</option>
                           <option value="CONNECTIONS">Only people I connect with</option>
                           <option value="PRIVATE">Only me</option>
                         </select>
@@ -399,7 +399,7 @@ export default function Onboarding() {
               </button>
             ) : (
               <button type="button" className="btn btn-blue btn-sm" onClick={finish} disabled={busy}>
-                {busy ? 'Saving…' : 'Enter Strings'} <ArrowRight size={14} />
+                {busy ? 'Saving…' : 'Enter Gigset'} <ArrowRight size={14} />
               </button>
             )}
           </div>

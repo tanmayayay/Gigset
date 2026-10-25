@@ -1,4 +1,4 @@
-// Strings — data model for the Indian music industry networking platform.
+// Gigset — data model for the Indian music industry networking platform.
 //
 // Postgres (Supabase) is the production database.
 //   - DATABASE_URL → Supabase transaction pooler (port 6543), used at runtime.
@@ -485,7 +485,7 @@ model ProfileViewDay {
 
 
 // ------------------------------------------------------- Trust & safety
-// A report about a person, post or message. Reviewed by the Strings team.
+// A report about a person, post or message. Reviewed by the Gigset team.
 model Report {
   id         String   @id @default(cuid())
   reporterId String

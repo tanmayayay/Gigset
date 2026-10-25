@@ -1,4 +1,4 @@
-/* Strings service worker: browser notifications only (no offline caching). */
+/* Gigset service worker: browser notifications only (no offline caching). */
 self.addEventListener('install', () => self.skipWaiting());
 self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));
 
@@ -6,12 +6,12 @@ self.addEventListener('push', (event) => {
   let data = {};
   try { data = event.data ? event.data.json() : {}; } catch { /* ignore */ }
   event.waitUntil((async () => {
-    // If Strings is open and in front, the in-app pop-up already told them.
+    // If Gigset is open and in front, the in-app pop-up already told them.
     const wins = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
     if (wins.some((w) => w.visibilityState === 'visible' && w.focused)) return;
-    await self.registration.showNotification(data.title || 'Strings', {
+    await self.registration.showNotification(data.title || 'Gigset', {
       body: data.body || '',
-      tag: data.tag || 'strings',
+      tag: data.tag || 'gigset',
       icon: './favicon.svg',
       badge: './favicon.svg',
       data: { url: data.url || '#/notifications' },

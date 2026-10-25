@@ -140,8 +140,8 @@ function LatestDiscussions() {
 
   useEffect(() => {
     load();
-    window.addEventListener('strings:post-created', load);
-    return () => window.removeEventListener('strings:post-created', load);
+    window.addEventListener('gigset:post-created', load);
+    return () => window.removeEventListener('gigset:post-created', load);
   }, [load]);
 
   return (

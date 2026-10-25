@@ -146,10 +146,10 @@ export default function PostCard({ post, onLike, onHide, following, onFollowChan
 
   const shareLink = `${window.location.origin}${window.location.pathname}#/profile/${author.id || ''}`;
   const share = async () => {
-    const text = `${author.name || 'Someone'} on Strings: “${(post.body || '').slice(0, 120)}”`;
+    const text = `${author.name || 'Someone'} on Gigset: “${(post.body || '').slice(0, 120)}”`;
     try {
       if (navigator.share) {
-        await navigator.share({ title: 'Strings', text, url: shareLink });
+        await navigator.share({ title: 'Gigset', text, url: shareLink });
         return;
       }
       await navigator.clipboard.writeText(`${text}\n${shareLink}`);
@@ -257,7 +257,7 @@ export default function PostCard({ post, onLike, onHide, following, onFollowChan
       {quote && (
         <div className="pc-quote" style={{ background: canvas }} onClick={onMediaTap}>
           <p className={(post.body || '').length > 110 ? 'sm' : ''}><RichText text={post.body} /></p>
-          <span className="pc-quote-by">— {author.name || 'Strings member'}</span>
+          <span className="pc-quote-by">— {author.name || 'Gigset member'}</span>
           {heartBurst}
         </div>
       )}

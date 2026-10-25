@@ -1,4 +1,4 @@
--- Strings: referrals + founding badge, trust & safety, email/push notifications.
+-- Gigset: referrals + founding badge, trust & safety, email/push notifications.
 -- Safe to run more than once. Run in the Supabase SQL editor BEFORE deploying the API.
 
 ALTER TABLE "User"

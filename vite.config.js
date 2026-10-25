@@ -8,7 +8,7 @@ function preconnect(env) {
     .filter((u) => /^https:\/\//.test(u || ''))
     .map((u) => new URL(u).origin)
   return {
-    name: 'strings-preconnect',
+    name: 'gigset-preconnect',
     transformIndexHtml: () =>
       origins.map((href) => ({ tag: 'link', attrs: { rel: 'preconnect', href, crossorigin: '' }, injectTo: 'head-prepend' })),
   }

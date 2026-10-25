@@ -73,7 +73,7 @@ export function PostModal({ onClose, startWithPhoto = false, prefill = '' }) {
       }
       // The backend requires a body; a photo-only post gets a light caption.
       await Posts.create({ body: body.trim() || '📸', mediaUrl });
-      window.dispatchEvent(new Event('strings:post-created'));
+      window.dispatchEvent(new Event('gigset:post-created'));
       onClose();
       pushToast('Posted.');
     } catch (e) {
@@ -160,7 +160,7 @@ export function OppModal({ onClose }) {
         requirements: text,
         city,
       });
-      window.dispatchEvent(new Event('strings:opp-created'));
+      window.dispatchEvent(new Event('gigset:opp-created'));
       onClose();
       pushToast('Opportunity posted.');
     } catch (e) {

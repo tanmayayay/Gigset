@@ -71,9 +71,9 @@ router.post('/referral/claim', auth, asyncHandler(async (req, res) => {
   notify(inviter.id, {
     type: 'referral',
     title: `${me.name} joined with your invite`,
-    body: 'Thanks for bringing your network to Strings.',
+    body: 'Thanks for bringing your network to Gigset.',
     link: `/profile/${me.id}`,
-    email: { subject: `${me.name} joined Strings with your invite`, cta: 'See their profile' },
+    email: { subject: `${me.name} joined Gigset with your invite`, cta: 'See their profile' },
   });
   res.json({ ok: true, invitedBy: inviter.name });
 }));

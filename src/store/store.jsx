@@ -4,7 +4,7 @@ import { Profiles, onUnauthorized, clearApiCache } from '../lib/api';
 
 // The signed-in profile is remembered on this device so the app can open
 // instantly and refresh it quietly in the background.
-const PROFILE_KEY = (uid) => `strings.profile.${uid}`;
+const PROFILE_KEY = (uid) => `gigset.profile.${uid}`;
 function readCachedProfile(uid) {
   try { return JSON.parse(localStorage.getItem(PROFILE_KEY(uid)) || 'null'); } catch { return null; }
 }
@@ -31,7 +31,7 @@ let toastSeq = 0;
 
 export function StoreProvider({ children }) {
   // ---- theme (local preference) ----
-  const [theme, setTheme] = useLocal('strings.theme', 'light');
+  const [theme, setTheme] = useLocal('gigset.theme', 'light');
   useEffect(() => { document.documentElement.dataset.theme = theme; }, [theme]);
   const toggleTheme = useCallback(() => setTheme((t) => (t === 'light' ? 'dark' : 'light')), [setTheme]);
 
@@ -124,10 +124,10 @@ export function StoreProvider({ children }) {
   const authUser = session?.user ?? null;
 
   // ---- onboarding draft (local, pre-profile) ----
-  const [draft, setDraft] = useLocal('strings.draft', null);
+  const [draft, setDraft] = useLocal('gigset.draft', null);
 
   // ---- bookmarks (local preference) ----
-  const [bookmarks, setBookmarks] = useLocal('strings.bookmarks', []); // [{kind:'opp'|'article'|'media'|'post', id}]
+  const [bookmarks, setBookmarks] = useLocal('gigset.bookmarks', []); // [{kind:'opp'|'article'|'media'|'post', id}]
   const isBookmarked = useCallback((kind, id) => bookmarks.some((b) => b.kind === kind && b.id === id), [bookmarks]);
   // Returns true when the item is now saved, false when it was removed.
   // `data` (optional) snapshots items that don't live in our database —
@@ -141,11 +141,11 @@ export function StoreProvider({ children }) {
   }, [bookmarks, setBookmarks]);
 
   // ---- community groups (local for v1 — no backend model yet) ----
-  const [joined, setJoined] = useLocal('strings.joined', ['guitarists']);
-  const [wallExtra, setWallExtra] = useLocal('strings.wallExtra', {});
+  const [joined, setJoined] = useLocal('gigset.joined', ['guitarists']);
+  const [wallExtra, setWallExtra] = useLocal('gigset.wallExtra', {});
 
   // ---- settings (local preferences) ----
-  const [settings, setSettings] = useLocal('strings.settings', {
+  const [settings, setSettings] = useLocal('gigset.settings', {
     visibility: 'public',
     notifFollowers: true, notifMessages: true, notifMatches: true, notifDigest: false,
   });

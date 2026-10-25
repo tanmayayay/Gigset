@@ -54,7 +54,7 @@ export default function NewsCover({ item, height = '100%', large = false }) {
         ))}
       </svg>
       <span className="nc-icon"><Icon size={large ? 38 : 26} strokeWidth={1.6} /></span>
-      <span className="nc-mark">{(item.source || 'Strings').replace(/^The /, '').slice(0, 1)}</span>
+      <span className="nc-mark">{(item.source || 'Gigset').replace(/^The /, '').slice(0, 1)}</span>
     </div>
   );
 }

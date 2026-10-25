@@ -4,8 +4,8 @@ import { X, Bookmark, RotateCcw, ArrowRight, Clock, Sparkles, PartyPopper, List,
 import NewsCover, { topicOf } from './NewsCover';
 import { timeAgo } from '../../lib/format';
 
-const SWIPED_KEY = 'strings.newsSwiped';
-const PREFS_KEY = 'strings.newsPrefs';
+const SWIPED_KEY = 'gigset.newsSwiped';
+const PREFS_KEY = 'gigset.newsPrefs';
 const THRESHOLD = 110;
 
 const today = () => new Date().toISOString().slice(0, 10);
@@ -81,7 +81,7 @@ function CardBody({ item, onReact }) {
       </div>
       <div className="deck-body">
         <div className="deck-src">
-          <b>{item.source || 'Strings newsroom'}</b>
+          <b>{item.source || 'Gigset newsroom'}</b>
           {item.publishedAt && <span><Clock size={12} /> {timeAgo(item.publishedAt)}</span>}
           {!item.isLive && <span>· {readMins(item)} min read</span>}
         </div>
@@ -264,7 +264,7 @@ export default function SwipeDeck({ items, isSaved, onSave, onUnsave, onRead, on
             <button onClick={() => setPrefs({})}>Reset</button>
           </div>
         ) : (
-          <p className="deck-side-empty">Strings learns what you like as you swipe and react, then brings those topics forward.</p>
+          <p className="deck-side-empty">Gigset learns what you like as you swipe and react, then brings those topics forward.</p>
         )}
       </div>
       <div className="deck-side-card">

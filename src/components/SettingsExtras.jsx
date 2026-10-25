@@ -17,7 +17,7 @@ export function InviteBlock() {
   const link = r ? inviteLink(r.code) : '';
   const copy = async () => { try { await navigator.clipboard.writeText(link); pushToast('Invite link copied.'); } catch { pushToast('Could not copy.', 'error'); } };
   const share = async () => {
-    try { if (navigator.share) await navigator.share({ title: 'Join me on Strings', text: 'Strings is where India’s music and live-event people connect and book each other.', url: link }); else copy(); }
+    try { if (navigator.share) await navigator.share({ title: 'Join me on Gigset', text: 'Gigset is where India’s music and live-event people connect and book each other.', url: link }); else copy(); }
     catch (e) { if (e?.name !== 'AbortError') copy(); }
   };
   return (
@@ -73,7 +73,7 @@ export function AlertsBlock() {
           <div className="toggle-row"><span style={{ display: 'flex', alignItems: 'center', gap: 8 }}><Bell size={15} /> Notifications on this device (messages, requests)</span>
             <button className={`switch${push === 'on' ? ' on' : ''}`} onClick={togglePush} aria-label="Browser notifications" disabled={push === 'unsupported' || !p.pushAvailable} /></div>
           {!p.emailAvailable && <p className="set-note">Email alerts are not switched on yet.</p>}
-          {push === 'unsupported' && <p className="set-note">This browser can&apos;t show notifications. On iPhone, add Strings to your Home Screen first.</p>}
+          {push === 'unsupported' && <p className="set-note">This browser can&apos;t show notifications. On iPhone, add Gigset to your Home Screen first.</p>}
           {push === 'blocked' && <p className="set-note">Notifications are blocked for this site. Allow them in your browser&apos;s site settings, then try again.</p>}
           {p.emailAvailable && !p.hasEmail && <p className="set-note">We don&apos;t have an email for you yet. Sign out and in again to add it.</p>}
         </>

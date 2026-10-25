@@ -1,6 +1,6 @@
 // Invite codes: a link like  …/#/epk/abc?ref=K7M2QXD  remembers who invited the visitor,
 // then the code is claimed once they have an account.
-const KEY = 'strings.ref';
+const KEY = 'gigset.ref';
 
 /** Call once at startup: remember ?ref=CODE from the page address. */
 export function captureRef() {

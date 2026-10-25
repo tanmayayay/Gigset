@@ -59,7 +59,7 @@ export default function Support() {
       {tab === 'terms' && (
         <div className="post-card" style={{ padding: 24 }}>
           <h4 style={{ marginBottom: 10 }}>Terms of Service (summary)</h4>
-          <p style={{ color: 'var(--text-dim)', fontSize: 13.5, lineHeight: 1.7 }}>By using Strings, you agree to keep your profile accurate, respect other stakeholders&apos; visibility settings, and use booking and messaging tools in good faith. Strings is not a party to any booking agreement made between users. Accounts found impersonating another person or business may be suspended.</p>
+          <p style={{ color: 'var(--text-dim)', fontSize: 13.5, lineHeight: 1.7 }}>By using Gigset, you agree to keep your profile accurate, respect other stakeholders&apos; visibility settings, and use booking and messaging tools in good faith. Gigset is not a party to any booking agreement made between users. Accounts found impersonating another person or business may be suspended.</p>
         </div>
       )}
 

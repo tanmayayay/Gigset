@@ -93,8 +93,8 @@ export default function Collab() {
   // Refresh when a new opportunity is posted via the gig composer.
   useEffect(() => {
     const onCreated = () => fetchOpps();
-    window.addEventListener('strings:opp-created', onCreated);
-    return () => window.removeEventListener('strings:opp-created', onCreated);
+    window.addEventListener('gigset:opp-created', onCreated);
+    return () => window.removeEventListener('gigset:opp-created', onCreated);
   }, [fetchOpps]);
 
   // Accumulate genre options from real data for the filter dropdown.

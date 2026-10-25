@@ -1,5 +1,5 @@
 -- ============================================================
--- STRINGS — Gighub audio storage
+-- GIGSET — Gighub audio storage
 -- Run once in the Supabase SQL editor (Database page).
 -- Idempotent: safe to re-run.
 -- ============================================================

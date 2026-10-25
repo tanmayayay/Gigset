@@ -1,5 +1,5 @@
 -- ============================================================
--- STRINGS — Vault (12-hour image stories)
+-- GIGSET — Vault (12-hour image stories)
 -- Run once in the Supabase SQL editor. Idempotent: safe to re-run.
 -- Photos reuse the existing `post-media` storage bucket.
 -- ============================================================

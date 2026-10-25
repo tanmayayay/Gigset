@@ -12,7 +12,7 @@ dist
 dist-ssr
 *.local
 
-# Strings data pipeline cache
+# Gigset data pipeline cache
 data-pipeline/.cache/
 
 # Editor directories and files
@@ -27,4 +27,8 @@ data-pipeline/.cache/
 *.sw?
 
 .env
-backend/.env.bak
+.env.local
+.env.*.local
+
+.env.bak
+*.bak

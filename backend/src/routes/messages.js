@@ -206,7 +206,7 @@ router.post(
       data: { updatedAt: new Date() },
     });
     // Chat messages are announced by the live inbox (pop-up + unread badges), not as bell notifications.
-    // Browsers that enabled push also get a system notification (the service worker skips it if Strings is open and focused).
+    // Browsers that enabled push also get a system notification (the service worker skips it if Gigset is open and focused).
     for (const o of others) {
       pushTo(o.userId, { title: msg.sender.name, body: msg.body, url: `#/messages?c=${req.params.id}`, tag: `msg-${req.params.id}` });
     }

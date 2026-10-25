@@ -280,7 +280,7 @@ export default function Profile() {
           <div><span>Role</span><b>{meta.label}</b></div>
           {person.city && <div><span>Based in</span><b>{person.city}</b></div>}
           <div><span>Verification</span><b>{verified ? 'Verified' : person.verificationStatus === 'PENDING' ? 'Pending' : 'Not yet verified'}</b></div>
-          {since && <div><span>On Strings since</span><b>{MONTHS[since.getMonth()]} {since.getFullYear()}</b></div>}
+          {since && <div><span>On Gigset since</span><b>{MONTHS[since.getMonth()]} {since.getFullYear()}</b></div>}
         </div>
         {isSelf && <div className="pfo-self"><Strength person={person} postsCount={postsCount} /></div>}
       </Section>

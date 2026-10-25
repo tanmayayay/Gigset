@@ -9,7 +9,7 @@ import { supabase } from '../../lib/supabase';
 import { useStore } from '../../store/store';
 import './notes.css';
 
-const SEEN_KEY = 'strings.vaultSeen';
+const SEEN_KEY = 'gigset.vaultSeen';
 const DURATION = 6000;
 const SPIN_MS = 3600;
 

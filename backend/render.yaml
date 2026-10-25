@@ -1,5 +1,5 @@
-# Render blueprint for the Strings API.
-# Usage: Render dashboard → New → Blueprint → connect the strings-web repo,
+# Render blueprint for the Gigset API.
+# Usage: Render dashboard → New → Blueprint → connect the gigset-web repo,
 # point it at the `backend/` directory. Fill in the env vars below (all are
 # already in the local backend/.env — copy values, never commit them).
 services:
@@ -23,12 +23,12 @@ services:
       - key: SUPABASE_JWT_SECRET
         sync: false
       - key: FRONTEND_URL
-        sync: false # deployed web origin, e.g. https://tanmayayay.github.io/strings-web
+        sync: false # deployed web origin, e.g. https://tanmayayay.github.io/gigset-web
       # --- Optional: email alerts + weekly digest (Resend) ---
       - key: RESEND_API_KEY
         sync: false
       - key: EMAIL_FROM
-        sync: false # e.g. Strings <hello@yourdomain.in> (domain verified in Resend)
+        sync: false # e.g. Gigset <hello@yourdomain.in> (domain verified in Resend)
       - key: EMAIL_SECRET
         sync: false # any long random string; signs unsubscribe links
       - key: API_PUBLIC_URL

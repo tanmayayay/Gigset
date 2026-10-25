@@ -12,7 +12,7 @@ import { useStore } from '../store/store';
 import './news.css';
 
 // v2: older saved choices are ignored so every device starts on its own default.
-const MODE_KEY = 'strings.newsMode.v2';
+const MODE_KEY = 'gigset.newsMode.v2';
 
 /** Phones and tablets (touch, no hover) open on the swipe deck; computers on the list. */
 function defaultMode() {
@@ -103,7 +103,7 @@ export default function News() {
     <div className="news-page">
       <header className="news-head">
         <div>
-          <span className="news-kicker"><span className="dot" /> Strings Daily</span>
+          <span className="news-kicker"><span className="dot" /> Gigset Daily</span>
           <h1>Today in Indian music</h1>
           <p>
             {all.length} stories{updatedAt ? ` · updated ${timeAgo(updatedAt)}` : ''} · swipe right to open, up to save, left to pass

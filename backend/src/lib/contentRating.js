@@ -95,6 +95,6 @@ export function parseBirthDate(input) {
   if (Number.isNaN(d.getTime()) || d.toISOString().slice(0, 10) !== input) return { error: 'That birth date does not look right.' };
   const age = ageFrom(d);
   if (age == null || age > 110) return { error: 'That birth date does not look right.' };
-  if (age < MIN_AGE) return { error: `Strings is for people ${MIN_AGE} and over.`, underAge: true };
+  if (age < MIN_AGE) return { error: `Gigset is for people ${MIN_AGE} and over.`, underAge: true };
   return { value: d };
 }

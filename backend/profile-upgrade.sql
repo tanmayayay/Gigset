@@ -1,5 +1,5 @@
 -- ============================================================
--- STRINGS — Profile upgrade (profile photo, live availability, view analytics)
+-- GIGSET — Profile upgrade (profile photo, live availability, view analytics)
 -- Run ONCE in the Supabase SQL editor BEFORE deploying the new backend.
 -- Idempotent: safe to re-run.
 -- ============================================================

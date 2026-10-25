@@ -64,7 +64,7 @@ router.post(
     const longBody = tooLong(body, 3000, 'body');
     if (longBody) return bad(res, 400, longBody);
     if (mediaUrl != null && !isOwnMediaUrl(mediaUrl)) {
-      return bad(res, 400, 'Field "mediaUrl" must be a photo uploaded to Strings.');
+      return bad(res, 400, 'Field "mediaUrl" must be a photo uploaded to Gigset.');
     }
     if (visibility !== undefined && !POST_VISIBILITIES.includes(visibility)) {
       return bad(res, 400, `Field "visibility" must be one of: ${POST_VISIBILITIES.join(', ')}`);

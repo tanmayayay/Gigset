@@ -385,7 +385,7 @@ function PostsView({ stream, act, userId, audio, onDelete }) {
 
 export default function Gighub() {
   const { userId, pushToast } = useStore();
-  const [mode, setMode] = useState(() => { try { return localStorage.getItem('strings.ghMode') === 'posts' ? 'posts' : 'reels'; } catch { return 'reels'; } });
+  const [mode, setMode] = useState(() => { try { return localStorage.getItem('gigset.ghMode') === 'posts' ? 'posts' : 'reels'; } catch { return 'reels'; } });
   const [filter, setFilter] = useState('all');
   const [tracks, setTracks] = useState([]);
   const [posts, setPosts] = useState([]);
@@ -395,7 +395,7 @@ export default function Gighub() {
   const audioEl = useRef(null);
   const act = useActions();
 
-  const setModeSaved = (m) => { setMode(m); try { localStorage.setItem('strings.ghMode', m); } catch { /* ignore */ } };
+  const setModeSaved = (m) => { setMode(m); try { localStorage.setItem('gigset.ghMode', m); } catch { /* ignore */ } };
 
   const load = useCallback(async () => {
     setLoading(true);

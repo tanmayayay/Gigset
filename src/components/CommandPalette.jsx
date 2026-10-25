@@ -16,7 +16,7 @@ const PAGES = [
   { label: 'Live', sub: 'Coming soon', to: '/live' },
   { label: 'Saved', sub: 'Your bookmarks', to: '/saved' },
   { label: 'Settings', sub: 'Privacy & preferences', to: '/settings' },
-  { label: 'About Strings', sub: 'Mission & story', to: '/about' },
+  { label: 'About Gigset', sub: 'Mission & story', to: '/about' },
   { label: 'Help & Legal', sub: 'Support centre', to: '/support' },
 ];
 
@@ -104,7 +104,7 @@ export default function CommandPalette({ open, onClose }) {
   if (!open) return null;
   return (
     <div className="cmdk-backdrop" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
-      <div className="cmdk" role="dialog" aria-label="Search Strings">
+      <div className="cmdk" role="dialog" aria-label="Search Gigset">
         <div className="cmdk-input-row">
           <Search size={17} style={{ color: 'var(--text-faint)', flexShrink: 0 }} />
           <input

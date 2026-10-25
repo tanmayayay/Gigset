@@ -1,7 +1,7 @@
 // Transactional email through Resend (https://resend.com). Entirely optional:
 // without RESEND_API_KEY + EMAIL_SECRET every function quietly does nothing.
 //   RESEND_API_KEY  Resend API key
-//   EMAIL_FROM      e.g. "Strings <hello@yourdomain.in>"
+//   EMAIL_FROM      e.g. "Gigset <hello@yourdomain.in>"
 //   EMAIL_SECRET    random string used to sign unsubscribe links
 //   API_PUBLIC_URL  public API origin, e.g. https://strings-web.onrender.com
 //   FRONTEND_URL    where the app lives (links in emails)
@@ -32,12 +32,12 @@ export function layout({ title, intro, rows = [], cta, ctaUrl, unsubscribe }) {
   return `<!doctype html><html><body style="margin:0;background:#f3f5fb;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif">
 <table role="presentation" width="100%" style="padding:24px 12px"><tr><td align="center">
 <table role="presentation" width="100%" style="max-width:520px;background:#fff;border-radius:16px;overflow:hidden">
-<tr><td style="background:#0b1530;padding:18px 24px;color:#fff;font-size:20px;font-weight:800;letter-spacing:.2px">Strings</td></tr>
+<tr><td style="background:#0b1530;padding:18px 24px;color:#fff;font-size:20px;font-weight:800;letter-spacing:.2px">Gigset</td></tr>
 <tr><td style="padding:26px 24px 8px"><h1 style="margin:0 0 10px;font-size:20px;color:#0b1530">${esc(title)}</h1>
 <p style="margin:0;font-size:15px;line-height:1.55;color:#33415c">${intro}</p>${list}
 ${cta && ctaUrl ? `<p style="margin:22px 0 6px"><a href="${esc(ctaUrl)}" style="display:inline-block;background:#2a63ee;color:#fff;text-decoration:none;font-weight:700;font-size:14.5px;padding:12px 22px;border-radius:12px">${esc(cta)}</a></p>` : ''}
 </td></tr>
-<tr><td style="padding:18px 24px 24px;font-size:12px;color:#8a94ab">You're getting this because you have a Strings account.${unsubscribe ? ` <a href="${esc(unsubscribe)}" style="color:#8a94ab">Unsubscribe</a>` : ''}</td></tr>
+<tr><td style="padding:18px 24px 24px;font-size:12px;color:#8a94ab">You're getting this because you have a Gigset account.${unsubscribe ? ` <a href="${esc(unsubscribe)}" style="color:#8a94ab">Unsubscribe</a>` : ''}</td></tr>
 </table></td></tr></table></body></html>`;
 }
 export { esc };

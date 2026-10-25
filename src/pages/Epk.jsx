@@ -128,7 +128,7 @@ export default function Epk() {
             icon={<UserX size={22} />}
             title="Press kit not found"
             text="This press kit doesn't exist or the profile isn't public."
-            action={<Link className="btn btn-blue btn-sm" to="/">Back to Strings</Link>}
+            action={<Link className="btn btn-blue btn-sm" to="/">Back to Gigset</Link>}
           />
         </article>
         <footer className="epk-foot"><Logo size={20} /><span>Tying the music industry together.</span></footer>
@@ -145,12 +145,12 @@ export default function Epk() {
       <div className="epk-bar">
         <Logo />
         <Link className="btn btn-blue btn-sm" to={`/profile/${person.id}`}>
-          Open in Strings <ArrowRight size={14} />
+          Open in Gigset <ArrowRight size={14} />
         </Link>
       </div>
 
       <article className="epk-sheet">
-        <p className="epk-sheet-kicker">Electronic press kit · via Strings</p>
+        <p className="epk-sheet-kicker">Electronic press kit · via Gigset</p>
         <h1 className="epk-sheet-name">{person.name}</h1>
         <p className="epk-sheet-sub">
           {labelFor(person.stakeholderType)}{person.city ? ` · ${person.city}` : ''}
@@ -205,7 +205,7 @@ export default function Epk() {
 
         <div className="epk-cta">
           <h3>Book {person.name.split(' ')[0]}</h3>
-          <p>On Strings, booking takes under a minute — pick a free day, choose a slot, and send your request directly.</p>
+          <p>On Gigset, booking takes under a minute — pick a free day, choose a slot, and send your request directly.</p>
           <div className="epk-cta-row">
             <button className="btn btn-blue" onClick={requestBooking}>Request booking</button>
             <button className="btn btn-ghost" onClick={share}><Share2 size={14} /> Share</button>

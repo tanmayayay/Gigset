@@ -1,4 +1,4 @@
-// Shared helpers for the Strings data pipeline.
+// Shared helpers for the Gigset data pipeline.
 // Plain Node 22, zero dependencies.
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { join, dirname } from "node:path";

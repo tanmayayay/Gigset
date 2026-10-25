@@ -1,6 +1,6 @@
-# Strings — Tying the music industry together
+# Gigset — Tying the music industry together
 
-A **Phase 1 prototype** of Strings: a professional networking + discovery + marketplace platform for the **Indian music & live-event industry**. Built as a polished, client-only React (Vite) web app for the partner demo on **Saturday, 26 Sept 2026**.
+A **Phase 1 prototype** of Gigset: a professional networking + discovery + marketplace platform for the **Indian music & live-event industry**. Built as a polished, client-only React (Vite) web app for the partner demo on **Saturday, 26 Sept 2026**.
 
 > One verified profile, one feed of the opportunities that matter, and the daily news that keeps the industry moving — for performers, venues, buyers of talent, crew, and institutions.
 
@@ -11,7 +11,7 @@ A **Phase 1 prototype** of Strings: a professional networking + discovery + mark
 **Prerequisites:** Node 18+ and npm.
 
 ```bash
-cd strings-web
+cd gigset-web
 npm install     # install dependencies
 npm run dev     # local dev server (hot reload)
 npm run build   # production build → dist/  (must pass cleanly)

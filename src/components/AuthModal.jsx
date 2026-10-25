@@ -56,7 +56,7 @@ export default function AuthModal({ open, onClose, initialTab = 'signin' }) {
     try {
       if (tab === 'signin') {
         await signIn(email.trim(), password);
-        pushToast('Welcome back to Strings.');
+        pushToast('Welcome back to Gigset.');
         close();
         navigate('/home');
       } else {
@@ -93,11 +93,11 @@ export default function AuthModal({ open, onClose, initialTab = 'signin' }) {
             exit={{ opacity: 0, y: 16, scale: 0.98 }}
             transition={{ type: 'spring', stiffness: 380, damping: 32 }}
             onClick={(e) => e.stopPropagation()}
-            role="dialog" aria-modal="true" aria-label="Sign in to Strings"
+            role="dialog" aria-modal="true" aria-label="Sign in to Gigset"
           >
             <button className="close-x auth-close" onClick={close} aria-label="Close">×</button>
             <div className="auth-brand"><Logo size={30} /></div>
-            <h3>{tab === 'signin' ? 'Welcome back to Strings' : 'Join Strings'}</h3>
+            <h3>{tab === 'signin' ? 'Welcome back to Gigset' : 'Join Gigset'}</h3>
             <p className="auth-sub">
               {tab === 'signin'
                 ? 'Sign in to your network, gigs and messages.'

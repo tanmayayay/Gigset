@@ -6,7 +6,7 @@ import { sendEmail, emailEnabled, layout, appUrl, unsubUrl, unsubToken, esc } fr
 
 const router = Router();
 
-const page = (msg) => `<!doctype html><meta name="viewport" content="width=device-width,initial-scale=1"><body style="font-family:-apple-system,Segoe UI,sans-serif;max-width:420px;margin:15vh auto;padding:0 20px;color:#0b1530"><h2>Strings</h2><p>${esc(msg)}</p></body>`;
+const page = (msg) => `<!doctype html><meta name="viewport" content="width=device-width,initial-scale=1"><body style="font-family:-apple-system,Segoe UI,sans-serif;max-width:420px;margin:15vh auto;padding:0 20px;color:#0b1530"><h2>Gigset</h2><p>${esc(msg)}</p></body>`;
 
 // GET /api/email/unsubscribe?u=&k=alerts|digest&t=  — one-click, signed link from every email.
 router.get('/unsubscribe', asyncHandler(async (req, res) => {
@@ -16,7 +16,7 @@ router.get('/unsubscribe', asyncHandler(async (req, res) => {
   const ok = t.length === want.length && crypto.timingSafeEqual(Buffer.from(t), Buffer.from(want));
   if (!ok) return res.status(400).send(page('This link is not valid.'));
   await prisma.user.updateMany({ where: { id: u }, data: k === 'alerts' ? { emailAlerts: false } : { weeklyDigest: false } });
-  res.send(page(k === 'alerts' ? 'You will no longer get alert emails from Strings.' : 'You will no longer get the weekly Strings digest.'));
+  res.send(page(k === 'alerts' ? 'You will no longer get alert emails from Gigset.' : 'You will no longer get the weekly Gigset digest.'));
 }));
 
 const IST_MS = 5.5 * 3600 * 1000;
@@ -60,12 +60,12 @@ router.post('/digest', asyncHandler(async (req, res) => {
     if (!dry) {
       const ok = await sendEmail({
         to: u.email,
-        subject: pending ? `${pending} booking request${pending > 1 ? 's' : ''} waiting on Strings` : 'Your week on Strings',
+        subject: pending ? `${pending} booking request${pending > 1 ? 's' : ''} waiting on Gigset` : 'Your week on Gigset',
         html: layout({
           title: `Your week, ${esc(u.name.split(' ')[0])}`,
-          intro: `Here's what happened on your Strings profile.${gigs}`,
+          intro: `Here's what happened on your Gigset profile.${gigs}`,
           rows,
-          cta: pending ? 'Review requests' : 'Open Strings',
+          cta: pending ? 'Review requests' : 'Open Gigset',
           ctaUrl: appUrl(pending ? '/collab?tab=bookings' : '/home'),
           unsubscribe: unsubUrl(u.id, 'digest'),
         }),

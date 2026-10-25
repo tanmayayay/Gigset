@@ -1,5 +1,5 @@
 -- ============================================================
--- STRINGS — Performance indexes
+-- GIGSET — Performance indexes
 -- Run once in the Supabase SQL editor. Idempotent: safe to re-run.
 -- Speeds up follower counts, notification lists, chat history,
 -- "my applications" and newest-first opportunity lists.

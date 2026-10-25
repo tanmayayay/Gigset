@@ -389,7 +389,7 @@ router.patch(
       data.visibility = visibility;
     }
     if (avatarUrl !== undefined) {
-      if (avatarUrl !== null && !isOwnMediaUrl(avatarUrl)) return bad(res, 400, 'Field "avatarUrl" must be a photo uploaded to Strings.');
+      if (avatarUrl !== null && !isOwnMediaUrl(avatarUrl)) return bad(res, 400, 'Field "avatarUrl" must be a photo uploaded to Gigset.');
       data.avatarUrl = avatarUrl;
     }
     if (birthDate !== undefined || contentOpen !== undefined) {

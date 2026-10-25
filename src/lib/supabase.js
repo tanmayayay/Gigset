@@ -19,7 +19,7 @@ export const isSupabaseConfigured = Boolean(url && anonKey);
 
 if (!isSupabaseConfigured) {
   console.warn(
-    '[strings] VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY are not set. ' +
+    '[gigset] VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY are not set. ' +
       'Copy .env.example to .env and fill them in (Supabase dashboard → Project Settings → API).'
   );
 }

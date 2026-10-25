@@ -1,6 +1,6 @@
-# Strings data pipeline
+# Gigset data pipeline
 
-Fetches real (non-scraped) data for the Strings app and writes it as static
+Fetches real (non-scraped) data for the Gigset app and writes it as static
 JSON that the frontend reads at build time:
 
 ```

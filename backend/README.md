@@ -1,6 +1,6 @@
-# Strings Backend
+# Gigset Backend
 
-Express v5 + Prisma (v6) REST API for **Strings** — the professional networking + discovery + marketplace platform for the Indian music industry. Postgres (via Supabase) is the production database.
+Express v5 + Prisma (v6) REST API for **Gigset** — the professional networking + discovery + marketplace platform for the Indian music industry. Postgres (via Supabase) is the production database.
 
 > **Setting up Supabase?** Follow **[SUPABASE_SETUP.md](./SUPABASE_SETUP.md)** —
 > the exact click-steps to create a free project (Mumbai region), wire up
@@ -16,7 +16,7 @@ Express v5 + Prisma (v6) REST API for **Strings** — the professional networkin
 ## Setup
 
 ```bash
-cd ~/workspace/strings-web/backend
+cd ~/workspace/gigset-web/backend
 npm install
 cp .env.example .env          # then fill it in per SUPABASE_SETUP.md
 npx prisma migrate dev --name supabase-init   # creates tables in Supabase Postgres
@@ -125,12 +125,12 @@ so this only needs doing once per fresh `node_modules`.
 The React app currently keeps everything in `localStorage` via `src/store/store.jsx`. The swap is mechanical because the API was designed to match:
 
 1. **Base URL** — add `const API = 'http://localhost:4000/api'` (later an env var) in one place, e.g. `src/lib/api.js`.
-2. **Auth** — after `POST /api/auth/dev-login` (Phase 2: real login), store the token in memory/localStorage and attach `Authorization: Bearer <token>` to every fetch. Replace the `useLocal('strings.…')` hooks with `useState` + `useEffect` fetches.
+2. **Auth** — after `POST /api/auth/dev-login` (Phase 2: real login), store the token in memory/localStorage and attach `Authorization: Bearer <token>` to every fetch. Replace the `useLocal('gigset.…')` hooks with `useState` + `useEffect` fetches.
 3. **Shape mapping** (frontend → API):
    - `profiles` → `GET /api/profiles` (fields: `id, name, stakeholderType, bio, city, verificationStatus` — same names as the demo data).
    - feed posts → `GET /api/posts` (newest first; `author` embedded; `_count.likes/_count.comments`). Likes: `POST /api/posts/:id/like`; comments: `GET|POST /api/posts/:id/comments`.
    - opportunities → `GET /api/opportunities`; applying → `POST /api/opportunities/:id/apply { message }`.
-   - bookings → `GET /api/bookings` (replaces `strings.bookings`), `POST /api/bookings { hostId, date, timeSlot, budget, message }` maps 1:1 from `BookingModal` (`personId→hostId`, `dateISO→date`, `slot→timeSlot`). Cancel → `PATCH /api/bookings/:id { status: 'CANCELLED' }`.
+   - bookings → `GET /api/bookings` (replaces `gigset.bookings`), `POST /api/bookings { hostId, date, timeSlot, budget, message }` maps 1:1 from `BookingModal` (`personId→hostId`, `dateISO→date`, `slot→timeSlot`). Cancel → `PATCH /api/bookings/:id { status: 'CANCELLED' }`.
    - venues/events/articles → `GET /api/venues|events|articles` (replace the static `src/data/demo.js` lists).
 4. **Keep it JSON** — every response is JSON-serializable with documented shapes in the endpoint table above; no response-shape guessing needed.
 5. **Demo parity** — `npm run seed` loads the same kind of sample data the frontend demo uses, so the app looks identical on first load against the API.

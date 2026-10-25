@@ -10,7 +10,7 @@ export function Logo({ size = 26, light = false }) {
         <path d="M4 21C4 21 6 5 13 5C20 5 22 21 22 21" stroke="#2A63EE" strokeWidth="2" strokeLinecap="round" />
         <path d="M8 21C8 21 9 11 13 11C17 11 18 21 18 21" stroke="#0EA5E9" strokeWidth="2" strokeLinecap="round" />
       </svg>
-      <span className={light ? '' : 'brand-gradient-text'}>Strings</span>
+      <span className={light ? '' : 'brand-gradient-text'}>Gigset</span>
     </span>
   );
 }

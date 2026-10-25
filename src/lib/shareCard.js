@@ -78,7 +78,7 @@ export async function drawShareCard({ kind = 'profile', person, link, facts = []
   ctx.fillStyle = '#fff';
   ctx.font = `800 44px ${FONT}`;
   ctx.textBaseline = 'alphabetic';
-  ctx.fillText('Strings', 72, 112);
+  ctx.fillText('Gigset', 72, 112);
   ctx.fillStyle = 'rgba(255,255,255,.55)';
   ctx.font = `500 26px ${FONT}`;
   ctx.fillText('India’s music & live-event network', 72, 152);
@@ -193,7 +193,7 @@ export async function drawShareCard({ kind = 'profile', person, link, facts = []
   ctx.textAlign = 'left';
   ctx.fillStyle = '#0B1530';
   ctx.font = `800 44px ${FONT}`;
-  ctx.fillText(kind === 'booked' ? 'Booked on Strings' : `Book ${person.name.split(' ')[0]}`, 360, fy + 98);
+  ctx.fillText(kind === 'booked' ? 'Booked on Gigset' : `Book ${person.name.split(' ')[0]}`, 360, fy + 98);
   ctx.fillStyle = '#52607A';
   ctx.font = `500 29px ${FONT}`;
   ctx.fillText(kind === 'booked' ? 'Find and book India’s live talent.' : 'Scan to see availability & send a request.', 360, fy + 148);

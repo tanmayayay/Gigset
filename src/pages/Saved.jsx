@@ -88,7 +88,7 @@ export default function Saved() {
       ),
     },
     {
-      kind: 'live', title: 'Headlines saved from Strings Daily', icon: Newspaper,
+      kind: 'live', title: 'Headlines saved from Gigset Daily', icon: Newspaper,
       items: itemsFor('live'),
       render: (n) => (
         <a className="article-card" key={n.id} href={n.url} target="_blank" rel="noopener noreferrer" style={{ display: 'block' }}>
@@ -101,7 +101,7 @@ export default function Saved() {
       kind: 'media', title: 'Gighub clips', icon: ImageIcon,
       items: itemsFor('media'),
       render: (p) => {
-        const name = p.author?.name || 'Strings member';
+        const name = p.author?.name || 'Gigset member';
         const isVideo = /\.(mp4|webm|mov)(\?|$)/i.test(p.mediaUrl || '');
         return (
           <div className="media-tile" key={p.id} onClick={() => navigate(`/profile/${p.author?.id}`)} style={{ cursor: 'pointer' }}>
@@ -125,7 +125,7 @@ export default function Saved() {
       kind: 'track', title: 'Tracks', icon: Music,
       items: itemsFor('track'),
       render: (t) => {
-        const uname = t.uploader?.name || t.author?.name || 'Strings member';
+        const uname = t.uploader?.name || t.author?.name || 'Gigset member';
         return (
           <div className="media-tile" key={t.id}>
             <div className="media-thumb" style={{ aspectRatio: '16/9', background: 'var(--gradient-card)' }}>
@@ -148,7 +148,7 @@ export default function Saved() {
       kind: 'post', title: 'Posts', icon: MessageSquare,
       items: itemsFor('post'),
       render: (p) => {
-        const name = p.author?.name || p.who || 'Strings member';
+        const name = p.author?.name || p.who || 'Gigset member';
         const sub = p.author ? `${p.author.stakeholderType || ''}`.trim() : `${p.role || ''} · ${p.time || ''}`;
         return (
           <div className="post-card" key={p.id}>

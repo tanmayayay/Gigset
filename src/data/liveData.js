@@ -1,5 +1,5 @@
 // ============================================================
-// STRINGS — live (real-world) data loader
+// GIGSET — live (real-world) data loader
 // A sibling data pipeline writes JSON snapshots to ./live/:
 //   venues.json, events.json, news.json, meta.json
 // If those files are absent (glob matches nothing), every export

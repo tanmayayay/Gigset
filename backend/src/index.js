@@ -34,22 +34,22 @@ const hasUrl = isSet(process.env.SUPABASE_URL);
 const hasSecret = isSet(process.env.SUPABASE_JWT_SECRET);
 if (hasUrl !== hasSecret) {
   console.warn(
-    '[strings-backend] WARNING: only one of SUPABASE_URL / SUPABASE_JWT_SECRET is set — ' +
+    '[gigset-backend] WARNING: only one of SUPABASE_URL / SUPABASE_JWT_SECRET is set — ' +
     'running in DEV mock-auth mode. Set both to require real Supabase JWTs.'
   );
 }
 console.log(
-  `[strings-backend] auth mode: ${isSupabaseMode ? 'SUPABASE (real JWTs required)' : 'DEV-ONLY mock (set SUPABASE_URL + SUPABASE_JWT_SECRET to switch)'}`
+  `[gigset-backend] auth mode: ${isSupabaseMode ? 'SUPABASE (real JWTs required)' : 'DEV-ONLY mock (set SUPABASE_URL + SUPABASE_JWT_SECRET to switch)'}`
 );
 
 // Fail closed: without real Supabase config the API would fall back to the
 // dev-only mock login, where anyone could sign in as anyone. Never allow that live.
 if (process.env.NODE_ENV === 'production' && !isSupabaseMode) {
-  console.error('[strings-backend] FATAL: NODE_ENV=production but SUPABASE_URL / SUPABASE_JWT_SECRET are not set. Refusing to start.');
+  console.error('[gigset-backend] FATAL: NODE_ENV=production but SUPABASE_URL / SUPABASE_JWT_SECRET are not set. Refusing to start.');
   process.exit(1);
 }
 if (process.env.NODE_ENV === 'production' && !process.env.FRONTEND_URL) {
-  console.warn('[strings-backend] WARNING: FRONTEND_URL is not set, so CORS allows every origin.');
+  console.warn('[gigset-backend] WARNING: FRONTEND_URL is not set, so CORS allows every origin.');
 }
 
 // Behind Render's proxy: trust one hop so rate limits see the real client IP.
@@ -118,7 +118,7 @@ app.use(['/api/profiles', '/api/opportunities', '/api/venues', '/api/events', '/
 app.get('/api/health', (req, res) => {
   res.json({
     ok: true,
-    service: 'strings-backend',
+    service: 'gigset-backend',
     version: '0.1.0',
     time: new Date().toISOString(),
   });
@@ -155,5 +155,5 @@ app.use((err, req, res, _next) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`[strings-backend] listening on http://localhost:${PORT}`);
+  console.log(`[gigset-backend] listening on http://localhost:${PORT}`);
 });

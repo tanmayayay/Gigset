@@ -1,4 +1,4 @@
-# Strings backend — production image (Render / Railway / Fly.io)
+# Gigset backend — production image (Render / Railway / Fly.io)
 FROM node:22-alpine
 
 WORKDIR /app

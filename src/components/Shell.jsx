@@ -23,7 +23,7 @@ const NAV_MAIN = [
 ];
 const NAV_MORE = [
   { to: '/settings', label: 'Settings', icon: Settings },
-  { to: '/about', label: 'About Strings', icon: Info },
+  { to: '/about', label: 'About Gigset', icon: Info },
   { to: '/support', label: 'Help & Legal', icon: LifeBuoy },
 ];
 
@@ -104,7 +104,7 @@ export default function Shell({ onOpenPalette, onNewPost, onNewOpp }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [live.unreadNotifications]);
 
-  // "(2) Strings" in the browser tab while messages wait.
+  // "(2) Gigset" in the browser tab while messages wait.
   useEffect(() => {
     const base = document.title.replace(/^\(\d+\+?\)\s*/, '');
     document.title = live.unreadMessages > 0 ? `(${live.unreadMessages > 99 ? '99+' : live.unreadMessages}) ${base}` : base;
@@ -165,7 +165,7 @@ export default function Shell({ onOpenPalette, onNewPost, onNewOpp }) {
             <button className="icon-btn mobile-menu-btn" onClick={() => setDrawer(true)} aria-label="Open menu">
               <Menu size={17} />
             </button>
-            <button className="topbar-search" onClick={onOpenPalette} aria-label="Search Strings">
+            <button className="topbar-search" onClick={onOpenPalette} aria-label="Search Gigset">
               <Search size={15} />
               <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Search people, venues, opportunities…</span>
               <kbd>⌘K</kbd>

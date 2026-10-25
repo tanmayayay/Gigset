@@ -114,7 +114,7 @@ async function queryOverpass(query) {
           backoffMs: 1000,
           headers: {
             // A real UA is required (mirrors 429 UA-less clients).
-            "User-Agent": "StringsDataPipeline/1.0 (music-industry research; contact via repo)",
+            "User-Agent": "GigsetDataPipeline/1.0 (music-industry research; contact via repo)",
           },
         });
         if (res.status === 429) {

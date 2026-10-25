@@ -36,11 +36,11 @@ export default function Settings() {
   };
 
   const deleteAccount = async () => {
-    if (!window.confirm('Delete your Strings account? Your profile, posts, stories and messages will be permanently removed. This cannot be undone.')) return;
+    if (!window.confirm('Delete your Gigset account? Your profile, posts, stories and messages will be permanently removed. This cannot be undone.')) return;
     if (window.prompt('Type DELETE to confirm.') !== 'DELETE') return;
     try {
       await Profiles.deleteMe();
-      Object.keys(localStorage).filter((k) => k.startsWith('strings.')).forEach((k) => localStorage.removeItem(k));
+      Object.keys(localStorage).filter((k) => k.startsWith('gigset.')).forEach((k) => localStorage.removeItem(k));
       await logout();
       navigate('/');
       pushToast('Your account was deleted.');
@@ -51,7 +51,7 @@ export default function Settings() {
 
   const resetLocal = () => {
     if (!window.confirm('Clear locally stored bookmarks and preferences on this device?')) return;
-    Object.keys(localStorage).filter((k) => k.startsWith('strings.')).forEach((k) => localStorage.removeItem(k));
+    Object.keys(localStorage).filter((k) => k.startsWith('gigset.')).forEach((k) => localStorage.removeItem(k));
     window.location.reload();
   };
 

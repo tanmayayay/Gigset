@@ -1,4 +1,4 @@
-# Sends the weekly "Your week on Strings" email. Free: runs on GitHub, calls the API.
+# Sends the weekly "Your week on Gigset" email. Free: runs on GitHub, calls the API.
 # Setup (GitHub repo → Settings → Secrets and variables → Actions):
 #   Secret   CRON_SECRET  = same value as CRON_SECRET on Render
 #   Variable API_URL      = https://strings-web.onrender.com

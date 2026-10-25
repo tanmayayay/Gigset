@@ -1,5 +1,5 @@
 -- ============================================================
--- STRINGS — Message receipts (sent / delivered / read ticks) + live inbox
+-- GIGSET — Message receipts (sent / delivered / read ticks) + live inbox
 -- Run ONCE in the Supabase SQL editor BEFORE deploying the new backend.
 -- Idempotent: safe to re-run.
 -- ============================================================

@@ -1,4 +1,4 @@
-// Strings seed — a small slice of real-ish Indian music data for local dev/demo.
+// Gigset seed — a small slice of real-ish Indian music data for local dev/demo.
 // Run: npm run seed   (idempotent: wipes the seed tables first)
 import 'dotenv/config';
 import { PrismaClient } from '@prisma/client';
@@ -174,7 +174,7 @@ async function main() {
       city: 'Mumbai',
       date: new Date('2026-10-10T20:00:00+05:30'),
       genre: 'Sufi',
-      source: 'strings-seed',
+      source: 'gigset-seed',
     },
   });
 

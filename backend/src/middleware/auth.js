@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// Strings auth middleware — Supabase JWT verification with a dev-only fallback.
+// Gigset auth middleware — Supabase JWT verification with a dev-only fallback.
 //
 // SUPABASE MODE (SUPABASE_URL + SUPABASE_JWT_SECRET are both set):
 //   Expects `Authorization: Bearer <supabase-access-token>`.
@@ -135,7 +135,7 @@ async function loadOrCreateUser(payload) {
         meta.name ||
         meta.full_name ||
         (email ? email.split('@')[0] : null) ||
-        'Strings user',
+        'Gigset user',
       stakeholderType: 'PERFORMER', // default; user picks their real type in onboarding
       bio: typeof meta.bio === 'string' ? meta.bio : null,
       city: typeof meta.city === 'string' ? meta.city : null,

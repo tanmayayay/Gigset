@@ -52,7 +52,7 @@ function Nav({ onJoin, onLogin, onDemo }) {
   return (
     <nav className={`ap-nav${solid ? ' solid' : ''}`}>
       <div className="ap-nav-in">
-        <Link to="/" aria-label="Strings home" className="ap-logo"><Logo /></Link>
+        <Link to="/" aria-label="Gigset home" className="ap-logo"><Logo /></Link>
         <div className="ap-links">
           <a href="#story">Overview</a>
           <a href="#roles">Who it&rsquo;s for</a>
@@ -136,7 +136,7 @@ function Device({ screen = 'profile', style }) {
   const Screen = SCREENS[screen];
   return (
     <div className="dv" style={style}>
-      <div className="dv-bar"><i /><i /><i /><span>strings.app</span></div>
+      <div className="dv-bar"><i /><i /><i /><span>gigset.app</span></div>
       <AnimatePresence mode="wait">
         <motion.div key={screen} initial={{ opacity: 0, y: 14, scale: 0.985 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.4, ease }}>
           <Screen />
@@ -159,7 +159,7 @@ function Hero({ onJoin, onDemo }) {
   return (
     <header className="ap-hero">
       <div className="ap-glow" aria-hidden="true" />
-      <motion.span className="ap-eyebrow" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, ease }}>Introducing Strings</motion.span>
+      <motion.span className="ap-eyebrow" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, ease }}>Introducing Gigset</motion.span>
       <motion.h1 initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, delay: 0.08, ease }}>
         Your music career,<br /><span className="ap-grad">beautifully connected.</span>
       </motion.h1>
@@ -184,7 +184,7 @@ function Hero({ onJoin, onDemo }) {
    ============================================================ */
 const STEPS = [
   { id: 'profile', kicker: 'Portfolio', title: 'A profile that works like a portfolio.', copy: 'Your sound, your samples, your story and your rating, laid out like a showcase. Embed tracks and videos so people can hear you before they ever message you.' },
-  { id: 'match', kicker: 'Match', title: 'Gigs that find you.', copy: 'Every brief on Strings is scored against your craft, city and past work. The right opportunities rise to the top, the noise stays out.' },
+  { id: 'match', kicker: 'Match', title: 'Gigs that find you.', copy: 'Every brief on Gigset is scored against your craft, city and past work. The right opportunities rise to the top, the noise stays out.' },
   { id: 'book', kicker: 'Collab and book', title: 'From hello to booked, in one place.', copy: 'Check live availability, send a request with a budget and a date, and confirm. No more lost enquiries in group chats.' },
   { id: 'notes', kicker: 'Notes', title: 'Stay in the moment.', copy: 'Drop a photo note from soundcheck. It orbits the community for 12 hours, then fades. Fresh, social and never a chore.' },
 ];
@@ -331,7 +331,7 @@ function MatchWidget() {
    ============================================================ */
 const QUOTES = [
   {
-    quote: 'I stopped losing gig leads to WhatsApp chaos. On Strings every enquiry lands on my profile with a budget and a date attached — I booked three sessions in my first week.',
+    quote: 'I stopped losing gig leads to WhatsApp chaos. On Gigset every enquiry lands on my profile with a budget and a date attached — I booked three sessions in my first week.',
     name: 'Meera Iyer', meta: 'Vocalist · Mumbai',
   },
   {
@@ -366,16 +366,16 @@ function Testimonials() {
 
 const FAQS = [
   {
-    q: 'Is Strings free?',
+    q: 'Is Gigset free?',
     a: 'Yes — creating a profile, discovering people and getting match scores is free throughout Phase 1. Down the line we\'ll introduce optional paid tiers for promoters running high-volume hiring and for advanced analytics, but the core network will always be free for working artists and crew.',
   },
   {
-    q: 'Who is Strings for?',
+    q: 'Who is Gigset for?',
     a: 'Everyone who makes live music happen in India: performers and bands, venues and studios, talent buyers (festivals, organisers, brands), crew and technical professionals, plus institutions and agencies like schools, societies and management firms.',
   },
   {
     q: 'How is this different from Instagram or WhatsApp?',
-    a: 'Instagram is for audiences; WhatsApp is for chaos. Strings is for work: verified profiles with real skills and gig history, structured briefs with budgets and dates, AI match scores so the right people see the right opportunities, and outreach that arrives spam-free — no broadcast groups, no buried leads.',
+    a: 'Instagram is for audiences; WhatsApp is for chaos. Gigset is for work: verified profiles with real skills and gig history, structured briefs with budgets and dates, AI match scores so the right people see the right opportunities, and outreach that arrives spam-free — no broadcast groups, no buried leads.',
   },
   {
     q: 'What does Phase 1 include?',
@@ -423,7 +423,7 @@ function BigCta({ onJoin }) {
 function Footer() {
   return (
     <footer className="ap-foot">
-      <div><Logo /><small>&copy; 2026 Strings. Free during Phase 1.</small></div>
+      <div><Logo /><small>&copy; 2026 Gigset. Free during Phase 1.</small></div>
       <div className="ap-foot-links"><Link to="/about">About</Link><Link to="/support">Support</Link></div>
     </footer>
   );

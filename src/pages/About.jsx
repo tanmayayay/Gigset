@@ -6,15 +6,15 @@ import { STAKEHOLDER_GROUPS } from '../data/demo';
 export default function About() {
   return (
     <div>
-      <PageHead title="About Strings" sub="Tying the music industry together." />
+      <PageHead title="About Gigset" sub="Tying the music industry together." />
       <div className="post-card" style={{ padding: 28 }}>
         <h4 style={{ fontSize: 16, marginBottom: 10, display: 'flex', alignItems: 'center', gap: 8 }}><Target size={17} style={{ color: 'var(--blue)' }} /> Our mission</h4>
-        <p style={{ color: 'var(--text-dim)', fontSize: 15, lineHeight: 1.75 }}>Strings exists to remove the two biggest frictions in the Indian music industry: artists cannot easily be found or booked, and the people who need musical talent and services cannot easily find or vet it. We give every stakeholder — performer, venue, engineer, school, or brand — one verified profile, one place to be discovered, and one feed of the news and opportunities relevant to them.</p>
+        <p style={{ color: 'var(--text-dim)', fontSize: 15, lineHeight: 1.75 }}>Gigset exists to remove the two biggest frictions in the Indian music industry: artists cannot easily be found or booked, and the people who need musical talent and services cannot easily find or vet it. We give every stakeholder — performer, venue, engineer, school, or brand — one verified profile, one place to be discovered, and one feed of the news and opportunities relevant to them.</p>
       </div>
 
       <div className="post-card" style={{ padding: 28 }}>
         <h4 style={{ fontSize: 16, marginBottom: 10, display: 'flex', alignItems: 'center', gap: 8 }}><Layers size={17} style={{ color: 'var(--blue)' }} /> Where we are</h4>
-        <p style={{ color: 'var(--text-dim)', fontSize: 14.5, lineHeight: 1.7, marginBottom: 16 }}>This is the Phase 1 prototype of the Strings concept — built to demonstrate the sitemap, feature set, and stakeholder model. The build ships in three phases:</p>
+        <p style={{ color: 'var(--text-dim)', fontSize: 14.5, lineHeight: 1.7, marginBottom: 16 }}>This is the Phase 1 prototype of the Gigset concept — built to demonstrate the sitemap, feature set, and stakeholder model. The build ships in three phases:</p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {[
             ['Phase 1 — Network (this prototype)', 'Profiles, feeds, Gighub discovery, Collab marketplace, communities, daily news, messaging.', 'blue'],

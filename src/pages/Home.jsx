@@ -16,7 +16,7 @@ import { Posts, Profiles, Opps, NewsLive, Directory } from '../lib/api';
 import { useStore } from '../store/store';
 import './home.css';
 
-const HIDDEN_KEY = 'strings.hiddenPosts';
+const HIDDEN_KEY = 'gigset.hiddenPosts';
 const TABS = [
   { id: 'foryou', label: 'For you', icon: Sparkles },
   { id: 'following', label: 'Following', icon: Users },
@@ -80,8 +80,8 @@ export default function Home() {
 
   useEffect(() => {
     load();
-    window.addEventListener('strings:post-created', load);
-    return () => window.removeEventListener('strings:post-created', load);
+    window.addEventListener('gigset:post-created', load);
+    return () => window.removeEventListener('gigset:post-created', load);
   }, [load]);
 
   // Side modules load in parallel and fail soft.
@@ -167,7 +167,7 @@ export default function Home() {
   // Stories from the news feed that fit this person's interests, mixed between posts.
   const newsPosts = useMemo(() => {
     let prefs = {};
-    try { prefs = JSON.parse(localStorage.getItem('strings.newsPrefs') || '{}'); } catch { /* ignore */ }
+    try { prefs = JSON.parse(localStorage.getItem('gigset.newsPrefs') || '{}'); } catch { /* ignore */ }
     return news.map(fromLive)
       .filter((n) => n.image || n.excerpt)
       .map((n, i) => ({ n, s: (prefs[topicOf(n)] || 0) * 2 - i * 0.2 + (n.image ? 1.5 : 0) + (n.region === 'india' ? 0.5 : 0) }))

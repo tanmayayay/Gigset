@@ -1,4 +1,4 @@
-# Strings — Real Data Sources (researched 2026-09-25)
+# Gigset — Real Data Sources (researched 2026-09-25)
 
 Ranked by: free access, India coverage, reliability, effort to enable.
 Verified items were tested live from this machine; unverified items are marked as such.
@@ -68,7 +68,7 @@ Verified items were tested live from this machine; unverified items are marked a
 - `thewildcity.com/feed/` redirects to the homepage; no RSS at `/rss`, `/rss.xml`, `/feed.xml`. Skip.
 
 ## Vendors (sound/light engineers, staging crew) — honest assessment
-- **No public API or open directory exists** for Indian AV crew/vendors. This is genuinely a gap — which is exactly why Strings' user-generated profiles ARE the directory (the product thesis).
+- **No public API or open directory exists** for Indian AV crew/vendors. This is genuinely a gap — which is exactly why Gigset' user-generated profiles ARE the directory (the product thesis).
 - **Recommendation:** seed data + user-generated supply. Do NOT scrape Justdial/IndiaMART (closed, bot-protected, ToS risk).
 
 ## Recommended pipeline (implemented in `data-pipeline/`)

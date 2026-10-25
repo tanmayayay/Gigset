@@ -14,6 +14,6 @@ export function birthError(iso) {
   if (!iso) return '';
   const a = ageOf(iso);
   if (a == null || a < 0 || a > 110) return 'That birth date does not look right.';
-  if (a < MIN_AGE) return `Strings is for people ${MIN_AGE} and over.`;
+  if (a < MIN_AGE) return `Gigset is for people ${MIN_AGE} and over.`;
   return '';
 }
