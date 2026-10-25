@@ -4,7 +4,7 @@ import { Profiles } from '../../lib/api';
 
 const short = (day) => { const [, m, d] = day.split('-'); return `${Number(d)}/${Number(m)}`; };
 
-function Delta({ now, prev }) {
+function Delta({ now, prev, days }) {
   if (!prev && !now) return <em>No views yet</em>;
   if (!prev) return <em className="up">New this period</em>;
   const pct = Math.round(((now - prev) / prev) * 100);
@@ -44,7 +44,7 @@ export default function Insights() {
         </div>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, margin: '14px 0 4px' }}>
           <b style={{ fontFamily: 'var(--font-display)', fontSize: 34 }}>{data.views.toLocaleString()}</b>
-          <span className="pf-delta"><Delta now={data.views} prev={data.prevViews} /></span>
+          <span className="pf-delta"><Delta now={data.views} prev={data.prevViews} days={days} /></span>
         </div>
         <div className="pf-bars" aria-label="Views per day">
           {data.series.map((s) => (

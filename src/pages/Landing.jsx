@@ -1,22 +1,21 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { motion, AnimatePresence, useInView } from 'framer-motion';
+import { motion, AnimatePresence, useInView, useScroll, useTransform, useMotionValueEvent } from 'framer-motion';
 import {
-  Network, Handshake, Newspaper, Mic, Building2, Briefcase, SlidersHorizontal,
-  GraduationCap, ChevronDown, ArrowRight, ChevronLeft, ChevronRight,
-  BadgeCheck, Check, Sparkles, Zap, Play, Users, MapPin,
+  Mic, Building2, Briefcase, SlidersHorizontal, GraduationCap, ArrowRight, ChevronRight, ChevronLeft,
+  BadgeCheck, Sparkles, Plus, Play, Heart, MapPin, CalendarCheck, Radio,
 } from 'lucide-react';
 import { useStore } from '../store/store';
 import { Logo } from '../components/ui';
 import AuthModal from '../components/AuthModal';
-import { STAKEHOLDER_GROUPS, PEOPLE, CITIES, initials, avatarColor } from '../data/demo';
+import { PEOPLE, CITIES, initials, avatarColor } from '../data/demo';
 import '../landing.css';
 
-/* ---------- count-up on scroll into view ---------- */
+/* ---------- helpers ---------- */
 function useCountUp(target, start, duration = 1600) {
   const [val, setVal] = useState(0);
   useEffect(() => {
-    if (!start) return;
+    if (!start) return undefined;
     let raf; const t0 = performance.now();
     const tick = (t) => {
       const p = Math.min(1, (t - t0) / duration);
@@ -28,42 +27,43 @@ function useCountUp(target, start, duration = 1600) {
   }, [start, target, duration]);
   return val;
 }
-
-/* ---------- deterministic pseudo-random for mock data ---------- */
 function hashStr(s) {
   let h = 2166136261;
   for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
   return h >>> 0;
 }
+const ease = [0.2, 0.7, 0.2, 1];
+function Reveal({ children, delay = 0, y = 36, className, as: Tag = 'div' }) {
+  const M = motion[Tag];
+  return <M className={className} initial={{ opacity: 0, y }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-70px' }} transition={{ duration: 0.8, delay, ease }}>{children}</M>;
+}
 
 /* ============================================================
-   NAV
+   NAV: frosted, slim, centred links
    ============================================================ */
 function Nav({ onJoin, onLogin, onDemo }) {
   const { user } = useStore();
-  const [scrolled, setScrolled] = useState(false);
+  const [solid, setSolid] = useState(false);
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
-    onScroll(); window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+    const f = () => setSolid(window.scrollY > 8);
+    f(); window.addEventListener('scroll', f, { passive: true });
+    return () => window.removeEventListener('scroll', f);
   }, []);
   return (
-    <nav className={`lnav${scrolled ? ' scrolled' : ''}`}>
-      <div className="lnav-in">
-        <Link to="/" aria-label="Strings home"><Logo light /></Link>
-        <div className="lnav-links">
-          <a href="#product">Product</a>
-          <a href="#who">Who it&rsquo;s for</a>
-          <a href="#stories">Stories</a>
+    <nav className={`ap-nav${solid ? ' solid' : ''}`}>
+      <div className="ap-nav-in">
+        <Link to="/" aria-label="Strings home" className="ap-logo"><Logo /></Link>
+        <div className="ap-links">
+          <a href="#story">Overview</a>
+          <a href="#roles">Who it&rsquo;s for</a>
+          <a href="#match">Match</a>
           <a href="#faq">FAQ</a>
         </div>
-        <div className="lnav-actions">
-          {user ? (
-            <button className="lbtn lbtn-grad" onClick={onDemo}>Open app <ArrowRight size={16} /></button>
-          ) : (
+        <div className="ap-nav-cta">
+          {user ? <button className="ap-pill" onClick={onDemo}>Open app</button> : (
             <>
-              <button className="lbtn lbtn-ghost" onClick={onLogin}>Log in</button>
-              <button className="lbtn lbtn-grad" onClick={onJoin}>Join Strings</button>
+              <button className="ap-textbtn" onClick={onLogin}>Sign in</button>
+              <button className="ap-pill" onClick={onJoin}>Join</button>
             </>
           )}
         </div>
@@ -73,100 +73,106 @@ function Nav({ onJoin, onLogin, onDemo }) {
 }
 
 /* ============================================================
-   HERO + product visual
+   The device: a portfolio-style profile that changes per story step
    ============================================================ */
-const WAVE_BARS = [18, 30, 22, 38, 26, 40, 32, 24, 36, 28, 42, 30, 20, 34, 26, 40, 32, 22, 36, 28, 38, 24, 30, 36, 26, 32];
+const WAVE = [30, 55, 40, 70, 48, 82, 60, 38, 66, 50, 78, 44, 36, 60, 52, 74, 46, 58, 40, 68];
 
-function MatchCardVisual() {
-  const rows = [
-    { p: PEOPLE[0], pct: 94 },
-    { p: PEOPLE[1], pct: 91 },
-    { p: PEOPLE[2], pct: 88 },
-  ];
+function ScreenProfile() {
   return (
-    <div className="lvisual">
-      <div className="lfloat">
-        <div className="lcard">
-          <div className="lcard-glow" />
-          <div className="lcard-head">
-            <span className="live"><i />Live matching</span>
-            <Sparkles size={18} color="#8FB6FF" />
-          </div>
-          <div className="lcard-match">
-            <div className="lring">
-              <svg width="104" height="104" viewBox="0 0 104 104">
-                <circle cx="52" cy="52" r="46" fill="none" stroke="rgba(148,178,255,.15)" strokeWidth="10" />
-                <circle cx="52" cy="52" r="46" fill="none" stroke="url(#ringGrad)" strokeWidth="10"
-                  strokeLinecap="round" strokeDasharray={2 * Math.PI * 46} strokeDashoffset={2 * Math.PI * 46 * 0.06} />
-                <defs>
-                  <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%" stopColor="#2A63EE" /><stop offset="100%" stopColor="#22D3EE" />
-                  </linearGradient>
-                </defs>
-              </svg>
-              <div className="num"><b>94%</b><span>match</span></div>
-            </div>
-            <div className="who">
-              <h4>Meera Iyer</h4>
-              <p>Vocalist · Mumbai</p>
-              <span className="lpill"><BadgeCheck size={13} /> Verified profile</span>
-            </div>
-          </div>
-          <div className="lrows">
-            {rows.map(({ p, pct }) => (
-              <div className="lrow" key={p.id}>
-                <div className="av" style={{ background: p.heroGradient || avatarColor(p.name) }}>{initials(p.name)}</div>
-                <div className="tx"><b>{p.name}</b><span>{p.role} · {p.city}</span></div>
-                <div className="pct">{pct}%</div>
-              </div>
-            ))}
-          </div>
-          <div className="lwave">
-            {WAVE_BARS.map((h, i) => (
-              <i key={i} style={{ height: `${h}px`, animationDelay: `${(i % 9) * 0.14}s` }} />
-            ))}
-          </div>
-        </div>
-        <div className="lchip lchip-a"><Zap size={15} color="#22D3EE" /> 12 new matches today</div>
-        <div className="lchip lchip-b"><MapPin size={15} color="#A78BFA" /> Gig alert · Delhi-NCR</div>
+    <div className="dv-screen">
+      <div className="dv-cover" />
+      <div className="dv-body">
+        <div className="dv-avatar">MI</div>
+        <h4>Meera Iyer <BadgeCheck size={16} /></h4>
+        <p>Vocalist &middot; Mumbai</p>
+        <div className="dv-chips"><span>Bollywood</span><span>Sufi</span><span>Jazz</span></div>
+        <div className="dv-stats"><div><b>2.4k</b><i>Followers</i></div><div><b>86</b><i>Gigs</i></div><div><b>4.9</b><i>Rating</i></div></div>
+        <div className="dv-listen"><button aria-label="Play"><Play size={14} fill="currentColor" /></button><div className="dv-wave">{WAVE.map((h, i) => <i key={i} style={{ height: `${h}%`, animationDelay: `${(i % 8) * 0.1}s` }} />)}</div></div>
+        <div className="dv-tiles"><i style={{ background: 'linear-gradient(135deg,#6a5cff,#22d3ee)' }} /><i style={{ background: 'linear-gradient(135deg,#ff7ab6,#ffb86b)' }} /><i style={{ background: 'linear-gradient(135deg,#34d399,#2a63ee)' }} /></div>
       </div>
     </div>
   );
 }
+function ScreenMatch() {
+  const rows = [[PEOPLE[0], 94], [PEOPLE[1], 91], [PEOPLE[2], 88]];
+  return (
+    <div className="dv-screen pad">
+      <h5><Sparkles size={14} /> Matched for you</h5>
+      {rows.map(([p, pct]) => (
+        <div className="dv-row" key={p.id}>
+          <div className="av" style={{ background: p.heroGradient || avatarColor(p.name) }}>{initials(p.name)}</div>
+          <div className="tx"><b>{p.name}</b><span>{p.role} &middot; {p.city}</span><div className="bar"><i style={{ width: `${pct}%` }} /></div></div>
+          <strong>{pct}%</strong>
+        </div>
+      ))}
+    </div>
+  );
+}
+function ScreenBook() {
+  const days = Array.from({ length: 35 }, (_, i) => i);
+  const busy = new Set([3, 4, 11, 17, 18, 25]); const booked = new Set([9, 22]);
+  return (
+    <div className="dv-screen pad">
+      <h5><CalendarCheck size={14} /> Availability</h5>
+      <div className="dv-cal">{days.map((d) => <i key={d} className={booked.has(d) ? 'booked' : busy.has(d) ? 'busy' : 'free'}>{(d % 31) + 1}</i>)}</div>
+      <button className="dv-req">Request 24 Oct</button>
+    </div>
+  );
+}
+function ScreenNotes() {
+  return (
+    <div className="dv-screen pad">
+      <h5><Radio size={14} /> Notes</h5>
+      <div className="dv-orbit">
+        {[-1, 0, 1].map((d) => <span key={d} className={d === 0 ? 'front' : ''} style={{ zIndex: d === 0 ? 2 : 1, transform: `translateX(${d * 96}px) translateZ(${-Math.abs(d) * 60}px) rotateY(${-d * 30}deg)`, background: d === 0 ? 'linear-gradient(160deg,#6a5cff,#22d3ee)' : d < 0 ? 'linear-gradient(160deg,#ff7ab6,#7c5cff)' : 'linear-gradient(160deg,#34d399,#2a63ee)' }} />)}
+      </div>
+      <p className="dv-cap">Tonight&rsquo;s soundcheck <Heart size={12} /></p>
+    </div>
+  );
+}
+const SCREENS = { profile: ScreenProfile, match: ScreenMatch, book: ScreenBook, notes: ScreenNotes };
 
+function Device({ screen = 'profile', style }) {
+  const Screen = SCREENS[screen];
+  return (
+    <div className="dv" style={style}>
+      <div className="dv-bar"><i /><i /><i /><span>strings.app</span></div>
+      <AnimatePresence mode="wait">
+        <motion.div key={screen} initial={{ opacity: 0, y: 14, scale: 0.985 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.4, ease }}>
+          <Screen />
+        </motion.div>
+      </AnimatePresence>
+    </div>
+  );
+}
+
+/* ============================================================
+   HERO: giant type, device rises and levels out as you scroll
+   ============================================================ */
 function Hero({ onJoin, onDemo }) {
   const { user } = useStore();
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start 85%', 'start 25%'] });
+  const rotateX = useTransform(scrollYProgress, [0, 1], [24, 0]);
+  const scale = useTransform(scrollYProgress, [0, 1], [0.86, 1]);
+  const opacity = useTransform(scrollYProgress, [0, 0.3], [0.4, 1]);
   return (
-    <header className="lhero">
-      <div className="lmesh" />
-      <div className="grain" />
-      <div className="lwrap lhero-grid">
-        <motion.div
-          initial={{ opacity: 0, y: 34 }} animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: [0.2, 0.7, 0.2, 1] }}
-        >
-          <span className="leyebrow"><span className="dot" />Phase 1 · Built for India&rsquo;s music industry</span>
-          <h1>The music industry,<br />finally on <span className="grad">first-name terms.</span></h1>
-          <p className="lsub">
-            Strings ties the industry together — performers, venues, buyers, crew and institutions —
-            in one network where gigs find people, not the other way around. Verified profiles,
-            AI match scores, and a live collab board across 8 Indian cities.
-          </p>
-          <div className="lctas">
-            {user ? (
-              <button className="lbtn lbtn-grad lbtn-lg" onClick={onDemo}>Open app <ArrowRight size={18} /></button>
-            ) : (
-              <button className="lbtn lbtn-grad lbtn-lg" onClick={onJoin}>Create your profile <ArrowRight size={18} /></button>
-            )}
-            <button className="lbtn lbtn-outline lbtn-lg" onClick={onDemo}><Play size={17} /> See it in action</button>
-          </div>
-          <div className="lhero-note"><Users size={15} /> Free during Phase 1 · No spam, no group-chat chaos</div>
-        </motion.div>
-        <motion.div
-          initial={{ opacity: 0, y: 50, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 0.85, delay: 0.18, ease: [0.2, 0.7, 0.2, 1] }}
-        >
-          <MatchCardVisual />
+    <header className="ap-hero">
+      <div className="ap-glow" aria-hidden="true" />
+      <motion.span className="ap-eyebrow" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, ease }}>Introducing Strings</motion.span>
+      <motion.h1 initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, delay: 0.08, ease }}>
+        Your music career,<br /><span className="ap-grad">beautifully connected.</span>
+      </motion.h1>
+      <motion.p className="ap-lede" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, delay: 0.2, ease }}>
+        One profile that works like a portfolio. One network for artists, venues, organisers and crew across India. Gigs that find you.
+      </motion.p>
+      <motion.div className="ap-ctas" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, delay: 0.3, ease }}>
+        {user ? <button className="ap-btn" onClick={onDemo}>Open app</button> : <button className="ap-btn" onClick={onJoin}>Create your profile</button>}
+        <button className="ap-link" onClick={() => document.getElementById('story')?.scrollIntoView({ behavior: 'smooth' })}>See how it works <ChevronRight size={18} /></button>
+      </motion.div>
+      <div className="ap-stage" ref={ref}>
+        <motion.div className="ap-device-wrap" style={{ rotateX, scale, opacity }}>
+          <Device screen="profile" />
         </motion.div>
       </div>
     </header>
@@ -174,259 +180,154 @@ function Hero({ onJoin, onDemo }) {
 }
 
 /* ============================================================
-   TICKER
+   Scrollytelling: pinned device, copy changes as you scroll
    ============================================================ */
-const TICKER_ITEMS = [
-  'Meera Iyer', 'Playback', 'Mumbai', 'Rohan Verma', 'Live sound', 'Delhi-NCR',
-  'Anjali Kulkarni', 'Carnatic-jazz', 'Bengaluru', 'Depot 48', 'Hip-hop', 'Pune',
-  'Sana Reddy', 'Fusion', 'Hyderabad', 'Aditya Rao', 'EDM', 'Chennai',
-  'Kavya Sharma', 'Wedding season', 'Kolkata', 'Vikram Nair', 'Indie', 'Chandigarh',
+const STEPS = [
+  { id: 'profile', kicker: 'Portfolio', title: 'A profile that works like a portfolio.', copy: 'Your sound, your samples, your story and your rating, laid out like a showcase. Embed tracks and videos so people can hear you before they ever message you.' },
+  { id: 'match', kicker: 'Match', title: 'Gigs that find you.', copy: 'Every brief on Strings is scored against your craft, city and past work. The right opportunities rise to the top, the noise stays out.' },
+  { id: 'book', kicker: 'Collab and book', title: 'From hello to booked, in one place.', copy: 'Check live availability, send a request with a budget and a date, and confirm. No more lost enquiries in group chats.' },
+  { id: 'notes', kicker: 'Notes', title: 'Stay in the moment.', copy: 'Drop a photo note from soundcheck. It orbits the community for 12 hours, then fades. Fresh, social and never a chore.' },
 ];
-function Ticker() {
-  const items = [...TICKER_ITEMS, ...TICKER_ITEMS];
+function StoryScroll() {
+  const ref = useRef(null);
+  const [idx, setIdx] = useState(0);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end end'] });
+  useMotionValueEvent(scrollYProgress, 'change', (v) => setIdx(Math.max(0, Math.min(STEPS.length - 1, Math.floor(v * STEPS.length * 0.999)))));
+  const jump = (i) => {
+    const el = ref.current; if (!el) return;
+    const top = el.getBoundingClientRect().top + window.scrollY;
+    window.scrollTo({ top: top + (el.offsetHeight - window.innerHeight) * ((i + 0.5) / STEPS.length), behavior: 'smooth' });
+  };
+  const s = STEPS[idx];
   return (
-    <div className="lticker" aria-hidden="true">
-      <div className="lticker-track">
-        {items.map((t, i) => (
-          <span className="lticker-item" key={i}>{t}<span className="sep">•</span></span>
-        ))}
+    <section className="ap-story" id="story" ref={ref} style={{ height: `${STEPS.length * 85}vh` }}>
+      <div className="ap-pin">
+        <div className="ap-story-copy">
+          <AnimatePresence mode="wait">
+            <motion.div key={s.id} initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -18 }} transition={{ duration: 0.45, ease }}>
+              <span className="ap-kicker">{s.kicker}</span>
+              <h2>{s.title}</h2>
+              <p>{s.copy}</p>
+            </motion.div>
+          </AnimatePresence>
+          <div className="ap-steps" role="tablist" aria-label="Product tour">
+            {STEPS.map((x, i) => <button key={x.id} role="tab" aria-selected={i === idx} className={i === idx ? 'on' : ''} onClick={() => jump(i)} aria-label={x.kicker}><i /></button>)}
+          </div>
+        </div>
+        <div className="ap-story-device"><Device screen={s.id} /></div>
       </div>
-    </div>
+    </section>
   );
 }
 
 /* ============================================================
-   STATS
+   Roles: horizontal showcase, like "take a closer look"
+   ============================================================ */
+const ROLES = [
+  { icon: Mic, name: 'Artists', line: 'Bands, solo acts, DJs, producers.', tone: 'linear-gradient(140deg,#5b3df5,#22d3ee)', who: PEOPLE.find((p) => p.type === 'Performer') },
+  { icon: Building2, name: 'Venues', line: 'Clubs, cafes, studios, open air.', tone: 'linear-gradient(140deg,#0ea5a4,#2a63ee)', who: PEOPLE.find((p) => p.type === 'Venue') },
+  { icon: Briefcase, name: 'Organisers', line: 'Promoters, agencies, planners.', tone: 'linear-gradient(140deg,#f59e0b,#ef4444)', who: PEOPLE.find((p) => p.type === 'Buyer') },
+  { icon: SlidersHorizontal, name: 'Crew', line: 'Sound, light, stage and video.', tone: 'linear-gradient(140deg,#7c3aed,#ec4899)', who: PEOPLE.find((p) => p.type === 'Crew') },
+  { icon: GraduationCap, name: 'Institutions', line: 'Academies, labels, collectives.', tone: 'linear-gradient(140deg,#ec4899,#f97316)', who: PEOPLE.find((p) => p.type === 'Institution') },
+];
+function Roles({ onJoin }) {
+  const rail = useRef(null);
+  const by = (d) => rail.current?.scrollBy({ left: d * 420, behavior: 'smooth' });
+  return (
+    <section className="ap-roles" id="roles">
+      <Reveal className="ap-head dark"><span className="ap-kicker">Who it&rsquo;s for</span><h2>Every seat at the table.</h2><p>Five kinds of people, one shared network.</p></Reveal>
+      <div className="ap-rail" ref={rail}>
+        {ROLES.map((r, i) => (
+          <motion.button key={r.name} className="ap-tile" style={{ background: r.tone }} onClick={onJoin}
+            initial={{ opacity: 0, x: 60 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, margin: '-40px' }} transition={{ duration: 0.7, delay: i * 0.07, ease }} whileHover={{ y: -6 }}>
+            <r.icon size={34} strokeWidth={1.5} />
+            <h3>{r.name}</h3>
+            <p>{r.line}</p>
+            {r.who && <span className="ap-tile-who"><i style={{ background: r.who.heroGradient || avatarColor(r.who.name) }}>{initials(r.who.name)}</i><b>{r.who.name}</b><em>{r.who.city}</em></span>}
+            <span className="ap-tile-go"><Plus size={18} /></span>
+          </motion.button>
+        ))}
+      </div>
+      <div className="ap-rail-nav"><button onClick={() => by(-1)} aria-label="Previous"><ChevronLeft size={20} /></button><button onClick={() => by(1)} aria-label="Next"><ChevronRight size={20} /></button></div>
+    </section>
+  );
+}
+
+/* ============================================================
+   Numbers
    ============================================================ */
 function Stat({ value, suffix, label }) {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: '-60px' });
   const n = useCountUp(value, inView);
-  return (
-    <div className="lstat" ref={ref}>
-      <b>{n.toLocaleString('en-IN')}{suffix}</b>
-      <span>{label}</span>
-    </div>
-  );
+  return <div className="ap-stat" ref={ref}><b>{n.toLocaleString('en-IN')}{suffix}</b><span>{label}</span></div>;
 }
 function Stats() {
   return (
-    <section className="lstats">
-      <div className="lwrap">
-        <div className="lstats-grid">
-          <Stat value={2400} suffix="+" label="Artists & crew onboard" />
-          <Stat value={120} suffix="+" label="Venues & spaces" />
-          <Stat value={8} suffix="" label="Cities live" />
-          <Stat value={10} suffix="k+" label="Gigs matched" />
-        </div>
-        <p className="lstats-caveat">Illustrative early-traction targets — this is demo data, not verified metrics.</p>
-      </div>
+    <section className="ap-stats">
+      <Reveal className="ap-stats-grid">
+        <Stat value={2400} suffix="+" label="Artists and crew" />
+        <Stat value={120} suffix="+" label="Venues and spaces" />
+        <Stat value={8} suffix="" label="Launch cities" />
+        <Stat value={10} suffix="k+" label="Gigs matched" />
+      </Reveal>
+      <p className="ap-fine">Illustrative early-traction targets. Demo figures, not verified metrics.</p>
     </section>
   );
 }
 
 /* ============================================================
-   THREE LAYERS
-   ============================================================ */
-const LAYERS = [
-  {
-    icon: Network, title: 'Network', copy: 'One verified identity for the whole industry. Rich profiles with skills, past gigs, response rates and endorsements — so trust travels before you do.',
-    points: ['Verified profiles & ID checks', 'Skill endorsements that matter', 'Follow the people you rate'],
-  },
-  {
-    icon: Handshake, title: 'Discovery & collab', copy: 'A live board of gigs, sessions and crew call-outs with AI match scores. Post a brief, get matched, shortlist — without the WhatsApp scramble.',
-    points: ['Match scores on every brief', 'Structured gigs & call-outs', 'Direct, spam-free outreach'],
-  },
-  {
-    icon: Newspaper, title: 'Newsroom', copy: "The industry's pulse in one feed — releases, festival economics, licensing explainers and backstage debate, curated for people who work in music.",
-    points: ['Daily industry briefing', 'Curated releases & trends', 'Backstage community threads'],
-  },
-];
-function Layers() {
-  return (
-    <section className="lsec" id="product">
-      <div className="lwrap">
-        <div className="lsec-head">
-          <span className="lkicker">The product</span>
-          <h2>Three layers. One industry.</h2>
-          <p>Strings isn&rsquo;t another social app — it&rsquo;s the working infrastructure of Indian music, built layer by layer.</p>
-        </div>
-        <div className="llayers">
-          {LAYERS.map((l, i) => (
-            <motion.div
-              key={l.title} className="llayer"
-              initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-60px' }} transition={{ duration: 0.55, delay: i * 0.12 }}
-            >
-              <div className="llayer-in">
-                <div className="lico"><l.icon size={26} /></div>
-                <h3>{l.title}</h3>
-                <p>{l.copy}</p>
-                <ul>
-                  {l.points.map((p) => <li key={p}><Check size={15} />{p}</li>)}
-                </ul>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ============================================================
-   MATCH WIDGET (showpiece)
+   Match demo (interactive)
    ============================================================ */
 const ROLE_OPTIONS = ['Performer', 'Venue', 'Crew', 'Buyer', 'Institution'];
-const ROLE_COPY = {
-  Performer: 'artists & instrumentalists', Venue: 'venues & spaces', Crew: 'sound, light & stage crew',
-  Buyer: 'organisers, festivals & brands', Institution: 'schools, societies & agencies',
-};
+const ROLE_COPY = { Performer: 'artists and instrumentalists', Venue: 'venues and spaces', Crew: 'sound, light and stage crew', Buyer: 'organisers, festivals and brands', Institution: 'schools, labels and agencies' };
 function MatchWidget() {
   const [role, setRole] = useState('Performer');
   const [city, setCity] = useState('Mumbai');
   const [result, setResult] = useState(null);
-  const resultRef = useRef(null);
-
   const calculate = () => {
     const seed = `${role}|${city}`;
-    const score = Math.min(98, 72 + (hashStr(seed) % 27));
-    const factors = [
-      { label: 'Role fit', value: Math.min(99, 70 + (hashStr(`role${role}`) % 30)) },
-      { label: 'City demand', value: Math.min(99, 65 + (hashStr(`city${city}`) % 35)) },
-      { label: 'Network effect', value: Math.min(99, 58 + (hashStr(`net${seed}`) % 42)) },
-    ];
-    setResult({ score, factors, role, city, key: Date.now() });
-    setTimeout(() => resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 60);
+    setResult({
+      score: Math.min(98, 72 + (hashStr(seed) % 27)), role, city, key: Date.now(),
+      factors: [
+        { label: 'Role fit', value: Math.min(99, 70 + (hashStr(`role${role}`) % 30)) },
+        { label: 'City demand', value: Math.min(99, 65 + (hashStr(`city${city}`) % 35)) },
+        { label: 'Network momentum', value: Math.min(99, 58 + (hashStr(`net${seed}`) % 42)) },
+      ],
+    });
   };
-
-  const animatedScore = useCountUp(result ? result.score : 0, !!result, 1400);
-
+  const shown = useCountUp(result ? result.score : 0, !!result, 1200);
   return (
-    <section className="lsec">
-      <div className="lwrap">
-        <div className="lmatch">
-          <div className="lmatch-grid">
-            <div className="lmatch-copy">
-              <span className="lkicker">Interactive demo</span>
-              <h2>See your match score, live.</h2>
-              <p>
-                Tell us who you are and where you work. Our mock matcher scores how the
-                industry would find you on Strings — based on role fit, city demand and
-                network momentum. This is the engine that powers every gig brief.
-              </p>
-            </div>
-            <div className="lmatch-panel">
-              <div className="lfield">
-                <label htmlFor="lm-role">I am a…</label>
-                <select id="lm-role" className="lselect" value={role} onChange={(e) => { setRole(e.target.value); setResult(null); }}>
-                  {ROLE_OPTIONS.map((r) => <option key={r} value={r}>{r}</option>)}
-                </select>
-              </div>
-              <div className="lfield">
-                <label htmlFor="lm-city">Based in…</label>
-                <select id="lm-city" className="lselect" value={city} onChange={(e) => { setCity(e.target.value); setResult(null); }}>
-                  {CITIES.map((c) => <option key={c} value={c}>{c}</option>)}
-                </select>
-              </div>
-              <button className="lbtn lbtn-grad lbtn-lg lmatch-btn" onClick={calculate}>
-                <Sparkles size={17} /> Calculate my match
-              </button>
-              <AnimatePresence mode="wait">
-                {result && (
-                  <motion.div
-                    className="lresult" ref={resultRef} key={result.key}
-                    initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.4 }}
-                  >
-                    <div className="lresult-score">
-                      <b>{animatedScore}%</b>
-                      <span>match for {ROLE_COPY[result.role]} in {result.city}</span>
-                    </div>
-                    {result.factors.map((f, i) => (
-                      <div className="lfactor" key={f.label}>
-                        <div className="fl"><span>{f.label}</span><b>{f.value}%</b></div>
-                        <div className="lbar">
-                          <i style={{ width: `${f.value}%`, transitionDelay: `${i * 0.15}s` }} />
-                        </div>
-                      </div>
-                    ))}
-                    <p className="lresult-note">Mock scores for illustration — the live engine learns from real gigs and ratings.</p>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          </div>
+    <section className="ap-match" id="match">
+      <Reveal className="ap-head"><span className="ap-kicker">Try it</span><h2>See your match score.</h2><p>Tell us who you are and where you work. We show how the industry would find you.</p></Reveal>
+      <Reveal className="ap-match-card" delay={0.1}>
+        <div className="ap-seg" role="radiogroup" aria-label="I am a">
+          {ROLE_OPTIONS.map((r) => <button key={r} role="radio" aria-checked={role === r} className={role === r ? 'on' : ''} onClick={() => { setRole(r); setResult(null); }}>{r}</button>)}
         </div>
-      </div>
-    </section>
-  );
-}
-
-/* ============================================================
-   STAKEHOLDER EXPLORER
-   ============================================================ */
-const TYPE_MAP = {
-  'Performers': 'Performer', 'Venues & spaces': 'Venue', 'Buyers of talent': 'Buyer',
-  'Crew & technical': 'Crew', 'Institutions & agencies': 'Institution',
-};
-const TAB_ICONS = { Mic, Building2, Briefcase, SlidersHorizontal, GraduationCap };
-function Explorer() {
-  const [tab, setTab] = useState(0);
-  const group = STAKEHOLDER_GROUPS[tab];
-  const Icon = TAB_ICONS[group.icon] || Users;
-  const peeps = useMemo(
-    () => PEOPLE.filter((p) => p.type === TYPE_MAP[group.name]).slice(0, 3),
-    [tab],
-  );
-  return (
-    <section className="lsec" id="who" style={{ paddingTop: 0 }}>
-      <div className="lwrap">
-        <div className="lsec-head">
-          <span className="lkicker">Who it&rsquo;s for</span>
-          <h2>Every seat at the table.</h2>
-          <p>Five stakeholder groups, one shared network. Pick a group to see who&rsquo;s already in the room.</p>
-        </div>
-        <div className="ltabs" role="tablist">
-          {STAKEHOLDER_GROUPS.map((g, i) => {
-            const GIcon = TAB_ICONS[g.icon] || Users;
-            return (
-              <button key={g.name} role="tab" aria-selected={tab === i}
-                className={`ltab${tab === i ? ' active' : ''}`} onClick={() => setTab(i)}>
-                <GIcon size={16} />{g.name}
-              </button>
-            );
-          })}
-        </div>
+        <label className="ap-sel"><MapPin size={16} />
+          <select value={city} onChange={(e) => { setCity(e.target.value); setResult(null); }} aria-label="City">{CITIES.map((c) => <option key={c}>{c}</option>)}</select>
+        </label>
+        <button className="ap-btn" onClick={calculate}><Sparkles size={16} /> Calculate</button>
         <AnimatePresence mode="wait">
-          <motion.div
-            key={tab} className="ltab-panel"
-            initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }}
-            transition={{ duration: 0.32 }}
-          >
-            <div>
-              <div className="lico"><Icon size={26} /></div>
-              <h3>{group.name}</h3>
-              <p className="desc">{group.desc}. On Strings they get verified profiles, targeted match scores and a feed of opportunities that actually fit their craft.</p>
-            </div>
-            <div>
-              {peeps.map((p) => (
-                <div className="lpeep" key={p.id}>
-                  <div className="av" style={{ background: p.heroGradient || avatarColor(p.name) }}>{initials(p.name)}</div>
-                  <div><b>{p.name}</b><span>{p.role} · {p.city}</span></div>
-                  {p.verified && <BadgeCheck size={17} className="tick" />}
-                </div>
-              ))}
-            </div>
-          </motion.div>
+          {result && (
+            <motion.div key={result.key} className="ap-result" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.45, ease }}>
+              <div className="ap-score"><b>{shown}<small>%</small></b><span>match for {ROLE_COPY[result.role]} in {result.city}</span></div>
+              <div className="ap-factors">
+                {result.factors.map((f, i) => (
+                  <div key={f.label}><div className="fl"><span>{f.label}</span><b>{f.value}%</b></div><div className="bar"><motion.i initial={{ width: 0 }} animate={{ width: `${f.value}%` }} transition={{ duration: 0.9, delay: 0.1 + i * 0.12, ease }} /></div></div>
+                ))}
+              </div>
+              <p className="ap-fine">Illustrative scores. The live engine learns from real gigs and ratings.</p>
+            </motion.div>
+          )}
         </AnimatePresence>
-      </div>
+      </Reveal>
     </section>
   );
 }
 
 /* ============================================================
-   TESTIMONIALS
+   Stories
    ============================================================ */
 const QUOTES = [
   {
@@ -444,55 +345,25 @@ const QUOTES = [
 ];
 function Testimonials() {
   const [idx, setIdx] = useState(0);
-  const [dir, setDir] = useState(1);
   useEffect(() => {
-    const t = setInterval(() => { setDir(1); setIdx((i) => (i + 1) % QUOTES.length); }, 5000);
+    const t = setInterval(() => setIdx((i) => (i + 1) % QUOTES.length), 6500);
     return () => clearInterval(t);
   }, []);
-  const go = (d) => { setDir(d); setIdx((i) => (i + d + QUOTES.length) % QUOTES.length); };
   const q = QUOTES[idx];
   const person = PEOPLE.find((p) => p.name === q.name);
   return (
-    <section className="lsec" id="stories" style={{ paddingTop: 0 }}>
-      <div className="lwrap">
-        <div className="lsec-head">
-          <span className="lkicker">Stories</span>
-          <h2>Loved by the people who work in music.</h2>
-        </div>
-        <div className="ltesti">
-          <AnimatePresence mode="wait" custom={dir}>
-            <motion.div
-              key={idx} className="lquote-card"
-              custom={dir}
-              initial={{ opacity: 0, x: dir * 60 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: dir * -60 }}
-              transition={{ duration: 0.42, ease: [0.2, 0.7, 0.2, 1] }}
-            >
-              <blockquote>&ldquo;{q.quote}&rdquo;</blockquote>
-              <div className="lquote-who">
-                <div className="av" style={{ background: person?.heroGradient || avatarColor(q.name) }}>{initials(q.name)}</div>
-                <div><b>{q.name}</b><span>{q.meta}</span></div>
-              </div>
-            </motion.div>
-          </AnimatePresence>
-          <div className="ltesti-nav">
-            <button className="larrow" onClick={() => go(-1)} aria-label="Previous story"><ChevronLeft size={18} /></button>
-            <div className="ldots">
-              {QUOTES.map((_, i) => (
-                <button key={i} className={`ldot${i === idx ? ' active' : ''}`} aria-label={`Story ${i + 1}`}
-                  onClick={() => { setDir(i > idx ? 1 : -1); setIdx(i); }} />
-              ))}
-            </div>
-            <button className="larrow" onClick={() => go(1)} aria-label="Next story"><ChevronRight size={18} /></button>
-          </div>
-        </div>
-      </div>
+    <section className="ap-quotes">
+      <AnimatePresence mode="wait">
+        <motion.figure key={idx} initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }} transition={{ duration: 0.55, ease }}>
+          <blockquote>&ldquo;{q.quote}&rdquo;</blockquote>
+          <figcaption><i style={{ background: person?.heroGradient || avatarColor(q.name) }}>{initials(q.name)}</i><b>{q.name}</b><span>{q.meta}</span></figcaption>
+        </motion.figure>
+      </AnimatePresence>
+      <div className="ap-dots">{QUOTES.map((_, i) => <button key={i} className={i === idx ? 'on' : ''} onClick={() => setIdx(i)} aria-label={`Story ${i + 1}`} />)}</div>
     </section>
   );
 }
 
-/* ============================================================
-   FAQ
-   ============================================================ */
 const FAQS = [
   {
     q: 'Is Strings free?',
@@ -518,96 +389,62 @@ const FAQS = [
 function Faq() {
   const [open, setOpen] = useState(0);
   return (
-    <section className="lsec" id="faq" style={{ paddingTop: 0 }}>
-      <div className="lwrap">
-        <div className="lsec-head">
-          <span className="lkicker">FAQ</span>
-          <h2>Questions, answered.</h2>
-        </div>
-        <div className="lfaq">
-          {FAQS.map((f, i) => {
-            const isOpen = open === i;
-            return (
-              <div className={`lfaq-item${isOpen ? ' open' : ''}`} key={f.q}>
-                <button className="lfaq-q" onClick={() => setOpen(isOpen ? -1 : i)} aria-expanded={isOpen}>
-                  {f.q}
-                  <span className="chev"><ChevronDown size={17} /></span>
-                </button>
-                <AnimatePresence initial={false}>
-                  {isOpen && (
-                    <motion.div className="lfaq-a"
-                      initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.3, ease: [0.2, 0.7, 0.2, 1] }}>
-                      <p>{f.a}</p>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            );
-          })}
-        </div>
+    <section className="ap-faq" id="faq">
+      <Reveal className="ap-head"><h2>Questions, answered.</h2></Reveal>
+      <div className="ap-faq-list">
+        {FAQS.map((f, i) => {
+          const isOpen = open === i;
+          return (
+            <div className={`ap-q${isOpen ? ' open' : ''}`} key={f.q}>
+              <button onClick={() => setOpen(isOpen ? -1 : i)} aria-expanded={isOpen}>{f.q}<span><Plus size={20} /></span></button>
+              <AnimatePresence initial={false}>
+                {isOpen && <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.35, ease }}><p>{f.a}</p></motion.div>}
+              </AnimatePresence>
+            </div>
+          );
+        })}
       </div>
     </section>
   );
 }
 
-/* ============================================================
-   BIG CTA + FOOTER
-   ============================================================ */
 function BigCta({ onJoin }) {
   return (
-    <section className="lcta">
-      <div className="lwrap">
-        <motion.div className="lcta-panel"
-          initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-80px' }} transition={{ duration: 0.7 }}>
-          <h2>Your next gig is already looking for you.</h2>
-          <p>Join the network that&rsquo;s tying India&rsquo;s music industry together — before the rest of your city does.</p>
-          <div className="lctas">
-            <button className="lbtn lbtn-white lbtn-lg" onClick={onJoin}>Create your profile <ArrowRight size={18} /></button>
-          </div>
-        </motion.div>
-      </div>
+    <section className="ap-cta">
+      <Reveal className="ap-cta-card">
+        <h2>Your next gig is already looking for you.</h2>
+        <p>Join the network that is tying India&rsquo;s music industry together.</p>
+        <button className="ap-btn light" onClick={onJoin}>Create your profile <ArrowRight size={18} /></button>
+      </Reveal>
     </section>
   );
 }
+
 function Footer() {
   return (
-    <footer className="lfoot">
-      <div className="lwrap lfoot-in">
-        <Logo light />
-        <div className="lfoot-links">
-          <Link to="/about">About</Link>
-          <Link to="/support">Support</Link>
-        </div>
-        <small>© 2026 Strings. All rights reserved.</small>
-      </div>
+    <footer className="ap-foot">
+      <div><Logo /><small>&copy; 2026 Strings. Free during Phase 1.</small></div>
+      <div className="ap-foot-links"><Link to="/about">About</Link><Link to="/support">Support</Link></div>
     </footer>
   );
 }
 
-/* ============================================================
-   PAGE
-   ============================================================ */
 export default function Landing() {
   const navigate = useNavigate();
   const { user } = useStore();
   const [authOpen, setAuthOpen] = useState(false);
   const [authTab, setAuthTab] = useState('signin');
-  // Join opens the auth modal on the "Create account" tab; the old code
-  // navigated straight to /onboarding, which bounces signed-out users back.
   const onJoin = () => { setAuthTab('signup'); setAuthOpen(true); };
   const onLogin = () => { setAuthTab('signin'); setAuthOpen(true); };
   const onDemo = () => { if (user) navigate('/home'); else onLogin(); };
   return (
-    <div className="landing">
+    <div className="ap">
       <Nav onJoin={onJoin} onLogin={onLogin} onDemo={onDemo} />
       <Hero onJoin={onJoin} onDemo={onDemo} />
-      <Ticker />
+      <StoryScroll />
+      <Roles onJoin={onJoin} />
       <Stats />
-      <Layers />
       <MatchWidget />
-      <Explorer />
       <Testimonials />
       <Faq />
       <BigCta onJoin={onJoin} />

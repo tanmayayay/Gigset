@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { useParams, useNavigate, useSearchParams, Navigate } from 'react-router-dom';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
-  Handshake, MessageCircle, UserPlus, UserCheck, Pencil, UserX, MapPin, Camera, Image as ImageIcon, Check, Share2, Star,
+  Handshake, MessageCircle, UserPlus, UserCheck, Pencil, UserX, MapPin, Camera, Check, Share2, Star,
 } from 'lucide-react';
 import { Avatar, Verified, EmptyState } from '../components/ui';
 import PostCard from '../components/PostCard';
@@ -17,10 +17,17 @@ import { Profiles, Posts, Convos, Reviews, Safety } from '../lib/api';
 import { useStore } from '../store/store';
 import { uploadAvatar } from '../lib/uploadImage';
 import { metaFor, glanceFacts, headlineOf, completeness } from '../lib/profileSchema';
+import { useCountUp } from '../lib/useCountUp';
 import '../components/profile/profile.css';
+import '../components/profile/portfolio.css';
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const compact = (n) => (n >= 10000 ? `${(n / 1000).toFixed(0)}k` : n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(n));
+
+function BigStat({ value, label }) {
+  const n = useCountUp(value, true, 1500);
+  return <div><b>{compact(n)}</b><span>{label}</span></div>;
+}
 
 function Strength({ person, postsCount }) {
   const { checks, pct } = completeness(person, { postsCount });
@@ -46,7 +53,7 @@ function Strength({ person, postsCount }) {
 export default function Profile() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [params, setParams] = useSearchParams();
+  const [params] = useSearchParams();
   const { userId, user, refreshProfile, pushToast } = useStore();
 
   const [person, setPerson] = useState(null);
@@ -60,10 +67,12 @@ export default function Profile() {
   const [rv, setRv] = useState(null);
   const [iBlocked, setIBlocked] = useState(false);
   const photoInput = useRef(null);
+  const heroRef = useRef(null);
+  const [stuck, setStuck] = useState(false);
+  const [spy, setSpy] = useState('about');
 
   const isSelf = !!userId && id === userId;
   const tab = params.get('tab') || 'overview';
-  const setTab = (t) => setParams(t === 'overview' ? {} : { tab: t }, { replace: true });
 
   const load = async () => {
     const p = await Profiles.get(id);
@@ -144,6 +153,33 @@ export default function Profile() {
   };
 
 
+  // Sticky sub-nav: show the mini identity once the hero scrolls away, and track which section is on screen.
+  useEffect(() => {
+    const hero = heroRef.current;
+    if (!hero) return undefined;
+    const io = new IntersectionObserver(([e]) => setStuck(!e.isIntersecting), { rootMargin: '-70px 0px 0px 0px', threshold: 0 });
+    io.observe(hero);
+    return () => io.disconnect();
+  }, [person]);
+  useEffect(() => {
+    const els = [...document.querySelectorAll('.pfo-sec')];
+    if (!els.length) return undefined;
+    const io = new IntersectionObserver((entries) => {
+      const vis = entries.filter((e) => e.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
+      if (vis) setSpy(vis.target.dataset.sec);
+    }, { rootMargin: '-35% 0px -55% 0px' });
+    els.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, [person, loading]);
+  // Old ?tab= links scroll to the matching section.
+  useEffect(() => {
+    if (!person || tab === 'overview') return;
+    const map = { posts: 'posts', media: 'work', reviews: 'reviews', insights: 'insights' };
+    const t = setTimeout(() => document.getElementById(map[tab] || 'about')?.scrollIntoView({ behavior: 'smooth' }), 400);
+    return () => clearTimeout(t);
+  }, [person, tab]);
+  const goTo = useCallback((sid) => document.getElementById(sid)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), []);
+
   // Old links (emails, notifications) used to open the Requests tab here; bookings now live in Collab.
   if (tab === 'requests') return <Navigate to="/collab?tab=bookings" replace />;
 
@@ -167,141 +203,134 @@ export default function Profile() {
   const mediaPosts = feedPosts.filter((p) => p.mediaUrl);
   const since = person.createdAt ? new Date(person.createdAt) : null;
   const first = person.name.split(' ')[0];
-
-  const tabs = [
-    { id: 'overview', label: 'Overview' },
-    { id: 'posts', label: 'Posts' },
-    { id: 'media', label: 'Media' },
-    { id: 'reviews', label: 'Reviews', badge: 0, count: rv?.count || 0 },
+  const sections = [
+    { id: 'about', label: 'Overview' },
+    { id: 'work', label: 'Work' },
+    { id: 'details', label: 'Details' },
+    { id: 'posts', label: 'Posts', count: feedPosts.length },
+    { id: 'reviews', label: 'Reviews', count: rv?.count || 0 },
     ...(isSelf ? [{ id: 'insights', label: 'Insights' }] : []),
   ];
 
   return (
-    <div className="pf" style={{ '--pf-tint': meta.tint }}>
-      <header className="pf-head">
-        <div className="pf-top">
-          <div className="pf-photo">
-            <Avatar name={person.name} src={person.avatarUrl} size={104} />
+    <div className="pfo" style={{ '--pf-tint': meta.tint }}>
+      <section className="pfo-hero" ref={heroRef}>
+        <div className="pfo-orb a" aria-hidden="true" /><div className="pfo-orb b" aria-hidden="true" /><div className="pfo-grain" aria-hidden="true" />
+        <motion.div className="pfo-hero-in" initial={{ opacity: 0, y: 26 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease: [0.2, 0.7, 0.2, 1] }}>
+          <div className="pfo-photo">
+            <Avatar name={person.name} src={person.avatarUrl} size={148} />
             {isSelf && (
               <>
                 <input ref={photoInput} type="file" accept="image/*" hidden onChange={(e) => { quickPhoto(e.target.files?.[0]); e.target.value = ''; }} />
-                <button className="pf-photo-btn" onClick={() => photoInput.current?.click()} disabled={uploading} aria-label="Change profile photo"><Camera size={15} /></button>
+                <button className="pfo-photo-btn" onClick={() => photoInput.current?.click()} disabled={uploading} aria-label="Change profile photo"><Camera size={16} /></button>
               </>
             )}
           </div>
-
-          <div className="pf-id">
-            <h1 className="pf-name">{person.name}{verified && <Verified size={20} />}</h1>
-            <div className="pf-meta">
-              <span className="pf-role"><RoleIcon size={13} /> {meta.label}</span>
-              {person.city && <span className="pf-loc"><MapPin size={14} /> {person.city}</span>}
-              {person.visibility !== 'PUBLIC' && isSelf && <span style={{ fontSize: 12, color: 'var(--text-faint)' }}>· {person.visibility === 'PRIVATE' ? 'Only you can see this' : 'Connections only'}</span>}
-            </div>
-            {(person.foundingMember || rv?.count > 0) && (
-              <div className="pf-badges">
-                {person.foundingMember && <span className="founding" title="One of the first 1,000 people on Strings"><Star size={11} fill="currentColor" /> Founding member</span>}
-                {rv?.count > 0 && <button className="rv-chip" onClick={() => setTab('reviews')}><Stars value={rv.average} size={12} /> {rv.average} · {rv.count}</button>}
-              </div>
+          <div className="pfo-badges">
+            <span className="pfo-chip"><RoleIcon size={13} /> {meta.label}</span>
+            {person.city && <span className="pfo-chip"><MapPin size={13} /> {person.city}</span>}
+            {person.foundingMember && <span className="pfo-chip gold"><Star size={12} fill="currentColor" /> Founding member</span>}
+            {rv?.count > 0 && <button className="pfo-chip" onClick={() => goTo('reviews')}><Stars value={rv.average} size={12} /> {rv.average} &middot; {rv.count}</button>}
+            {person.visibility !== 'PUBLIC' && isSelf && <span className="pfo-chip">{person.visibility === 'PRIVATE' ? 'Only you can see this' : 'Connections only'}</span>}
+          </div>
+          <h1 className="pfo-name">{person.name}{verified && <Verified size={34} />}</h1>
+          {headline && <p className="pfo-headline">{headline}</p>}
+          <div className="pfo-actions">
+            {isSelf ? (
+              <>
+                <button className="pfo-btn solid" onClick={() => setEditing(true)}><Pencil size={16} /> Edit profile</button>
+                <button className="pfo-btn" onClick={openShare}><Share2 size={16} /> Share</button>
+              </>
+            ) : (
+              <>
+                <button className="pfo-btn solid" onClick={() => navigate(`/collab?with=${person.id}`)}><Handshake size={16} /> Collab / Book</button>
+                <button className="pfo-btn" onClick={toggleFollow}>{following ? <><UserCheck size={16} /> Following</> : <><UserPlus size={16} /> Follow</>}</button>
+                <button className="pfo-btn" onClick={openChat}><MessageCircle size={16} /> Message</button>
+                <button className="pfo-btn icon" onClick={openShare} aria-label="Share profile"><Share2 size={16} /></button>
+                {userId && <SafetyMenu person={person} blocked={iBlocked} onBlockChange={(b) => { setIBlocked(b); if (b) setFollowing(false); }} />}
+              </>
             )}
-            {headline && <p className="pf-headline">{headline}</p>}
-            <div className="pf-stats">
-              <div><b>{compact(followers)}</b><span>Followers</span></div>
-              <div><b>{compact(person._count?.following ?? 0)}</b><span>Following</span></div>
-              <div><b>{compact(postsCount)}</b><span>Posts</span></div>
-            </div>
           </div>
-        </div>
-
-        <div className="pf-actions">
-          {isSelf ? (
-            <>
-              <button className="btn btn-ghost btn-sm" onClick={() => setEditing(true)}><Pencil size={14} /> Edit profile</button>
-              <button className="btn btn-ghost btn-sm" onClick={openShare}><Share2 size={14} /> Share</button>
-            </>
-          ) : (
-            <>
-              <button className="btn btn-blue btn-sm" onClick={() => navigate(`/collab?with=${person.id}`)}><Handshake size={14} /> Collab / Book</button>
-              <button className="btn btn-sm btn-ghost" onClick={toggleFollow}>
-                {following ? <><UserCheck size={14} /> Following</> : <><UserPlus size={14} /> Follow</>}
-              </button>
-              <button className="btn btn-ghost btn-sm" onClick={openChat}><MessageCircle size={14} /> Message</button>
-              <button className="btn btn-ghost btn-sm" onClick={openShare} aria-label="Share profile"><Share2 size={14} /></button>
-              {userId && <SafetyMenu person={person} blocked={iBlocked} onBlockChange={(b) => { setIBlocked(b); if (b) setFollowing(false); }} />}
-            </>
-          )}
-        </div>
-
-        {facts.length > 0 && (
-          <div className="pf-facts">
-            {facts.map((f) => <div className="pf-fact" key={f.key}><span>{f.label}</span><b>{f.value}</b></div>)}
+          <div className="pfo-stats">
+            <BigStat value={followers} label="Followers" />
+            <BigStat value={person._count?.following ?? 0} label="Following" />
+            <BigStat value={postsCount} label="Posts" />
+            {rv?.count > 0 && <div><b>{rv.average}</b><span>Rating</span></div>}
           </div>
-        )}
-      </header>
+        </motion.div>
+      </section>
 
-      <nav className="pf-tabs" aria-label="Profile sections">
-        {tabs.map((t) => (
-          <button key={t.id} className={`pf-tab${tab === t.id ? ' on' : ''}`} onClick={() => setTab(t.id)}>
-            {t.label}{t.count > 0 && <span className="pf-count">{t.count}</span>}{t.badge > 0 && <span className="dot">{t.badge}</span>}
-          </button>
-        ))}
+      <nav className={`pfo-nav${stuck ? ' stuck' : ''}`} aria-label="Profile sections">
+        <div className="pfo-nav-in">
+          <div className="pfo-mini"><Avatar name={person.name} src={person.avatarUrl} size={30} /><b>{person.name}</b></div>
+          <div className="pfo-anchors">
+            {sections.map((x) => <button key={x.id} className={spy === x.id ? 'on' : ''} onClick={() => goTo(x.id)}>{x.label}{x.count > 0 && <em>{x.count}</em>}</button>)}
+          </div>
+          {isSelf
+            ? <button className="pfo-cta" onClick={() => setEditing(true)}>Edit</button>
+            : <button className="pfo-cta" onClick={() => navigate(`/collab?with=${person.id}`)}>Collab / Book</button>}
+        </div>
       </nav>
 
-      <div className="pf-grid">
-        <div style={{ minWidth: 0 }}>
-          {tab === 'overview' && (
-            <>
-              <div className="pf-card">
-                <h3>About</h3>
-                {person.bio ? <p className="pf-about" style={{ margin: 0 }}>{person.bio}</p>
-                  : <p style={{ margin: 0, color: 'var(--text-faint)', fontSize: 14 }}>
-                    {isSelf ? <>Tell people who you are. <button className="btn btn-ghost btn-xs" onClick={() => setEditing(true)}>Write your bio</button></> : `${first} hasn't written a bio yet.`}
-                  </p>}
-              </div>
-              <Samples data={person.detail?.data} />
-              <RoleDetails person={person} onEdit={isSelf ? () => setEditing(true) : undefined} />
-            </>
-          )}
-
-          {tab === 'posts' && (
-            feedPosts.length ? feedPosts.map((p) => <PostCard key={p.id} post={p} />)
-              : <EmptyState icon={<MessageCircle size={22} />} title="No posts yet" text={`${first} hasn't posted anything yet.`} />
-          )}
-
-          {tab === 'media' && (
-            mediaPosts.length ? (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(150px,1fr))', gap: 8 }}>
-                {mediaPosts.map((p) => (
-                  <div key={p.id} style={{ aspectRatio: '1', borderRadius: 14, overflow: 'hidden', background: 'var(--bg-softer)', border: '1px solid var(--border)' }}>
-                    <img src={p.mediaUrl} alt="" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                  </div>
-                ))}
-              </div>
-            ) : <EmptyState icon={<ImageIcon size={22} />} title="No media yet" text="Posts with photos will appear here." />
-          )}
-
-          {tab === 'reviews' && <ReviewsTab personId={id} isSelf={isSelf} data={rv} onChanged={loadReviews} />}
-          {tab === 'insights' && isSelf && <Insights />}
+      <Section id="about" title={isSelf && !person.bio ? 'Tell your story.' : `Meet ${first}.`}>
+        {person.bio ? <p className="pfo-lead">{person.bio}</p>
+          : <p className="pfo-lead dim">{isSelf ? <>Add a bio so people know who you are. <button className="pfo-link" onClick={() => setEditing(true)}>Write it now</button></> : `${first} hasn't written a bio yet.`}</p>}
+        <div className="pfo-specs">
+          {facts.map((f) => <div key={f.key}><span>{f.label}</span><b>{f.value}</b></div>)}
+          <div><span>Role</span><b>{meta.label}</b></div>
+          {person.city && <div><span>Based in</span><b>{person.city}</b></div>}
+          <div><span>Verification</span><b>{verified ? 'Verified' : person.verificationStatus === 'PENDING' ? 'Pending' : 'Not yet verified'}</b></div>
+          {since && <div><span>On Strings since</span><b>{MONTHS[since.getMonth()]} {since.getFullYear()}</b></div>}
         </div>
+        {isSelf && <div className="pfo-self"><Strength person={person} postsCount={postsCount} /></div>}
+      </Section>
 
-        <aside style={{ minWidth: 0 }}>
-          {isSelf && <Strength person={person} postsCount={postsCount} />}
-          <div className="pf-card">
-            <h3>At a glance</h3>
-            <dl className="pf-rows" style={{ margin: 0, gridTemplateColumns: '1fr', gap: 12 }}>
-              <div className="pf-row"><dt>Role</dt><dd>{meta.label}</dd></div>
-              {person.city && <div className="pf-row"><dt>Based in</dt><dd>{person.city}</dd></div>}
-              <div className="pf-row"><dt>Verification</dt><dd>{verified ? 'Verified by Strings' : person.verificationStatus === 'PENDING' ? 'Verification pending' : 'Member (not yet verified)'}</dd></div>
-              {rv?.count > 0 && <div className="pf-row"><dt>Rating</dt><dd>{rv.average} / 5 from {rv.count} booking{rv.count === 1 ? '' : 's'}</dd></div>}
-              {since && <div className="pf-row"><dt>On Strings since</dt><dd>{MONTHS[since.getMonth()]} {since.getFullYear()}</dd></div>}
-            </dl>
+      <Section id="work" title="The work.">
+        <Samples data={person.detail?.data} />
+        {mediaPosts.length > 0 ? (
+          <div className="pfo-reel" aria-label="Photos and clips">
+            {mediaPosts.map((p) => (
+              <figure key={p.id}>
+                <img src={p.mediaUrl} alt={p.body || ''} loading="lazy" />
+                {p.body && <figcaption>{p.body}</figcaption>}
+              </figure>
+            ))}
           </div>
-        </aside>
-      </div>
+        ) : <p className="pfo-lead dim small">{isSelf ? 'Share photos and clips from Home and they show up here as your showcase.' : 'No photos or clips yet.'}</p>}
+      </Section>
+
+      <Section id="details" title="The details.">
+        <RoleDetails person={person} onEdit={isSelf ? () => setEditing(true) : undefined} />
+      </Section>
+
+      <Section id="posts" title="Latest.">
+        {feedPosts.length ? <div className="pfo-feed">{feedPosts.map((p) => <PostCard key={p.id} post={p} />)}</div>
+          : <EmptyState icon={<MessageCircle size={22} />} title="No posts yet" text={`${first} hasn't posted anything yet.`} />}
+      </Section>
+
+      <Section id="reviews" title="What people say.">
+        <ReviewsTab personId={id} isSelf={isSelf} data={rv} onChanged={loadReviews} />
+      </Section>
+
+      {isSelf && (
+        <Section id="insights" title="Your numbers.">
+          <Insights />
+        </Section>
+      )}
 
       <AnimatePresence>
         {editing && <EditProfile person={person} onClose={() => setEditing(false)} onSaved={async () => { await load(); await refreshProfile(); setEditing(false); }} />}
         {shareCard && <ShareModal card={shareCard} title={isSelf ? 'Share your profile' : `Share ${first}`} onClose={() => setShareCard(null)} />}
       </AnimatePresence>
     </div>
+  );
+}
+
+function Section({ id, title, children }) {
+  return (
+    <motion.section id={id} className="pfo-sec" data-sec={id} initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-60px' }} transition={{ duration: 0.7, ease: [0.2, 0.7, 0.2, 1] }}>
+      <h2>{title}</h2>
+      {children}
+    </motion.section>
   );
 }
