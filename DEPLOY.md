@@ -10,7 +10,7 @@
    - `SUPABASE_URL` — `https://<ref>.supabase.co` (no `/rest/v1`)
    - `SUPABASE_ANON_KEY`
    - `SUPABASE_JWT_SECRET`
-   - `FRONTEND_URL` — `https://tanmayayay.github.io/gigset-web` (your Pages URL)
+   - `FRONTEND_URL` — `https://tanmayayay.github.io` (the site origin only, no path)
 4. Deploy. Note the public URL, e.g. `https://strings-api.onrender.com`.
 5. Smoke test: `curl https://strings-api.onrender.com/api/health` → `{"ok":true}`.
 
