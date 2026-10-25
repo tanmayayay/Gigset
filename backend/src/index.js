@@ -61,7 +61,8 @@ app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
 // comma-separated — e.g. FRONTEND_URL=https://tanmayayay.github.io
 // When unset (local dev), all origins are allowed as before.
 if (process.env.FRONTEND_URL) {
-  const origins = process.env.FRONTEND_URL.split(',').map((s) => s.trim()).filter(Boolean);
+  // Browsers send only the origin (no path), so accept a full site URL like https://user.github.io/Gigset too.
+  const origins = process.env.FRONTEND_URL.split(',').map((s) => s.trim()).filter(Boolean).map((u) => { try { return new URL(u).origin; } catch { return u.replace(/\/+$/, ''); } });
   app.use(cors({ origin: origins }));
 } else {
   app.use(cors());
