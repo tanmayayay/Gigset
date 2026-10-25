@@ -1,0 +1,1 @@
+function e(e,t=new Date){if(!/^\d{4}-\d{2}-\d{2}$/.test(e||``))return null;let[n,r,i]=e.split(`-`).map(Number),a=t.getFullYear()-n;return(t.getMonth()+1<r||t.getMonth()+1===r&&t.getDate()<i)&&--a,a}function t(t){if(!t)return``;let n=e(t);return n==null||n<0||n>110?`That birth date does not look right.`:n<13?`Gigset is for people 13 and over.`:``}export{t};
