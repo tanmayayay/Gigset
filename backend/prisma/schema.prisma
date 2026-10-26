@@ -228,6 +228,7 @@ model Opportunity {
   genre        String?
   budgetMin    Int?
   budgetMax    Int?
+  visibility   String            @default("PUBLIC") // PUBLIC | CONNECTIONS
   status       OpportunityStatus @default(OPEN)
   createdAt    DateTime          @default(now())
   updatedAt    DateTime          @updatedAt
@@ -338,6 +339,7 @@ model Booking {
   timeSlot    String? // e.g. "8–10 PM"
   budget      String? // e.g. "₹30k–60k" (free-form label, matches frontend budget buckets)
   message     String?
+  epkTemplate String        @default("classic") // press kit style sent with the request
   status      BookingStatus @default(PENDING)
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt

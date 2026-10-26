@@ -1,8 +1,11 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { CalendarCheck, Clock, Wallet, MessageSquare, Send, X } from 'lucide-react';
+import { CalendarCheck, Clock, Wallet, MessageSquare, Send, X, FileText } from 'lucide-react';
 import { Bookings } from '../lib/api';
 import { useStore } from '../store/store';
+import { TemplatePicker } from './epk/EpkModal';
+import useKit from './epk/useKit';
+import { savedTemplate, saveTemplate } from '../lib/epk';
 import './booking.css';
 
 const pad = (n) => String(n).padStart(2, '0');
@@ -12,7 +15,10 @@ const SLOTS = ['10 AM–12 PM', '2–4 PM', '6–8 PM', '8–10 PM'];
 const BUDGETS = ['Under ₹15k', '₹15k–30k', '₹30k–60k', '₹60k+'];
 
 export default function BookingModal({ person, day, onClose }) {
-  const { pushToast } = useStore();
+  const { pushToast, userId } = useStore();
+  const { kit } = useKit(userId);
+  const [tpl, setTpl] = useState(savedTemplate);
+  const [showTpl, setShowTpl] = useState(false);
   const [slot, setSlot] = useState(SLOTS[0]);
   const [budget, setBudget] = useState(BUDGETS[1]);
   const [message, setMessage] = useState('');
@@ -29,6 +35,7 @@ export default function BookingModal({ person, day, onClose }) {
         date: dayKey(day), // YYYY-MM-DD in the person's own calendar (not UTC)
         timeSlot: slot,
         budget,
+        epkTemplate: tpl,
         message: message.trim() || undefined,
       });
       pushToast('Booking request sent.');
@@ -104,6 +111,12 @@ export default function BookingModal({ person, day, onClose }) {
             onChange={(e) => setMessage(e.target.value)}
             placeholder={`Tell ${person.name.split(' ')[0]} about the gig — venue, set length, what you need…`}
           />
+        </div>
+
+        <div className="field">
+          <label><FileText size={13} style={{ verticalAlign: -2, marginRight: 6 }} />Your press kit <span style={{ fontWeight: 400, color: 'var(--text-faint)' }}>(sent automatically)</span></label>
+          <button type="button" className="btn btn-ghost btn-sm" onClick={() => setShowTpl((v) => !v)}>{showTpl ? 'Hide templates' : `Template: ${tpl[0].toUpperCase() + tpl.slice(1)} · change`}</button>
+          {showTpl && kit && <div style={{ marginTop: 10 }}><TemplatePicker kit={kit} value={tpl} onChange={(t) => { setTpl(t); saveTemplate(t); }} /></div>}
         </div>
 
         <div className="booking-summary" aria-live="polite">

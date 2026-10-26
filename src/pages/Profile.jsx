@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { useParams, useNavigate, useSearchParams, Navigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
-  Handshake, MessageCircle, UserPlus, UserCheck, Pencil, UserX, MapPin, Camera, Check, Share2, Star,
+  Handshake, MessageCircle, UserPlus, UserCheck, Pencil, UserX, MapPin, Camera, Check, Share2, Star, FileText,
 } from 'lucide-react';
 import { Avatar, Verified, EmptyState } from '../components/ui';
 import PostCard from '../components/PostCard';
@@ -13,6 +13,7 @@ import ShareModal from '../components/ShareModal';
 import SafetyMenu from '../components/SafetyMenu';
 import ReviewsTab, { Stars } from '../components/profile/Reviews';
 import Samples from '../components/profile/Samples';
+import EpkModal from '../components/epk/EpkModal';
 import { Profiles, Posts, Convos, Reviews, Safety } from '../lib/api';
 import { useStore } from '../store/store';
 import { uploadAvatar } from '../lib/uploadImage';
@@ -62,6 +63,7 @@ export default function Profile() {
   const [feedPosts, setFeedPosts] = useState([]);
   const [following, setFollowing] = useState(false);
   const [editing, setEditing] = useState(false);
+  const [epkOpen, setEpkOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [shareCard, setShareCard] = useState(null);
   const [rv, setRv] = useState(null);
@@ -239,6 +241,7 @@ export default function Profile() {
             {isSelf ? (
               <>
                 <button className="pfo-btn solid" onClick={() => setEditing(true)}><Pencil size={16} /> Edit profile</button>
+                <button className="pfo-btn" onClick={() => setEpkOpen(true)}><FileText size={16} /> Generate EPK</button>
                 <button className="pfo-btn" onClick={openShare}><Share2 size={16} /> Share</button>
               </>
             ) : (
@@ -246,6 +249,7 @@ export default function Profile() {
                 <button className="pfo-btn solid" onClick={() => navigate(`/collab?with=${person.id}`)}><Handshake size={16} /> Collab / Book</button>
                 <button className="pfo-btn" onClick={toggleFollow}>{following ? <><UserCheck size={16} /> Following</> : <><UserPlus size={16} /> Follow</>}</button>
                 <button className="pfo-btn" onClick={openChat}><MessageCircle size={16} /> Message</button>
+                <button className="pfo-btn" onClick={() => setEpkOpen(true)}><FileText size={16} /> Press kit</button>
                 <button className="pfo-btn icon" onClick={openShare} aria-label="Share profile"><Share2 size={16} /></button>
                 {userId && <SafetyMenu person={person} blocked={iBlocked} onBlockChange={(b) => { setIBlocked(b); if (b) setFollowing(false); }} />}
               </>
@@ -319,6 +323,7 @@ export default function Profile() {
       )}
 
       <AnimatePresence>
+        {epkOpen && <EpkModal personId={person.id} person={person} onClose={() => setEpkOpen(false)} onEditProfile={isSelf ? () => { setEpkOpen(false); setEditing(true); } : undefined} />}
         {editing && <EditProfile person={person} onClose={() => setEditing(false)} onSaved={async () => { await load(); await refreshProfile(); setEditing(false); }} />}
         {shareCard && <ShareModal card={shareCard} title={isSelf ? 'Share your profile' : `Share ${first}`} onClose={() => setShareCard(null)} />}
       </AnimatePresence>

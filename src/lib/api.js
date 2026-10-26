@@ -160,6 +160,8 @@ export const Profiles = {
   unfollow: (id) => api(`/api/profiles/${id}/follow`, { method: 'DELETE' }),
   /** People the caller follows — for the Messages "new conversation" picker. */
   following: () => api('/api/profiles/me/following'),
+  /** Mutual follows: the only people you can collab with. */
+  connections: () => api('/api/profiles/me/connections', { fresh: true }),
   /** Permanently deletes the caller's account and everything they posted. */
   deleteMe: () => api('/api/profiles/me', { method: 'DELETE' }),
 };
@@ -181,8 +183,8 @@ export const Stories = {
 };
 
 export const Opps = {
-  list: (params = {}) => api(`/api/opportunities${qs(params)}`, { auth: false }),
-  get: (id) => api(`/api/opportunities/${id}`, { auth: false }),
+  list: (params = {}) => api(`/api/opportunities${qs(params)}`, { auth: 'optional' }),
+  get: (id) => api(`/api/opportunities/${id}`, { auth: 'optional' }),
   create: (data) => api('/api/opportunities', { method: 'POST', body: data }),
   apply: (id, message, intent) => api(`/api/opportunities/${id}/apply`, { method: 'POST', body: { message, intent } }),
   applications: (id, params = {}) => api(`/api/opportunities/${id}/applications${qs(params)}`),

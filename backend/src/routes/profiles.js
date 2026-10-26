@@ -5,6 +5,7 @@ import { asyncHandler, bad, notFound, pagination, tooLong, jsonTooBig, isOwnMedi
 import { cleanDetail } from '../lib/profileDetail.js';
 import { notify } from '../lib/notify.js';
 import { isBlockedBetween } from '../lib/blocks.js';
+import { connectionIds, relationBetween } from '../lib/connections.js';
 import { contentInfo, parseBirthDate } from '../lib/contentRating.js';
 
 // The caller's own content settings (computed; the birth date itself is never sent back).
@@ -200,6 +201,23 @@ router.get(
   })
 );
 
+// GET /api/profiles/me/connections  (auth) — mutual follows: the people you can collab with.
+router.get(
+  '/me/connections',
+  auth,
+  asyncHandler(async (req, res) => {
+    const ids = await connectionIds(req.user.id);
+    const items = ids.length
+      ? await prisma.user.findMany({
+          where: { id: { in: ids } },
+          select: { id: true, name: true, stakeholderType: true, avatarUrl: true, city: true, verificationStatus: true, bio: true },
+          orderBy: { name: 'asc' },
+        })
+      : [];
+    res.json({ items });
+  })
+);
+
 // GET /api/profiles/me/following  (auth) — people the caller follows.
 // Registered BEFORE /:id so Express doesn't capture "me" as an id.
 router.get(
@@ -345,7 +363,7 @@ router.get(
     // Private profiles are visible only to their owner.
     if (user.visibility === 'PRIVATE' && req.user?.id !== user.id) return notFound(res, 'Profile');
     if (req.user?.id !== user.id) recordView(user.id, req.user?.id || req.ip || 'anon');
-    res.json(user);
+    res.json({ ...user, relation: await relationBetween(req.user?.id, user.id) });
   })
 );
 

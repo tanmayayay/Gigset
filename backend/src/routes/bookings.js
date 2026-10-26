@@ -4,6 +4,10 @@ import { auth } from '../middleware/auth.js';
 import { asyncHandler, bad, notFound, pagination, tooLong } from '../lib/http.js';
 import { notify } from '../lib/notify.js';
 import { isBlockedBetween } from '../lib/blocks.js';
+import { areConnected } from '../lib/connections.js';
+import { checkAll, CLEAN_MESSAGE } from '../lib/moderation.js';
+
+export const EPK_TEMPLATES = ['classic', 'stage', 'minimal'];
 
 const router = Router();
 
@@ -62,7 +66,7 @@ router.post(
   '/',
   auth,
   asyncHandler(async (req, res) => {
-    const { hostId, date, timeSlot, budget, message } = req.body ?? {};
+    const { hostId, date, timeSlot, budget, message, epkTemplate } = req.body ?? {};
 
     if (!hostId || typeof hostId !== 'string') {
       return bad(res, 400, 'Field "hostId" is required (the profile being booked).');
@@ -80,8 +84,15 @@ router.post(
       return bad(res, 400, 'Message, time slot or budget is too long.');
     }
 
+    if (!checkAll(message).ok) return bad(res, 422, CLEAN_MESSAGE);
+    if (epkTemplate !== undefined && epkTemplate !== null && !EPK_TEMPLATES.includes(epkTemplate)) {
+      return bad(res, 400, `Field "epkTemplate" must be one of: ${EPK_TEMPLATES.join(', ')}`);
+    }
     const host = await prisma.user.findUnique({ where: { id: hostId } });
     if (!host) return notFound(res, 'Host profile');
+    if (!(await areConnected(req.user.id, hostId))) {
+      return bad(res, 403, `You can only send collab requests to your connections. Follow ${host.name.split(' ')[0]} and ask them to follow you back first.`);
+    }
     if (await isBlockedBetween(req.user.id, hostId)) return bad(res, 403, 'You cannot send a request to this person.');
 
     // Respect the host's live calendar: busy days and confirmed bookings can't be requested.
@@ -99,6 +110,7 @@ router.post(
         timeSlot: timeSlot ?? null,
         budget: budget ?? null,
         message: message ?? null,
+        epkTemplate: epkTemplate ?? 'classic',
       },
       include: { requester: { select: partySelect }, host: { select: partySelect } },
     });
@@ -107,7 +119,7 @@ router.post(
     notify(hostId, {
       type: 'booking',
       title: 'New booking request',
-      body: `${booking.requester.name} asked to book you for ${day}.`,
+      body: `${booking.requester.name} asked to book you for ${day}. Their press kit is attached.`,
       link: '/collab?tab=bookings',
       from: req.user.id,
       email: { subject: `${booking.requester.name} wants to book you on ${day}`, cta: 'Review the request' },

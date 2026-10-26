@@ -143,6 +143,7 @@ export function OppModal({ onClose }) {
   const [title, setTitle] = useState('');
   const [city, setCity] = useState('Mumbai');
   const [details, setDetails] = useState('');
+  const [visibility, setVisibility] = useState('PUBLIC');
   const [saving, setSaving] = useState(false);
 
   const publish = async () => {
@@ -159,6 +160,7 @@ export function OppModal({ onClose }) {
         description: text,
         requirements: text,
         city,
+        visibility,
       });
       window.dispatchEvent(new Event('gigset:opp-created'));
       onClose();
@@ -180,6 +182,11 @@ export function OppModal({ onClose }) {
       </select>
       <label>Requirements</label>
       <textarea value={details} onChange={(e) => setDetails(e.target.value)} placeholder="Describe what you're looking for…" />
+      <label>Who can see it</label>
+      <div className="vis-toggle">
+        <button type="button" className={visibility === 'PUBLIC' ? 'on' : ''} onClick={() => setVisibility('PUBLIC')}><b>Public</b><small>Anyone on Gigset</small></button>
+        <button type="button" className={visibility === 'CONNECTIONS' ? 'on' : ''} onClick={() => setVisibility('CONNECTIONS')}><b>Connections</b><small>Only people you follow back</small></button>
+      </div>
       <div className="modal-actions">
         <button className="btn btn-ghost btn-sm" onClick={onClose}>Cancel</button>
         <button className="btn btn-blue btn-sm" onClick={publish} disabled={saving}>{saving ? 'Posting…' : 'Post opportunity'}</button>

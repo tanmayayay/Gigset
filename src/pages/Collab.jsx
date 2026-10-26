@@ -2,8 +2,10 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useOutletContext, useSearchParams } from 'react-router-dom';
 import BookingsPanel from '../components/collab/BookingsPanel';
 import BookPanel from '../components/collab/BookPanel';
+import ConnectionsPanel from '../components/collab/ConnectionsPanel';
+import '../components/collab/collab.css';
 import { useBookings } from '../lib/useBookings';
-import { Plus, MapPin, Wallet, Users as UsersIcon, Check, Bookmark, Briefcase, Search as SearchIcon } from 'lucide-react';
+import { Plus, MapPin, Wallet, Users as UsersIcon, Check, Bookmark, Briefcase, Search as SearchIcon, Lock } from 'lucide-react';
 import { PageHead, Avatar, Tag, EmptyState, Verified } from '../components/ui';
 import { MatchScore, computeMatchScore } from '../components/widgets';
 import { CITIES } from '../data/demo';
@@ -196,7 +198,7 @@ export default function Collab() {
       } else {
         await Profiles.follow(p.id);
         setFollowedIds((prev) => new Set(prev).add(p.id));
-        pushToast(`Connected with ${p.name}.`);
+        pushToast(`Following ${p.name}. You connect once they follow you back.`);
       }
     } catch (e) {
       pushToast(e.message, 'error');
@@ -213,14 +215,14 @@ export default function Collab() {
       <div className="two-col">
         <div>
           <div className="filter-row">
-            {[['discover', 'Discover'], ['mine', 'My gigs'], ['bookings', 'Bookings']].map(([v, l]) => (
+            {[['discover', 'Discover'], ['connections', 'Connections'], ['mine', 'My gigs'], ['bookings', 'Bookings']].map(([v, l]) => (
               <button key={v} className={`filter-chip${tab === v ? ' active' : ''}`} onClick={() => { setTab(v); setExpandedOppId(null); }}>
                 {l}{v === 'bookings' && bookings.pending > 0 && <span className="dot" style={{ marginLeft: 6 }}>{bookings.pending}</span>}
               </button>
             ))}
           </div>
           {withId && <BookPanel id={withId} onClose={closeWith} />}
-          {tab === 'bookings' ? <BookingsPanel data={bookings} /> : (<>
+          {tab === 'bookings' ? <BookingsPanel data={bookings} /> : tab === 'connections' ? <ConnectionsPanel onCollab={(id) => setParams((p) => { const n = new URLSearchParams(p); n.set('with', id); return n; })} /> : (<>
           <div className="filter-row">
             <select className="filter-select" value={genreF} onChange={(e) => setGenreF(e.target.value)}>
               <option value="all">All genres</option>{genreOptions.map((g) => <option key={g} value={g}>{g}</option>)}
@@ -284,6 +286,7 @@ export default function Collab() {
                       {o.city && <Tag color="sky"><MapPin size={11} /> {o.city}</Tag>}
                       {budget && <Tag color="gray"><Wallet size={11} /> {budget}</Tag>}
                       {tab === 'mine' && <Tag color={o.status === 'OPEN' ? 'green' : 'gray'}>{o.status}</Tag>}
+                      {o.visibility === 'CONNECTIONS' && <Tag color="gray"><Lock size={11} /> Connections only</Tag>}
                     </div>
                   </div>
                   <MatchScore opp={o} viewer={user} />

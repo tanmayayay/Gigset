@@ -1,11 +1,21 @@
 import { Router } from 'express';
 import { prisma } from '../lib/prisma.js';
-import { auth } from '../middleware/auth.js';
+import { auth, optionalAuth } from '../middleware/auth.js';
+import { connectionIds } from '../lib/connections.js';
+import { checkAll, CLEAN_MESSAGE } from '../lib/moderation.js';
 import { asyncHandler, bad, notFound, pagination } from '../lib/http.js';
 
 const router = Router();
 
 const OPP_STATUSES = ['OPEN', 'CLOSED'];
+const VISIBILITIES = ['PUBLIC', 'CONNECTIONS'];
+
+// Connections-only opportunities are visible to their poster and the poster's connections.
+async function canSee(opp, userId) {
+  if (!opp.visibility || opp.visibility === 'PUBLIC' || opp.posterId === userId) return true;
+  if (!userId) return false;
+  return (await connectionIds(userId)).includes(opp.posterId);
+}
 
 const posterSelect = {
   id: true,
@@ -18,9 +28,14 @@ const posterSelect = {
 // GET /api/opportunities?status=OPEN&city=Mumbai&genre=&take=20&skip=0
 router.get(
   '/',
+  optionalAuth,
   asyncHandler(async (req, res) => {
     const { take, skip } = pagination(req);
     const where = {};
+    const me = req.user?.id;
+    where.OR = me
+      ? [{ visibility: 'PUBLIC' }, { posterId: me }, { posterId: { in: await connectionIds(me) } }]
+      : [{ visibility: 'PUBLIC' }];
     if (req.query.status) {
       if (!OPP_STATUSES.includes(req.query.status)) {
         return bad(res, 400, `Invalid status. One of: ${OPP_STATUSES.join(', ')}`);
@@ -53,7 +68,11 @@ router.post(
   '/',
   auth,
   asyncHandler(async (req, res) => {
-    const { title, description, requirements, city, genre, budgetMin, budgetMax } = req.body ?? {};
+    const { title, description, requirements, city, genre, budgetMin, budgetMax, visibility } = req.body ?? {};
+    if (visibility !== undefined && !VISIBILITIES.includes(visibility)) {
+      return bad(res, 400, `Field "visibility" must be one of: ${VISIBILITIES.join(', ')}`);
+    }
+    if (!checkAll(title, description, typeof requirements === 'string' ? requirements : '').ok) return bad(res, 422, CLEAN_MESSAGE);
 
     if (!title || typeof title !== 'string' || !title.trim()) {
       return bad(res, 400, 'Field "title" is required.');
@@ -68,6 +87,7 @@ router.post(
     const opp = await prisma.opportunity.create({
       data: {
         posterId: req.user.id,
+        visibility: visibility ?? 'PUBLIC',
         title: title.trim(),
         description: description.trim(),
         requirements: requirements ?? null,
@@ -86,6 +106,7 @@ router.post(
 // GET /api/opportunities/:id
 router.get(
   '/:id',
+  optionalAuth,
   asyncHandler(async (req, res) => {
     const opp = await prisma.opportunity.findUnique({
       where: { id: req.params.id },
@@ -94,7 +115,7 @@ router.get(
         _count: { select: { applications: true } },
       },
     });
-    if (!opp) return notFound(res, 'Opportunity');
+    if (!opp || !(await canSee(opp, req.user?.id))) return notFound(res, 'Opportunity');
     res.json(opp);
   })
 );
@@ -106,7 +127,7 @@ router.post(
   auth,
   asyncHandler(async (req, res) => {
     const opp = await prisma.opportunity.findUnique({ where: { id: req.params.id } });
-    if (!opp) return notFound(res, 'Opportunity');
+    if (!opp || !(await canSee(opp, req.user.id))) return notFound(res, 'Opportunity');
     if (opp.status !== 'OPEN') return bad(res, 400, 'This opportunity is closed.');
     if (opp.posterId === req.user.id) return bad(res, 400, 'You cannot apply to your own opportunity.');
 

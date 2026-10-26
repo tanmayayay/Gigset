@@ -118,7 +118,7 @@ export default function Shell({ onOpenPalette, onNewPost, onNewOpp }) {
   const sidebarBody = (onNav) => (
     <>
       <Link to="/home" className="logo" onClick={onNav} style={{ textDecoration: 'none' }}>
-        <Logo light size={24} />
+        <Logo light={theme === 'dark'} size={24} />
       </Link>
       <div className="nav-group-label" style={{ padding: '0 12px 10px', textTransform: 'none', letterSpacing: 0, fontSize: 11 }}>
         Tying the music industry together

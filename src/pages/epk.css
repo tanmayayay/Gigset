@@ -222,3 +222,13 @@
   font-size: 12.5px;
   color: #6f6c62;
 }
+
+/* v2: template-driven page */
+.epk-page2{max-width:none;padding:0 0 60px}
+.epk-page2 .epk-bar{max-width:none;padding:12px 24px;position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--border);gap:12px;flex-wrap:wrap}
+.epk-tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.epk-chip{all:unset;cursor:pointer;padding:6px 14px;border-radius:99px;border:1px solid var(--border);font-size:13px;font-weight:600;color:var(--text-dim)}
+.epk-chip.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.epk-stagewrap{padding:28px 16px 0}
+.epk-stagewrap .ek{box-shadow:0 20px 70px rgba(0,0,0,.18);border-radius:6px;overflow:hidden}
+@media print{.epk-noprint{display:none!important}.epk-page2{padding:0;background:#fff}.epk-stagewrap{padding:0}.epk-stagewrap .ek{box-shadow:none;border-radius:0}@page{margin:0}}
