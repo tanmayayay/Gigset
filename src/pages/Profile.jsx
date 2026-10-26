@@ -323,7 +323,7 @@ export default function Profile() {
       )}
 
       <AnimatePresence>
-        {epkOpen && <EpkModal personId={person.id} person={person} onClose={() => setEpkOpen(false)} onEditProfile={isSelf ? () => { setEpkOpen(false); setEditing(true); } : undefined} />}
+        {epkOpen && <EpkModal personId={person.id} person={person} onClose={() => setEpkOpen(false)} />}
         {editing && <EditProfile person={person} onClose={() => setEditing(false)} onSaved={async () => { await load(); await refreshProfile(); setEditing(false); }} />}
         {shareCard && <ShareModal card={shareCard} title={isSelf ? 'Share your profile' : `Share ${first}`} onClose={() => setShareCard(null)} />}
       </AnimatePresence>

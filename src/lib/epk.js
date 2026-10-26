@@ -2,9 +2,9 @@ import { sectionsFor, roleLabel, metaFor, headlineOf, isFilled, fmtValue } from 
 import { samplesOf } from '../components/profile/Samples';
 
 export const EPK_TEMPLATES = [
-  { id: 'classic', name: 'Classic', blurb: 'Editorial one-sheet. Clean, printable, easy to read.' },
-  { id: 'stage', name: 'Stage', blurb: 'Dark and bold, with your photo front and centre.' },
-  { id: 'minimal', name: 'Minimal', blurb: 'Monochrome and typographic. Lets the facts speak.' },
+  { id: 'classic', name: 'Pop', blurb: 'Bright, chunky and playful. Stands out in an inbox.' },
+  { id: 'stage', name: 'Neon', blurb: 'Dark with glowing colour. Built for DJs and live acts.' },
+  { id: 'minimal', name: 'Mono', blurb: 'Black and white, huge type. Straight to the point.' },
 ];
 export const isTemplate = (t) => EPK_TEMPLATES.some((x) => x.id === t);
 const KEY = 'gigset.epkTemplate';
@@ -19,8 +19,30 @@ const safeHref = (u) => { try { const x = new URL(u); return /^https?:$/.test(x.
  * Turn a profile into a press kit. The bare minimum (name + role) always produces a valid kit;
  * every extra piece of profile information adds a section.
  */
-export function buildEpk(person, { posts = [], reviews = null } = {}) {
+export const EPK_SECTIONS = [
+  ['highlights', 'Highlights'], ['details', 'Details'], ['listen', 'Listen & watch'], ['reviews', 'Reviews'], ['links', 'Links'], ['contact', 'Contact'],
+];
+const csv = (v) => (Array.isArray(v) ? v : []);
+/** Pull the saved press-kit edits out of the profile's detail data. */
+export function readEdits(d = {}) {
+  return {
+    headline: d.epkHeadline || '', about: d.epkAbout || '', tags: csv(d.epkTags), milestones: csv(d.epkMilestones),
+    email: d.epkEmail || '', phone: d.epkPhone || '', accent: d.epkAccent || '', hide: csv(d.epkHide),
+  };
+}
+/** Flat keys that fit the profile detail store. Empty values are left out so they are removed. */
+export function editsToDetail(e) {
+  const out = {};
+  const put = (k, v) => { if (Array.isArray(v) ? v.length : v && String(v).trim()) out[k] = Array.isArray(v) ? v : String(v).trim(); };
+  put('epkHeadline', e.headline?.slice(0, 120)); put('epkAbout', e.about?.slice(0, 590)); put('epkTags', csv(e.tags).slice(0, 10));
+  put('epkMilestones', csv(e.milestones).map((m) => m.slice(0, 120)).slice(0, 6)); put('epkEmail', e.email?.slice(0, 120));
+  put('epkPhone', e.phone?.slice(0, 40)); put('epkAccent', /^#[0-9a-f]{6}$/i.test(e.accent || '') ? e.accent : ''); put('epkHide', csv(e.hide));
+  return out;
+}
+
+export function buildEpk(person, { reviews = null, edits = null } = {}) {
   const role = person.stakeholderType;
+  const ed = edits || readEdits(person.detail?.data);
   const meta = metaFor(role);
   const d = person.detail?.data || {};
   const label = roleLabel(role);
@@ -30,7 +52,7 @@ export function buildEpk(person, { posts = [], reviews = null } = {}) {
   const fields = sectionsFor(role).flatMap((s) => s.fields.map((f) => ({ ...f, section: s.title })));
   const tags = [];
   for (const f of fields) if (f.type === 'tags' && Array.isArray(d[f.key])) tags.push(...d[f.key]);
-  const uniqueTags = [...new Set(tags)].slice(0, 10);
+  const uniqueTags = ed.tags.length ? ed.tags.slice(0, 10) : [...new Set(tags)].slice(0, 10);
 
   // Every filled answer, grouped by the profile section it came from.
   const details = sectionsFor(role)
@@ -48,23 +70,20 @@ export function buildEpk(person, { posts = [], reviews = null } = {}) {
     .map((f) => ({ key: f.key, label: f.label.replace(/ \(.*\)$/, ''), href: safeHref(d[f.key]) })).filter((l) => l.href);
 
   const samples = samplesOf(d).map((s) => ({ kind: s.embed.kind, src: s.embed.src, url: s.url, tall: s.embed.tall }));
-  const gallery = posts.filter((p) => p.mediaUrl).slice(0, 6).map((p) => ({ id: p.id, url: p.mediaUrl, caption: p.body && p.body !== '📸' ? p.body : '' }));
   const quotes = (reviews?.items || []).filter((r) => (r.body || '').trim().length >= 12).slice(0, 3)
     .map((r) => ({ id: r.id, body: r.body.trim(), rating: r.rating, name: r.reviewer?.name || 'A collaborator' }));
 
   const years = Number(d.experienceYears);
   const stats = [];
   const followers = person._count?.followers ?? 0;
-  const postCount = person._count?.posts ?? 0;
   if (Number.isFinite(years) && years > 0) stats.push({ value: `${years}+`, label: 'Years' });
   if (followers > 0) stats.push({ value: followers >= 1000 ? `${(followers / 1000).toFixed(1)}k` : String(followers), label: 'Followers' });
   if (reviews?.count > 0) stats.push({ value: String(reviews.average), label: `Rating · ${reviews.count}` });
-  if (postCount > 0) stats.push({ value: String(postCount), label: 'Posts' });
   if (person.verificationStatus === 'VERIFIED') stats.push({ value: '✓', label: 'Verified' });
 
-  const headline = headlineOf(person) || [d.artistType || d.venueType, (d.genres || d.genresHosted || [])[0]].filter(Boolean).join(' · ') || label;
+  const headline = ed.headline || headlineOf(person) || [d.artistType || d.venueType, (d.genres || d.genresHosted || [])[0]].filter(Boolean).join(' · ') || label;
   const bio = (person.bio || '').trim();
-  const about = bio || `${person.name} is ${/^[aeiou]/i.test(label) ? 'an' : 'a'} ${label.toLowerCase()}${person.city ? ` based in ${person.city}` : ''}${uniqueTags.length ? `, working with ${uniqueTags.slice(0, 3).join(', ')}` : ''}. Find them on Gigset to collaborate or book.`;
+  const about = ed.about || bio || `${person.name} is ${/^[aeiou]/i.test(label) ? 'an' : 'a'} ${label.toLowerCase()}${person.city ? ` based in ${person.city}` : ''}${uniqueTags.length ? `, working with ${uniqueTags.slice(0, 3).join(', ')}` : ''}. Find them on Gigset to collaborate or book.`;
 
   // How complete is the kit, and what would improve it?
   const checks = [
@@ -75,15 +94,16 @@ export function buildEpk(person, { posts = [], reviews = null } = {}) {
     { key: 'details', done: details.reduce((n, s) => n + s.rows.length + s.tags.length, 0) >= 4, tip: `Fill in your ${label.toLowerCase()} details` },
     { key: 'links', done: links.length > 0, tip: 'Add Instagram, Spotify or a website' },
     { key: 'samples', done: samples.length > 0, tip: 'Add a YouTube, Spotify or SoundCloud sample' },
-    { key: 'gallery', done: gallery.length > 0, tip: 'Post a few photos' },
+    { key: 'milestones', done: ed.milestones.length > 0, tip: 'Add a few milestones' },
+    { key: 'contact', done: !!(ed.email || ed.phone), tip: 'Add a booking email or phone' },
     { key: 'reviews', done: quotes.length > 0, tip: 'Collect a review from a past collaborator' },
     { key: 'verified', done: person.verificationStatus === 'VERIFIED', tip: 'Get verified' },
   ];
   const strength = { pct: Math.round((checks.filter((c) => c.done).length / checks.length) * 100), checks, tips: checks.filter((c) => !c.done).map((c) => c.tip) };
 
   return {
-    id: person.id, name: person.name, first, label, tint: meta.tint, city: person.city || '', avatarUrl: person.avatarUrl || '',
-    verified: person.verificationStatus === 'VERIFIED', headline, about, aboutIsAuto: !bio, tags: uniqueTags, stats, details, links,
-    samples, gallery, quotes, strength, bookable: meta.bookable, profilePath: `/profile/${person.id}`,
+    id: person.id, name: person.name, first, label, tint: ed.accent || meta.tint, city: person.city || '', avatarUrl: person.avatarUrl || '',
+    verified: person.verificationStatus === 'VERIFIED', headline, about, aboutIsAuto: !bio && !ed.about, tags: uniqueTags, stats, details, links,
+    samples, quotes, milestones: ed.milestones, email: ed.email, phone: ed.phone, hide: ed.hide, edits: ed, strength, bookable: meta.bookable, profilePath: `/profile/${person.id}`,
   };
 }

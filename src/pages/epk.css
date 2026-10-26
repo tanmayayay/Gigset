@@ -232,3 +232,4 @@
 .epk-stagewrap{padding:28px 16px 0}
 .epk-stagewrap .ek{box-shadow:0 20px 70px rgba(0,0,0,.18);border-radius:6px;overflow:hidden}
 @media print{.epk-noprint{display:none!important}.epk-page2{padding:0;background:#fff}.epk-stagewrap{padding:0}.epk-stagewrap .ek{box-shadow:none;border-radius:0}@page{margin:0}}
+.epk-chip{font-family:inherit}.ekm-tabs button{font-family:inherit}.ekm-tpl{font-family:inherit}
