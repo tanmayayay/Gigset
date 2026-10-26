@@ -66,6 +66,12 @@ export default function Collab() {
   const [appsLoadingId, setAppsLoadingId] = useState(null);
   const [recs, setRecs] = useState([]);
   const [followedIds, setFollowedIds] = useState(new Set());
+  const [connIds, setConnIds] = useState(new Set());
+  useEffect(() => {
+    if (!userId) return;
+    Profiles.following().then((r) => setFollowedIds(new Set((r.items || []).map((x) => x.id)))).catch(() => {});
+    Profiles.connections().then((r) => setConnIds(new Set((r.items || []).map((x) => x.id)))).catch(() => {});
+  }, [userId]);
 
   const fetchOpps = useCallback(async () => {
     setLoading(true);
@@ -384,7 +390,7 @@ export default function Collab() {
                     className={`btn btn-xs ${isC ? 'btn-ghost' : 'btn-blue'}`}
                     onClick={() => toggleFollow(p)}
                   >
-                    {isC ? 'Connected' : 'Connect'}
+                    {connIds.has(p.id) ? 'Connected' : isC ? 'Requested' : 'Connect'}
                   </button>
                 </div>
               );

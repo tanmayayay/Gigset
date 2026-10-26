@@ -111,3 +111,9 @@ body::after{content:''; position:fixed; inset:0; z-index:-1; pointer-events:none
 :root:not([data-theme="dark"]) .mini-profile b{color:var(--text);}
 :root:not([data-theme="dark"]) .sidebar .logo{color:var(--text);}
 :root:not([data-theme="dark"]) .sidebar .drawer-close{color:var(--text);}
+
+/* calm background: no animated aurora or grid, no sidebar scanlines */
+body::before,body::after{display:none!important}
+.sidebar::before{background:none!important;opacity:0}
+.sidebar{background:linear-gradient(180deg,#0b1224,#0e1830)}
+.shell::after{display:none!important}.btn-blue::after{display:none!important}

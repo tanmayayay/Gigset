@@ -105,7 +105,7 @@ export default function NotesWheel() {
           const done = !it.add && allSeen(it);
           const latest = it.add ? null : it.stories[it.stories.length - 1];
           const style = {
-            transform: `translateX(${d * 96}px) translateZ(${-ad * 90}px) rotateY(${-d * 34}deg) scale(${front ? 1 : 0.86 - ad * 0.04})`,
+            transform: `translateX(${d * 58}px) translateZ(${-ad * 50}px) rotateY(${-d * 34}deg) scale(${front ? 1 : 0.86 - ad * 0.04})`,
             opacity: front ? 1 : Math.max(0.25, 0.8 - ad * 0.2),
             zIndex: 10 - ad,
             filter: front ? 'none' : `saturate(.85) blur(${ad * 0.4}px)`,

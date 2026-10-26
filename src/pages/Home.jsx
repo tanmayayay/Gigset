@@ -288,8 +288,8 @@ export default function Home() {
         <NewsCard items={news} />
         <TrendingCard posts={posts} onPick={(t) => { setTag(t); setTab('foryou'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} />
         <NearbyCard events={events} venues={venues} city={user?.city} />
-        <OppsCard opps={opps} user={user} />
         <PeopleCard people={people} following={following} onFollow={onFollow} />
+        <OppsCard opps={opps} user={user} />
         <RailFooter />
       </aside>
       {reading && (
