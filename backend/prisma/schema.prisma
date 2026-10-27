@@ -280,6 +280,10 @@ model Article {
 model Conversation {
   id        String   @id @default(cuid())
   title     String?
+  // DIRECT (two people) or GROUP. status: ACTIVE, or REQUEST/DECLINED for a first message to someone you are not connected with.
+  kind        String  @default("DIRECT")
+  status      String  @default("ACTIVE")
+  createdById String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -649,4 +653,24 @@ model Announcement {
   createdAt DateTime  @default(now())
 
   @@index([active, createdAt])
+}
+
+// A relaxed "let's make something together" request between two connections.
+// PENDING -> (host accepts and offers times) OFFERED -> (requester picks one) SCHEDULED. Or DECLINED / CANCELLED.
+model CollabRequest {
+  id             String   @id @default(cuid())
+  requesterId    String
+  hostId         String
+  vibe           String   @default("JAM")
+  note           String?
+  epkTemplate    String   @default("classic")
+  status         String   @default("PENDING")
+  options        Json?
+  chosen         Json?
+  conversationId String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([hostId, status])
+  @@index([requesterId, status])
 }

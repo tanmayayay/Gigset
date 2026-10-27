@@ -4,6 +4,8 @@ import { auth } from '../middleware/auth.js';
 import { asyncHandler, bad, notFound, pagination } from '../lib/http.js';
 import { isBlockedBetween } from '../lib/blocks.js';
 import { pushTo } from '../lib/push.js';
+import { areConnected, connectionIds } from '../lib/connections.js';
+import { notify } from '../lib/notify.js';
 
 const router = Router();
 
@@ -52,6 +54,10 @@ router.get(
       return {
         id: c.id,
         title: c.title,
+        kind: c.kind,
+        status: c.status,
+        createdById: c.createdById,
+        memberCount: c.members.length,
         members: c.members.filter((x) => x.userId !== req.user.id).map((x) => x.user),
         lastMessage: c.messages[0] ?? null,
         unread: unreadBy[c.id] || 0,
@@ -80,19 +86,98 @@ router.post(
     if (await isBlockedBetween(req.user.id, userId)) return bad(res, 403, 'You cannot message this person.');
 
     const candidates = await prisma.conversation.findMany({
-      where: { members: { every: { userId: { in: [req.user.id, userId] } } } },
+      where: { kind: 'DIRECT', members: { every: { userId: { in: [req.user.id, userId] } } } },
       include: { members: { select: { userId: true } } },
     });
     const direct = candidates.find((c) => c.members.length === 2);
-    if (direct) return res.json({ id: direct.id, created: false });
+    if (direct) {
+      if (direct.status === 'DECLINED' && direct.createdById === req.user.id) return bad(res, 403, 'This person is not taking messages from you right now.');
+      return res.json({ id: direct.id, created: false, status: direct.status });
+    }
 
+    // People you are not connected with land in the other person's Requests tab until they accept.
+    const connected = await areConnected(req.user.id, userId);
     const convo = await prisma.conversation.create({
-      data: { members: { create: [{ userId: req.user.id }, { userId }] } },
+      data: { kind: 'DIRECT', status: connected ? 'ACTIVE' : 'REQUEST', createdById: req.user.id, members: { create: [{ userId: req.user.id }, { userId }] } },
     });
-    res.status(201).json({ id: convo.id, created: true });
+    res.status(201).json({ id: convo.id, created: true, status: convo.status });
   })
 );
 
+// POST /api/conversations/group  (auth)  { title, memberIds[] }  — only people you are connected with can be added.
+router.post(
+  '/group',
+  auth,
+  asyncHandler(async (req, res) => {
+    const title = typeof req.body?.title === 'string' ? req.body.title.trim().slice(0, 60) : '';
+    const ids = [...new Set(Array.isArray(req.body?.memberIds) ? req.body.memberIds.filter((x) => typeof x === 'string') : [])].filter((x) => x !== req.user.id);
+    if (!title) return bad(res, 400, 'Give the group a name.');
+    if (ids.length < 1) return bad(res, 400, 'Pick at least one person.');
+    if (ids.length > 29) return bad(res, 400, 'Groups can have up to 30 people.');
+    const allowed = new Set(await connectionIds(req.user.id));
+    if (ids.some((id) => !allowed.has(id))) return bad(res, 403, 'You can only add people you are connected with.');
+    const convo = await prisma.conversation.create({
+      data: { title, kind: 'GROUP', status: 'ACTIVE', createdById: req.user.id, members: { create: [req.user.id, ...ids].map((userId) => ({ userId })) } },
+    });
+    const me = await prisma.user.findUnique({ where: { id: req.user.id }, select: { name: true } });
+    await prisma.message.create({ data: { conversationId: convo.id, senderId: req.user.id, body: `Hey everyone, I started "${title}". Say hi! 👋` } });
+    for (const id of ids) notify(id, { type: 'group', title: `${me?.name || 'Someone'} added you to ${title}`, link: `/messages?c=${convo.id}`, from: req.user.id });
+    res.status(201).json({ id: convo.id });
+  })
+);
+
+// POST /api/conversations/:id/members  { userIds[] }  — anyone in the group can add their connections.
+router.post(
+  '/:id/members',
+  auth,
+  asyncHandler(async (req, res) => {
+    const c = await prisma.conversation.findFirst({ where: { id: req.params.id, kind: 'GROUP', members: { some: { userId: req.user.id } } }, include: { members: { select: { userId: true } } } });
+    if (!c) return notFound(res, 'Group');
+    const ids = [...new Set(Array.isArray(req.body?.userIds) ? req.body.userIds.filter((x) => typeof x === 'string') : [])].filter((x) => !c.members.some((m) => m.userId === x));
+    if (c.members.length + ids.length > 30) return bad(res, 400, 'Groups can have up to 30 people.');
+    const allowed = new Set(await connectionIds(req.user.id));
+    if (ids.some((id) => !allowed.has(id))) return bad(res, 403, 'You can only add people you are connected with.');
+    if (ids.length) await prisma.conversationMember.createMany({ data: ids.map((userId) => ({ conversationId: c.id, userId })), skipDuplicates: true });
+    for (const id of ids) notify(id, { type: 'group', title: `You were added to ${c.title}`, link: `/messages?c=${c.id}`, from: req.user.id });
+    res.json({ ok: true, added: ids.length });
+  })
+);
+
+// POST /api/conversations/:id/leave  — leave a group (the chat stays for everyone else).
+router.post(
+  '/:id/leave',
+  auth,
+  asyncHandler(async (req, res) => {
+    const c = await prisma.conversation.findFirst({ where: { id: req.params.id, kind: 'GROUP', members: { some: { userId: req.user.id } } } });
+    if (!c) return notFound(res, 'Group');
+    await prisma.conversationMember.deleteMany({ where: { conversationId: c.id, userId: req.user.id } });
+    const left = await prisma.conversationMember.count({ where: { conversationId: c.id } });
+    if (left === 0) await prisma.conversation.delete({ where: { id: c.id } });
+    res.json({ ok: true });
+  })
+);
+
+// POST /api/conversations/:id/accept | /decline  — the person who received a message request.
+router.post(
+  '/:id/accept',
+  auth,
+  asyncHandler(async (req, res) => {
+    const c = await prisma.conversation.findFirst({ where: { id: req.params.id, kind: 'DIRECT', status: 'REQUEST', createdById: { not: req.user.id }, members: { some: { userId: req.user.id } } } });
+    if (!c) return notFound(res, 'Request');
+    await prisma.conversation.update({ where: { id: c.id }, data: { status: 'ACTIVE' } });
+    res.json({ ok: true });
+  })
+);
+router.post(
+  '/:id/decline',
+  auth,
+  asyncHandler(async (req, res) => {
+    const c = await prisma.conversation.findFirst({ where: { id: req.params.id, kind: 'DIRECT', status: 'REQUEST', createdById: { not: req.user.id }, members: { some: { userId: req.user.id } } } });
+    if (!c) return notFound(res, 'Request');
+    await prisma.conversation.update({ where: { id: c.id }, data: { status: 'DECLINED' } });
+    res.json({ ok: true });
+  })
+);
 
 // GET /api/conversations/live?since=<ISO time from the previous response>  (auth)
 // The lightweight "inbox pulse" the app polls every few seconds:
@@ -189,12 +274,26 @@ router.post(
     if (body.length > 2000) {
       return bad(res, 400, 'Message is too long (max 2000 characters).');
     }
+    const convoRow = await prisma.conversation.findUnique({ where: { id: req.params.id }, select: { kind: true, status: true, createdById: true } });
     const others = await prisma.conversationMember.findMany({
       where: { conversationId: req.params.id, userId: { not: req.user.id } },
       select: { userId: true },
     });
-    for (const o of others) {
-      if (await isBlockedBetween(req.user.id, o.userId)) return bad(res, 403, 'You cannot message this person.');
+    if (convoRow.kind === 'DIRECT') {
+      for (const o of others) {
+        if (await isBlockedBetween(req.user.id, o.userId)) return bad(res, 403, 'You cannot message this person.');
+      }
+      if (convoRow.status === 'DECLINED') return bad(res, 403, 'This person is not taking messages from you right now.');
+      if (convoRow.status === 'REQUEST') {
+        if (convoRow.createdById === req.user.id) {
+          // Until they accept you can send a few lines, not a flood.
+          const sent = await prisma.message.count({ where: { conversationId: req.params.id, senderId: req.user.id } });
+          if (sent >= 3) return bad(res, 403, 'Wait for them to accept your request before sending more.');
+        } else {
+          // Replying to a request is the same as accepting it.
+          await prisma.conversation.update({ where: { id: req.params.id }, data: { status: 'ACTIVE' } });
+        }
+      }
     }
     const msg = await prisma.message.create({
       data: { conversationId: req.params.id, senderId: req.user.id, body: body.trim() },
@@ -207,8 +306,9 @@ router.post(
     });
     // Chat messages are announced by the live inbox (pop-up + unread badges), not as bell notifications.
     // Browsers that enabled push also get a system notification (the service worker skips it if Gigset is open and focused).
+    const groupTitle = convoRow.kind === 'GROUP' ? (await prisma.conversation.findUnique({ where: { id: req.params.id }, select: { title: true } }))?.title : null;
     for (const o of others) {
-      pushTo(o.userId, { title: msg.sender.name, body: msg.body, url: `#/messages?c=${req.params.id}`, tag: `msg-${req.params.id}` });
+      pushTo(o.userId, { title: groupTitle ? `${groupTitle} · ${msg.sender.name}` : msg.sender.name, body: msg.body, url: `#/messages?c=${req.params.id}`, tag: `msg-${req.params.id}` });
     }
     res.status(201).json(msg);
   })

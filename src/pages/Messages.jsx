@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Send, MessageCircle, Plus, ChevronLeft, Check, CheckCheck, Clock, AlertCircle } from 'lucide-react';
+import { Send, MessageCircle, Plus, ChevronLeft, Check, CheckCheck, Clock, AlertCircle, Users, UserPlus, LogOut, Inbox } from 'lucide-react';
 import { PageHead, Avatar, EmptyState, Modal } from '../components/ui';
 import { useStore } from '../store/store';
 import { Convos, Profiles } from '../lib/api';
@@ -22,6 +22,60 @@ function Ticks({ m }) {
   return <span className="tick" title="Sent"><Check size={14} /></span>;
 }
 
+function GroupModal({ onClose, onDone }) {
+  const { pushToast } = useStore();
+  const [people, setPeople] = useState(null);
+  const [picked, setPicked] = useState([]);
+  const [title, setTitle] = useState('');
+  const [busy, setBusy] = useState(false);
+  useEffect(() => { Profiles.connections().then((r) => setPeople(r.items || [])).catch(() => setPeople([])); }, []);
+  const toggle = (id) => setPicked((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]));
+  const create = async () => {
+    setBusy(true);
+    try { const r = await Convos.createGroup({ title: title.trim(), memberIds: picked }); onDone(r.id); }
+    catch (e) { pushToast(e.message, 'error'); setBusy(false); }
+  };
+  return (
+    <Modal title="New group" onClose={onClose}>
+      <input type="text" placeholder="Group name (jam crew, band, …)" value={title} maxLength={60} onChange={(e) => setTitle(e.target.value)} autoFocus />
+      <p className="msg-hint" style={{ margin: '8px 0 0' }}>You can add people you are connected with.</p>
+      <div style={{ maxHeight: 280, overflowY: 'auto', marginTop: 8 }}>
+        {people === null ? <p className="msg-hint">Loading…</p> : people.length === 0
+          ? <EmptyState icon={<Users size={22} />} title="No connections yet" text="Follow each other to connect, then make a group." />
+          : people.map((p) => (
+            <button key={p.id} className={`msg-list-item${picked.includes(p.id) ? ' active' : ''}`} style={{ width: '100%', textAlign: 'left' }} onClick={() => toggle(p.id)}>
+              <Avatar name={p.name || '?'} src={p.avatarUrl} size={34} />
+              <div style={{ flex: 1, minWidth: 0 }}><b>{p.name}</b><p>{[p.stakeholderType, p.city].filter(Boolean).join(' · ')}</p></div>
+              {picked.includes(p.id) && <Check size={16} />}
+            </button>
+          ))}
+      </div>
+      <button className="btn btn-blue" style={{ width: '100%', marginTop: 12 }} disabled={busy || !title.trim() || picked.length === 0} onClick={create}>Create group{picked.length ? ` (${picked.length + 1})` : ''}</button>
+    </Modal>
+  );
+}
+
+function GroupMembers({ convo, onClose, onChanged, onLeft }) {
+  const { pushToast } = useStore();
+  const [people, setPeople] = useState([]);
+  useEffect(() => { Profiles.connections().then((r) => setPeople(r.items || [])).catch(() => {}); }, []);
+  const inGroup = new Set(convo.members.map((m) => m.id));
+  const addable = people.filter((p) => !inGroup.has(p.id));
+  const add = async (id) => { try { await Convos.addMembers(convo.id, [id]); await onChanged(); } catch (e) { pushToast(e.message, 'error'); } };
+  const leave = async () => { try { await Convos.leave(convo.id); onLeft(); } catch (e) { pushToast(e.message, 'error'); } };
+  return (
+    <Modal title={convo.title || 'Group'} onClose={onClose}>
+      <p className="msg-hint" style={{ margin: 0 }}>Members</p>
+      {convo.members.map((m) => <div key={m.id} className="msg-list-item" style={{ cursor: 'default' }}><Avatar name={m.name || '?'} src={m.avatarUrl} size={32} /><div style={{ flex: 1 }}><b>{m.name}</b></div></div>)}
+      {addable.length > 0 && <>
+        <p className="msg-hint" style={{ margin: '12px 0 0' }}>Add from your connections</p>
+        {addable.map((p) => <button key={p.id} className="msg-list-item" style={{ width: '100%', textAlign: 'left' }} onClick={() => add(p.id)}><Avatar name={p.name || '?'} src={p.avatarUrl} size={32} /><div style={{ flex: 1 }}><b>{p.name}</b></div><UserPlus size={15} /></button>)}
+      </>}
+      <button className="btn btn-ghost" style={{ width: '100%', marginTop: 14 }} onClick={leave}><LogOut size={14} /> Leave group</button>
+    </Modal>
+  );
+}
+
 export default function Messages() {
   const { user, userId, pushToast } = useStore();
   const navigate = useNavigate();
@@ -39,10 +93,19 @@ export default function Messages() {
   const [following, setFollowing] = useState([]);
   const [followingLoading, setFollowingLoading] = useState(false);
   const [fq, setFq] = useState('');
+  const [tab, setTab] = useState('chats'); // chats | requests
+  const [groupOpen, setGroupOpen] = useState(false);
+  const [membersOpen, setMembersOpen] = useState(false);
 
   const convo = convos.find((c) => c.id === activeId) || null;
-  const other = convo ? convo.members.find((m) => m.id !== userId) || convo.members[0] : null;
-  const otherName = other?.name || 'Conversation';
+  const isGroup = convo?.kind === 'GROUP';
+  const other = convo && !isGroup ? convo.members.find((m) => m.id !== userId) || convo.members[0] : null;
+  const otherName = isGroup ? convo.title || 'Group' : other?.name || 'Conversation';
+  const chats = convos.filter((c) => c.status === 'ACTIVE' || (c.status === 'REQUEST' && c.createdById === userId));
+  const requests = convos.filter((c) => c.status === 'REQUEST' && c.createdById !== userId);
+  const isRequestToMe = convo?.status === 'REQUEST' && convo.createdById !== userId;
+  const isMyPending = convo?.status === 'REQUEST' && convo.createdById === userId;
+  const listed = tab === 'requests' ? requests : chats;
 
   const loadConvos = useCallback(async () => {
     try {
@@ -74,8 +137,9 @@ export default function Messages() {
   // navigate here right after Convos.open).
   useEffect(() => {
     const deep = searchParams.get('c');
-    if (deep && convos.some((c) => c.id === deep)) { setActiveId(deep); setShowThread(true); }
-    else if (!deep && !activeId && convos.length > 0) setActiveId(convos[0].id);
+    const target = deep && convos.find((c) => c.id === deep);
+    if (target) { setActiveId(deep); setShowThread(true); setTab(target.status === 'REQUEST' && target.createdById !== userId ? 'requests' : 'chats'); }
+    else if (!deep && !activeId && convos.length > 0) setActiveId((convos.find((c) => c.status === 'ACTIVE') || convos[0]).id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams, convos]);
 
@@ -188,22 +252,27 @@ export default function Messages() {
       <PageHead title="Messages" sub="Conversations with your network — requests from non-connections appear here too." />
       <div className={`msg-shell${showThread ? ' show-thread' : ''}`}>
         <div className="msg-list">
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 12px', borderBottom: '1px solid var(--border-soft)' }}>
-            <b style={{ fontSize: 13.5 }}>Conversations</b>
-            <button className="btn btn-blue btn-sm" onClick={() => setNewOpen(true)}>
-              <Plus size={14} /> New message
-            </button>
+          <div className="msg-tabs">
+            <button className={tab === 'chats' ? 'on' : ''} onClick={() => setTab('chats')}>Chats</button>
+            <button className={tab === 'requests' ? 'on' : ''} onClick={() => setTab('requests')}>Requests{requests.length > 0 && <em>{requests.length}</em>}</button>
+            <span style={{ flex: 1 }} />
+            <button className="msg-icon" title="New group" aria-label="New group" onClick={() => setGroupOpen(true)}><Users size={15} /></button>
+            <button className="msg-icon blue" title="New message" aria-label="New message" onClick={() => setNewOpen(true)}><Plus size={15} /></button>
           </div>
-          {convos.length === 0 ? (
-            <EmptyState icon={<MessageCircle size={22} />} title="No conversations yet" text="Start one from someone's profile." />
+          {tab === 'requests' && <p className="msg-hint">Messages from people you are not connected with. Nothing happens until you accept.</p>}
+          {listed.length === 0 ? (
+            tab === 'requests'
+              ? <EmptyState icon={<Inbox size={22} />} title="No requests" text="When someone you are not connected with messages you, it lands here." />
+              : <EmptyState icon={<MessageCircle size={22} />} title="No conversations yet" text="Start one from someone's profile, or make a group with your connections." />
           ) : (
-            convos.map((c) => {
+            listed.map((c) => {
+              const g = c.kind === 'GROUP';
               const o = c.members.find((m) => m.id !== userId) || c.members[0];
               return (
                 <button key={c.id} className={`msg-list-item${c.id === activeId ? ' active' : ''}`} onClick={() => { setActiveId(c.id); setShowThread(true); }}>
-                  <Avatar name={o?.name || '?'} src={o?.avatarUrl} size={38} />
+                  {g ? <span className="msg-gavatar"><Users size={18} /></span> : <Avatar name={o?.name || '?'} src={o?.avatarUrl} size={38} />}
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <b>{o?.name}</b>
+                    <b>{g ? c.title : o?.name}{g && <small className="msg-gcount">{c.memberCount}</small>}{c.status === 'REQUEST' && c.createdById === userId && <small className="msg-pending">Pending</small>}</b>
                     <p className={c.unread > 0 ? 'unread' : ''}>{c.lastMessage?.body}</p>
                   </div>
                   {c.unread > 0 && c.id !== activeId && <span className="msg-unread">{c.unread > 99 ? '99+' : c.unread}</span>}
@@ -217,15 +286,25 @@ export default function Messages() {
             <>
               <div className="msg-thread-head">
                 <button className="msg-back" onClick={() => setShowThread(false)} aria-label="Back to conversations"><ChevronLeft size={22} /></button>
-                <Avatar name={otherName} src={other?.avatarUrl} size={34} />
-                <div className="msg-thread-who" onClick={() => other && navigate(`/profile/${other.id}`)}><b>{otherName}</b><div style={{ fontSize: 11.5, color: 'var(--text-faint)' }}>Typically replies within a day</div></div>
+                {isGroup ? <span className="msg-gavatar sm"><Users size={16} /></span> : <Avatar name={otherName} src={other?.avatarUrl} size={34} />}
+                <div className="msg-thread-who" onClick={() => (isGroup ? setMembersOpen(true) : other && navigate(`/profile/${other.id}`))}><b>{otherName}</b><div style={{ fontSize: 11.5, color: 'var(--text-faint)' }}>{isGroup ? `${convo.memberCount} people · tap for members` : 'Typically replies within a day'}</div></div>
+                {isGroup && <div style={{ marginLeft: 'auto' }}><button className="btn btn-ghost btn-sm" onClick={() => setMembersOpen(true)}><UserPlus size={14} /> People</button></div>}
                 {other && other.id !== userId && <div style={{ marginLeft: 'auto' }}><SafetyMenu person={other} onBlockChange={(b) => { if (b) { setShowThread(false); loadConvos(); } }} /></div>}
               </div>
+              {isRequestToMe && (
+                <div className="msg-banner">
+                  <span><b>{otherName}</b> is not connected with you yet. Accept to chat, or decline and they will not be able to message you.</span>
+                  <div><button className="btn btn-ghost btn-sm" onClick={async () => { try { await Convos.decline(activeId); setShowThread(false); setActiveId(null); await loadConvos(); } catch (e) { pushToast(e.message, 'error'); } }}>Decline</button>
+                    <button className="btn btn-blue btn-sm" onClick={async () => { try { await Convos.accept(activeId); await loadConvos(); setTab('chats'); } catch (e) { pushToast(e.message, 'error'); } }}>Accept</button></div>
+                </div>
+              )}
+              {isMyPending && <div className="msg-banner soft"><span>Sent as a request. {otherName.split(' ')[0]} will see it once they accept. You can send up to 3 messages until then.</span></div>}
               <div className="msg-thread-body" ref={bodyRef}>
                 {shown.map((m) => {
                   const mine = m.senderId === userId;
                   return (
                     <div key={m.id} className={`bubble ${mine ? 'me' : 'them'}${m._state === 'failed' ? ' failed' : ''}`}>
+                      {isGroup && !mine && <span className="bubble-from">{m.sender?.name}</span>}
                       <span className="bubble-text">{m.body}</span>
                       <span className="bubble-meta">
                         {m._state === 'failed' ? (
@@ -242,7 +321,7 @@ export default function Messages() {
                 })}
               </div>
               <div className="msg-thread-input">
-                <input type="text" enterKeyHint="send" placeholder={`Message ${otherName.split(' ')[0]}…`} value={text} onChange={(e) => setText(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && send()} />
+                <input type="text" enterKeyHint="send" placeholder={isGroup ? `Message ${otherName}…` : `Message ${otherName.split(' ')[0]}…`} value={text} onChange={(e) => setText(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && send()} />
                 <button className="btn btn-blue btn-sm" onClick={send} aria-label="Send message"><Send size={14} /></button>
               </div>
             </>
@@ -253,6 +332,13 @@ export default function Messages() {
       </div>
       <p style={{ fontSize: 12, color: 'var(--text-faint)', marginTop: 12 }}>Signed in as {user?.name}.</p>
 
+      {groupOpen && <GroupModal onClose={() => setGroupOpen(false)} onDone={async (id) => { setGroupOpen(false); await loadConvos(); setTab('chats'); setActiveId(id); setShowThread(true); }} />}
+      {membersOpen && convo && isGroup && (
+        <GroupMembers convo={convo} onClose={() => setMembersOpen(false)}
+          onChanged={loadConvos}
+          onLeft={async () => { setMembersOpen(false); setActiveId(null); setShowThread(false); await loadConvos(); }} />
+      )}
+
       {newOpen && (
         <Modal title="New message" onClose={() => setNewOpen(false)}>
           <input
@@ -262,6 +348,7 @@ export default function Messages() {
             onChange={(e) => setFq(e.target.value)}
             autoFocus
           />
+          <p className="msg-hint" style={{ margin: '8px 0 0' }}>Connections chat straight away. Anyone else gets your message as a request.</p>
           <div style={{ maxHeight: 320, overflowY: 'auto', marginTop: 10 }}>
             {followingLoading ? (
               <p style={{ fontSize: 13, color: 'var(--text-faint)', padding: '12px 4px' }}>Loading…</p>

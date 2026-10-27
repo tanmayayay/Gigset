@@ -208,6 +208,23 @@ export const Convos = {
   live: (since) => api(`/api/conversations/live${since ? qs({ since }) : ''}`),
   /** Tell the sender you have seen their messages (turns their ticks blue). */
   markRead: (id) => api(`/api/conversations/${id}/read`, { method: 'POST', body: {} }),
+  /** Group chat with people you are connected with. */
+  createGroup: (title, memberIds) => api('/api/conversations/group', { method: 'POST', body: { title, memberIds } }),
+  addMembers: (id, userIds) => api(`/api/conversations/${id}/members`, { method: 'POST', body: { userIds } }),
+  leave: (id) => api(`/api/conversations/${id}/leave`, { method: 'POST', body: {} }),
+  /** Message requests from people you are not connected with. */
+  accept: (id) => api(`/api/conversations/${id}/accept`, { method: 'POST', body: {} }),
+  decline: (id) => api(`/api/conversations/${id}/decline`, { method: 'POST', body: {} }),
+};
+
+/** Relaxed collab requests: ask, they say yes and share times, you pick one. */
+export const Collabs = {
+  list: () => api('/api/collabs', { fresh: true }),
+  create: ({ hostId, vibe, note, epkTemplate }) => api('/api/collabs', { method: 'POST', body: { hostId, vibe, note, epkTemplate } }),
+  accept: (id, options) => api(`/api/collabs/${id}/accept`, { method: 'POST', body: { options } }),
+  decline: (id) => api(`/api/collabs/${id}/decline`, { method: 'POST', body: {} }),
+  choose: (id, index) => api(`/api/collabs/${id}/choose`, { method: 'POST', body: { index } }),
+  cancel: (id) => api(`/api/collabs/${id}/cancel`, { method: 'POST', body: {} }),
 };
 
 export const Account = {

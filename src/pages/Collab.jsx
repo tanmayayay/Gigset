@@ -4,6 +4,8 @@ import BookingsPanel from '../components/collab/BookingsPanel';
 import BookPanel from '../components/collab/BookPanel';
 import ConnectionsPanel from '../components/collab/ConnectionsPanel';
 import FindPanel from '../components/collab/FindPanel';
+import CollabRequests from '../components/collab/CollabRequests';
+import { Collabs } from '../lib/api';
 import '../components/collab/collab.css';
 import { useBookings } from '../lib/useBookings';
 import { Plus, MapPin, Wallet, Users as UsersIcon, Check, Bookmark, Briefcase, Search as SearchIcon, Lock } from 'lucide-react';
@@ -44,9 +46,12 @@ export default function Collab() {
   const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
   const withId = params.get('with');
-  const [tab, setTab] = useState(params.get('tab') === 'bookings' ? 'bookings' : 'discover');
+  const TABS = ['discover', 'find', 'connections', 'requests', 'mine', 'bookings'];
+  const [tab, setTab] = useState(TABS.includes(params.get('tab')) ? params.get('tab') : 'discover');
   const tabParam = params.get('tab');
-  useEffect(() => { if (tabParam === 'bookings') setTab('bookings'); }, [tabParam]);
+  useEffect(() => { if (TABS.includes(tabParam)) setTab(tabParam); }, [tabParam]);
+  const [todo, setTodo] = useState(0);
+  useEffect(() => { if (userId) Collabs.list().then((r) => setTodo(r.todo)).catch(() => {}); }, [userId]);
   const bookings = useBookings(!!userId);
   const closeWith = () => setParams((p) => { const n = new URLSearchParams(p); n.delete('with'); return n; }, { replace: true });
   const [cityF, setCityF] = useState('all');
@@ -216,20 +221,20 @@ export default function Collab() {
     <div>
       <PageHead
         title="Collab"
-        sub="Find or post opportunities, collaborate and book people. Gigs, session work and crew requirements, sorted by your AI match."
+        sub="Make music with people you vibe with. Find artists, send a collab request, or browse gigs and crew calls."
         action={<button className="btn btn-blue btn-sm" onClick={openOpp}><Plus size={14} /> Post an opportunity</button>}
       />
       <div className="two-col">
         <div>
           <div className="filter-row">
-            {[['discover', 'Gigs'], ['find', 'Find artists'], ['connections', 'Connections'], ['mine', 'My gigs'], ['bookings', 'Bookings']].map(([v, l]) => (
+            {[['discover', 'Gigs'], ['find', 'Find artists'], ['connections', 'Connections'], ['requests', 'Requests'], ['mine', 'My gigs'], ['bookings', 'Bookings']].map(([v, l]) => (
               <button key={v} className={`filter-chip${tab === v ? ' active' : ''}`} onClick={() => { setTab(v); setExpandedOppId(null); }}>
-                {l}{v === 'bookings' && bookings.pending > 0 && <span className="dot" style={{ marginLeft: 6 }}>{bookings.pending}</span>}
+                {l}{v === 'requests' && todo > 0 && <span className="dot" style={{ marginLeft: 6 }}>{todo}</span>}{v === 'bookings' && bookings.pending > 0 && <span className="dot" style={{ marginLeft: 6 }}>{bookings.pending}</span>}
               </button>
             ))}
           </div>
-          {withId && <BookPanel id={withId} onClose={closeWith} />}
-          {tab === 'bookings' ? <BookingsPanel data={bookings} /> : tab === 'find' ? <FindPanel onOpen={(id) => setParams((p) => { const n = new URLSearchParams(p); n.set('with', id); return n; })} /> : tab === 'connections' ? <ConnectionsPanel onCollab={(id) => setParams((p) => { const n = new URLSearchParams(p); n.set('with', id); return n; })} /> : (<>
+          {withId && <BookPanel id={withId} onClose={closeWith} onSent={() => Collabs.list().then((r) => setTodo(r.todo)).catch(() => {})} />}
+          {tab === 'bookings' ? <BookingsPanel data={bookings} /> : tab === 'requests' ? <CollabRequests onChange={setTodo} /> : tab === 'find' ? <FindPanel onOpen={(id) => setParams((p) => { const n = new URLSearchParams(p); n.set('with', id); return n; })} /> : tab === 'connections' ? <ConnectionsPanel onCollab={(id) => setParams((p) => { const n = new URLSearchParams(p); n.set('with', id); return n; })} /> : (<>
           <div className="filter-row">
             <select className="filter-select" value={genreF} onChange={(e) => setGenreF(e.target.value)}>
               <option value="all">All genres</option>{genreOptions.map((g) => <option key={g} value={g}>{g}</option>)}
