@@ -22,6 +22,7 @@ const Settings = lazy(() => import('./pages/Settings'));
 const About = lazy(() => import('./pages/About'));
 const Support = lazy(() => import('./pages/Support'));
 const Saved = lazy(() => import('./pages/Saved'));
+const AdminPage = lazy(() => import('./pages/Admin'));
 import EmailVerified from './pages/EmailVerified';
 
 /* Supabase email-confirmation links redirect to the Site URL with the
@@ -126,6 +127,7 @@ function AppShell() {
           <Route path="/settings" element={<Settings />} />
           <Route path="/about" element={<About />} />
           <Route path="/support" element={<Support />} />
+          <Route path="/admin" element={<AdminPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

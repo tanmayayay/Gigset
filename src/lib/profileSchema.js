@@ -48,7 +48,8 @@ export const ROLE_ORDER = ['PERFORMER', 'VENUE', 'BUYER', 'CREW', 'INSTITUTION']
 export const roleLabel = (t) => ROLE_META[t]?.label || t || 'Member';
 export const metaFor = (t) => ROLE_META[t] || ROLE_META.PERFORMER;
 
-const GENRES = ['Bollywood', 'Indie', 'Hip-hop', 'Rock', 'Electronic', 'Classical', 'Carnatic', 'Hindustani', 'Folk', 'Sufi', 'Jazz', 'Pop', 'Metal', 'Ghazal', 'Punjabi', 'Devotional'];
+export const INSTRUMENTS = ['Vocals', 'Guitar', 'Keys', 'Tabla', 'Drums', 'Bass', 'Violin', 'Sitar', 'Flute', 'Saxophone', 'Decks'];
+export const GENRES = ['Bollywood', 'Indie', 'Hip-hop', 'Rock', 'Electronic', 'Classical', 'Carnatic', 'Hindustani', 'Folk', 'Sufi', 'Jazz', 'Pop', 'Metal', 'Ghazal', 'Punjabi', 'Devotional'];
 const LANGUAGES = ['Hindi', 'English', 'Punjabi', 'Tamil', 'Telugu', 'Bengali', 'Marathi', 'Malayalam', 'Kannada', 'Gujarati', 'Urdu'];
 const CITIES_HINT = ['Mumbai', 'Delhi-NCR', 'Bengaluru', 'Pune', 'Hyderabad', 'Chennai', 'Kolkata', 'Goa'];
 
@@ -69,7 +70,7 @@ export const ROLE_SECTIONS = {
       fields: [
         { key: 'artistType', label: 'I perform as', type: 'select', glance: true, options: ['Solo artist', 'Band', 'DJ', 'Singer-songwriter', 'Instrumentalist', 'Producer', 'Classical / folk ensemble', 'Rapper / MC'] },
         { key: 'genres', label: 'Genres', type: 'tags', suggestions: GENRES, glance: true },
-        { key: 'instruments', label: 'Instruments', type: 'tags', suggestions: ['Vocals', 'Guitar', 'Keys', 'Tabla', 'Drums', 'Bass', 'Violin', 'Sitar', 'Flute', 'Saxophone', 'Decks'] },
+        { key: 'instruments', label: 'Instruments', type: 'tags', suggestions: INSTRUMENTS },
         { key: 'experienceYears', label: 'Years performing', type: 'number', glance: true, suffix: 'yrs' },
         { key: 'bandSize', label: 'Group size', type: 'number', placeholder: 'e.g. 4' },
       ],

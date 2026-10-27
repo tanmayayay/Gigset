@@ -24,6 +24,8 @@ services:
         sync: false
       - key: FRONTEND_URL
         sync: false # deployed web origin, e.g. https://tanmayayay.github.io/gigset-web
+      - key: ADMIN_EMAILS
+        sync: false # comma separated sign-in emails that are always admins, e.g. you@gmail.com,partner@gmail.com
       # --- Optional: email alerts + weekly digest (Resend) ---
       - key: RESEND_API_KEY
         sync: false

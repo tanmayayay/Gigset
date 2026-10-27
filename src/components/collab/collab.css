@@ -11,3 +11,8 @@
 .vis-toggle{display:flex;gap:6px}.vis-toggle button{flex:1;padding:10px;border-radius:12px;border:1.5px solid var(--border);background:transparent;color:var(--text);cursor:pointer;text-align:left;font:inherit}
 .vis-toggle button.on{border-color:var(--blue);background:color-mix(in srgb,var(--blue) 10%,transparent)}
 .vis-toggle b{display:flex;align-items:center;gap:6px;font-size:13.5px}.vis-toggle small{display:block;color:var(--text-dim);font-size:12px;margin-top:2px}
+.find-lead{margin:14px 0 10px;font-size:13.5px;color:var(--text-dim)}
+.find-filters{display:flex;gap:8px;flex-wrap:wrap}
+.find-search{position:relative;display:inline-flex;align-items:center}.find-search svg{position:absolute;left:10px;opacity:.5;pointer-events:none}.find-search input{padding-left:30px;min-width:150px}
+.find-quick{margin-top:10px;font-size:12.5px;color:var(--text-dim);display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.find-tags{display:flex;gap:5px;flex-wrap:wrap}.find-tags span{font-size:11.5px;font-weight:600;padding:2px 9px;border-radius:99px;background:color-mix(in srgb,var(--blue) 12%,transparent);color:var(--blue)}

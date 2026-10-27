@@ -25,6 +25,7 @@
 import { createRemoteJWKSet, decodeProtectedHeader, jwtVerify } from 'jose';
 import { prisma } from '../lib/prisma.js';
 import { asyncHandler } from '../lib/http.js';
+import { touchActive } from '../lib/activity.js';
 
 // A value counts as "set" only if it is non-empty AND not still a template
 // placeholder (e.g. "<ref>", "<password>") from .env.example. This keeps a
@@ -144,6 +145,9 @@ async function loadOrCreateUser(payload) {
   return user;
 }
 
+/** Call when an account is suspended or changed so the change applies at once. */
+export function forgetUser(authId) { if (authId) userCache.delete(authId); }
+
 export const auth = asyncHandler(async (req, res, next) => {
   const header = req.headers.authorization || '';
   const token = /^Bearer\s+(\S+)$/.exec(header)?.[1];
@@ -167,7 +171,11 @@ export const auth = asyncHandler(async (req, res, next) => {
       return unauthorized(res, 'Invalid or expired token.', 'Sign in again via Supabase Auth to get a fresh access token.');
     }
     const user = await getOrCreateUser(payload);
+    if (user.suspendedAt) {
+      return res.status(403).json({ error: 'This account has been suspended.', suspended: true, reason: user.suspendReason || undefined });
+    }
     req.user = { id: user.id, authId: user.authId, email: payload.email ?? null };
+    touchActive(user.id);
     return next();
   }
 

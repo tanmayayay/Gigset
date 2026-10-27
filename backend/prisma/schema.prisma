@@ -99,6 +99,10 @@ model User {
   contentOpen        Boolean            @default(false)
   emailAlerts        Boolean            @default(true)
   weeklyDigest       Boolean            @default(true)
+  // Admin: role is USER or ADMIN. Suspended people cannot use the app.
+  role               String             @default("USER")
+  suspendedAt        DateTime?
+  suspendReason      String?
   lastDigestAt       DateTime?
   createdAt          DateTime           @default(now())
   updatedAt          DateTime           @updatedAt
@@ -132,6 +136,7 @@ model User {
   reviewsWritten          Review[]             @relation("Reviewer")
   reviewsReceived         Review[]             @relation("Reviewee")
   pushSubscriptions       PushSubscription[]
+  activeDays              ActiveDay[]
 
   @@index([stakeholderType])
   @@index([city])
@@ -605,4 +610,43 @@ model CommunityVote {
 
   @@id([userId, targetType, targetId])
   @@index([targetType, targetId])
+}
+
+// ------------------------------------------------------------------- Admin
+// One row per person per day they used the app: powers DAU/MAU, retention and heatmaps.
+model ActiveDay {
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  day    String // "YYYY-MM-DD"
+
+  @@id([userId, day])
+  @@index([day])
+}
+
+// Everything an admin does is written here so nothing happens without a trace.
+model AuditLog {
+  id         String   @id @default(cuid())
+  adminId    String
+  adminName  String
+  action     String
+  targetType String?
+  targetId   String?
+  summary    String?
+  createdAt  DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+// A message banner shown to everyone in the app (maintenance, news, thank-yous).
+model Announcement {
+  id        String    @id @default(cuid())
+  title     String
+  body      String?
+  tone      String    @default("info") // info | success | warning
+  active    Boolean   @default(true)
+  expiresAt DateTime?
+  createdBy String?
+  createdAt DateTime  @default(now())
+
+  @@index([active, createdAt])
 }

@@ -293,3 +293,37 @@ export const Groups = {
 export const NewsLive = {
   get: () => api('/api/news/live', { auth: 'optional' }),
 };
+
+/** Admin console. Every call is rejected by the server unless the signed-in person is an admin. */
+const A = (path, opts = {}) => api(`/api/admin${path}`, { fresh: true, ...opts });
+export const Admin = {
+  me: () => A('/me'),
+  analytics: (days = 30) => A(`/analytics?days=${days}`),
+  users: (params = {}) => A(`/users${qs(params)}`),
+  user: (id) => A(`/users/${id}`),
+  userAction: (id, action, body = {}) => A(`/users/${id}/${action}`, { method: 'POST', body }),
+  deleteUser: (id, confirm) => A(`/users/${id}`, { method: 'DELETE', body: { confirm } }),
+  content: (params = {}) => A(`/content${qs(params)}`),
+  deletePost: (id) => A(`/content/posts/${id}`, { method: 'DELETE' }),
+  removeCommunityPost: (id, removed = true) => A(`/content/community/${id}/remove`, { method: 'POST', body: { removed } }),
+  closeOpp: (id) => A(`/content/opportunities/${id}/close`, { method: 'POST' }),
+  deleteOpp: (id) => A(`/content/opportunities/${id}`, { method: 'DELETE' }),
+  reports: (params = {}) => A(`/reports${qs(params)}`),
+  resolveReport: (id, action, authorId) => A(`/reports/${id}`, { method: 'POST', body: { action, authorId } }),
+  announcements: () => A('/announcements'),
+  announce: (data) => A('/announcements', { method: 'POST', body: data }),
+  setAnnouncement: (id, active) => A(`/announcements/${id}`, { method: 'PATCH', body: { active } }),
+  deleteAnnouncement: (id) => A(`/announcements/${id}`, { method: 'DELETE' }),
+  broadcast: (data) => A('/broadcast', { method: 'POST', body: data }),
+  audit: (params = {}) => A(`/audit${qs(params)}`),
+  /** Downloads the CSV with the admin's sign-in. */
+  async exportUsers() {
+    const token = await getAccessToken();
+    const r = await fetch(`${API_BASE}/api/admin/export/users.csv`, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
+    if (!r.ok) throw new ApiError('Could not export.', r.status, null);
+    const url = URL.createObjectURL(await r.blob());
+    const a = document.createElement('a'); a.href = url; a.download = 'gigset-users.csv'; a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+  },
+};
+export const Announcements = { active: () => api('/api/announcements', { auth: false }) };

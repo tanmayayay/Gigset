@@ -3,6 +3,7 @@ import { useNavigate, useOutletContext, useSearchParams } from 'react-router-dom
 import BookingsPanel from '../components/collab/BookingsPanel';
 import BookPanel from '../components/collab/BookPanel';
 import ConnectionsPanel from '../components/collab/ConnectionsPanel';
+import FindPanel from '../components/collab/FindPanel';
 import '../components/collab/collab.css';
 import { useBookings } from '../lib/useBookings';
 import { Plus, MapPin, Wallet, Users as UsersIcon, Check, Bookmark, Briefcase, Search as SearchIcon, Lock } from 'lucide-react';
@@ -221,14 +222,14 @@ export default function Collab() {
       <div className="two-col">
         <div>
           <div className="filter-row">
-            {[['discover', 'Discover'], ['connections', 'Connections'], ['mine', 'My gigs'], ['bookings', 'Bookings']].map(([v, l]) => (
+            {[['discover', 'Gigs'], ['find', 'Find artists'], ['connections', 'Connections'], ['mine', 'My gigs'], ['bookings', 'Bookings']].map(([v, l]) => (
               <button key={v} className={`filter-chip${tab === v ? ' active' : ''}`} onClick={() => { setTab(v); setExpandedOppId(null); }}>
                 {l}{v === 'bookings' && bookings.pending > 0 && <span className="dot" style={{ marginLeft: 6 }}>{bookings.pending}</span>}
               </button>
             ))}
           </div>
           {withId && <BookPanel id={withId} onClose={closeWith} />}
-          {tab === 'bookings' ? <BookingsPanel data={bookings} /> : tab === 'connections' ? <ConnectionsPanel onCollab={(id) => setParams((p) => { const n = new URLSearchParams(p); n.set('with', id); return n; })} /> : (<>
+          {tab === 'bookings' ? <BookingsPanel data={bookings} /> : tab === 'find' ? <FindPanel onOpen={(id) => setParams((p) => { const n = new URLSearchParams(p); n.set('with', id); return n; })} /> : tab === 'connections' ? <ConnectionsPanel onCollab={(id) => setParams((p) => { const n = new URLSearchParams(p); n.set('with', id); return n; })} /> : (<>
           <div className="filter-row">
             <select className="filter-select" value={genreF} onChange={(e) => setGenreF(e.target.value)}>
               <option value="all">All genres</option>{genreOptions.map((g) => <option key={g} value={g}>{g}</option>)}

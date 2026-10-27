@@ -120,6 +120,12 @@ router.get(
       where.stakeholderType = req.query.type;
     }
     if (req.query.city) where.city = req.query.city;
+    // Find a collaborator: filter by what they play and what genre they work in.
+    const tagFilter = (key, v) => ({ detail: { is: { data: { path: [key], array_contains: [String(v).slice(0, 40)] } } } });
+    const and = [];
+    if (req.query.instrument) and.push(tagFilter('instruments', req.query.instrument));
+    if (req.query.genre) and.push(tagFilter('genres', req.query.genre));
+    if (and.length) where.AND = and;
     if (req.query.search) where.name = { contains: String(req.query.search).slice(0, 80), mode: 'insensitive' };
 
     const [items, total] = await Promise.all([

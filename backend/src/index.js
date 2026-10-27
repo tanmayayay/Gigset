@@ -23,6 +23,7 @@ import safetyRouter from './routes/safety.js';
 import reviewsRouter from './routes/reviews.js';
 import pushRouter from './routes/push.js';
 import mailRouter from './routes/mail.js';
+import adminRouter, { publicRouter as announcementsRouter } from './routes/admin.js';
 import { isSupabaseMode, isSet } from './middleware/auth.js';
 
 const app = express();
@@ -144,6 +145,8 @@ app.use('/api', safetyRouter); // /api/reports, /api/blocks
 app.use('/api/reviews', reviewsRouter);
 app.use('/api/push', pushRouter);
 app.use('/api/email', mailRouter);
+app.use('/api/admin', adminRouter);
+app.use('/api/announcements', announcementsRouter);
 
 // 404 for unknown /api routes.
 app.use('/api', (req, res) => {

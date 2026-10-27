@@ -2,11 +2,11 @@ import { useState, useEffect, useCallback, Suspense } from 'react';
 import { NavLink, Outlet, useNavigate, useLocation, Link } from 'react-router-dom';
 import {
   Home, LayoutGrid, Handshake, Users, Newspaper, MessageCircle, Search,
-  User, Bell, Settings, Info, LifeBuoy, Plus, Moon, Sun, Bookmark, Menu, X, LogOut,
+  User, Bell, Settings, Info, LifeBuoy, Plus, Moon, Sun, Bookmark, Menu, X, LogOut, ShieldCheck, Megaphone,
 } from 'lucide-react';
 import { Logo, Avatar } from './ui';
 import { useStore } from '../store/store';
-import { Notifs, Account } from '../lib/api';
+import { Notifs, Account, Admin, Announcements } from '../lib/api';
 import { pendingRef, clearRef } from '../lib/ref';
 import { useLiveInbox, startLiveInbox, stopLiveInbox, dismissPopup, setMessagePopupsMuted } from '../lib/liveInbox';
 import { timeAgo, resolveNotifLink } from '../lib/format';
@@ -109,10 +109,22 @@ export default function Shell({ onOpenPalette, onNewPost, onNewOpp }) {
     return () => { document.title = base; };
   }, [live.unreadMessages]);
 
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [banners, setBanners] = useState([]);
+  useEffect(() => {
+    if (!userId) return;
+    Admin.me().then(() => setIsAdmin(true)).catch(() => setIsAdmin(false));
+    Announcements.active().then((r) => setBanners(r.items || [])).catch(() => {});
+  }, [userId]);
+  const seenBanners = (() => { try { return JSON.parse(localStorage.getItem('gigset.banners') || '[]'); } catch { return []; } })();
+  const visibleBanners = banners.filter((b) => !seenBanners.includes(b.id));
+  const hideBanner = (id) => { try { localStorage.setItem('gigset.banners', JSON.stringify([...seenBanners, id].slice(-30))); } catch { /* ignore */ } setBanners((b) => b.filter((x) => x.id !== id)); };
+
   const NAV_YOU = [
     { to: `/profile/${userId}`, label: 'Profile', icon: User },
     { to: '/notifications', label: 'Notifications', icon: Bell, badgeKey: 'notifs' },
     { to: '/search', label: 'Search', icon: Search },
+    ...(isAdmin ? [{ to: '/admin', label: 'Admin', icon: ShieldCheck }] : []),
   ];
 
   const sidebarBody = (onNav) => (
@@ -238,6 +250,12 @@ export default function Shell({ onOpenPalette, onNewPost, onNewOpp }) {
         </header>
 
         <main className="content-area">
+          {visibleBanners.map((b) => (
+            <div key={b.id} className={`announce announce-${b.tone}`} role="status">
+              <Megaphone size={16} /><div><b>{b.title}</b>{b.body && <span>{b.body}</span>}</div>
+              <button onClick={() => hideBanner(b.id)} aria-label="Dismiss"><X size={14} /></button>
+            </div>
+          ))}
           <div className="content-inner wide">
             <Suspense fallback={<div className="page-loading"><span className="spinner" /></div>}>
               <div key={pathname} className="page-fade">
