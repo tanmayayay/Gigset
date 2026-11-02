@@ -213,8 +213,6 @@ export default function Home() {
           </div>
         </div>
 
-        <NotesWheel />
-
         <div className="home-composer">
           <div className="home-composer-top">
             <Avatar name={user?.name || 'Guest'} src={user?.avatarUrl} size={42} />
@@ -285,6 +283,7 @@ export default function Home() {
 
       <aside className="home-rail" aria-label="Highlights">
         <MeCard user={user} postCount={myCounts?.posts} followingCount={myCounts?.following ?? following.size} />
+        <NotesWheel />
         <NewsCard items={news} />
         <TrendingCard posts={posts} onPick={(t) => { setTag(t); setTab('foryou'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} />
         <NearbyCard events={events} venues={venues} city={user?.city} />

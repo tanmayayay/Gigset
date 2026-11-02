@@ -83,3 +83,11 @@
 .note-card:not(.seen) .note-face::after{animation:none;box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--blue) 70%,transparent)}
 .note-face.add b{font-size:11px}.note-cap em{font-size:10.5px}.note-count{font-size:9.5px;padding:0 5px}
 .notes{padding-block:10px}
+
+/* Notes now live in the side rail: quiet panel, no glow */
+.home-rail .notes{margin-bottom:0;padding:14px 14px 12px;background:var(--panel);border-radius:var(--radius-lg,18px)}
+.home-rail .notes::before{display:none}
+.home-rail .notes-head h3{font-family:inherit;font-size:15px;text-transform:none;letter-spacing:0}
+.home-rail .notes-head h3 svg{display:none}
+.home-rail .notes-sub{font-family:inherit;font-size:12px}
+.home-rail .notes-dot{animation:none;box-shadow:none}
