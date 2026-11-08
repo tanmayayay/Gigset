@@ -70,7 +70,7 @@ export default function NotesWheel() {
 
   const press = (i) => {
     if (i !== active) { setActive(i); return; }
-    if (items[i].add) { if (user) setAdding(true); else pushToast('Sign in to post a note.', 'error'); }
+    if (items[i].add) { if (user) setAdding(true); else pushToast('Sign in to post a cut.', 'error'); }
     else setOpenAt(i - 1);
   };
 
@@ -86,9 +86,9 @@ export default function NotesWheel() {
   const liveCount = ordered.length;
 
   return (
-    <section className="notes" aria-label="Notes" onMouseEnter={() => setHold(true)} onMouseLeave={() => setHold(false)} onFocus={() => setHold(true)} onBlur={() => setHold(false)}>
+    <section className="notes" aria-label="Cuts" onMouseEnter={() => setHold(true)} onMouseLeave={() => setHold(false)} onFocus={() => setHold(true)} onBlur={() => setHold(false)}>
       <header className="notes-head">
-        <h3><Radio size={15} /> Notes</h3>
+        <h3><Radio size={15} /> Cuts</h3>
         <span className="notes-sub"><i className="notes-dot" /> {liveCount} live · fade after 12h</span>
       </header>
 
@@ -116,11 +116,11 @@ export default function NotesWheel() {
               className={`note-card${front ? ' front' : ''}${it.add ? ' add' : ''}${done ? ' seen' : ''}`}
               style={style}
               onClick={() => press(i)}
-              aria-label={it.add ? 'Post a note' : `${it.author.name}, ${it.stories.length} ${it.stories.length === 1 ? 'note' : 'notes'}`}
+              aria-label={it.add ? 'Post a cut' : `${it.author.name}, ${it.stories.length} ${it.stories.length === 1 ? 'cut' : 'cuts'}`}
               tabIndex={front ? 0 : -1}
             >
               {it.add ? (
-                <span className="note-face add"><Plus size={30} strokeWidth={1.8} /><b>Post a note</b></span>
+                <span className="note-face add"><Plus size={16} strokeWidth={2.2} /></span>
               ) : (
                 <span className="note-face" style={{ backgroundImage: `url(${latest.mediaUrl})` }}>
                   <span className="note-scan" />
@@ -135,13 +135,13 @@ export default function NotesWheel() {
             </button>
           );
         })}
-        {loaded && n === 1 && <p className="notes-empty">No notes yet. Drop the first photo from tonight.</p>}
+        {loaded && n === 1 && <p className="notes-empty">No cuts yet. Drop the first photo from tonight.</p>}
       </div>
 
       <footer className="notes-foot">
-        <button className="notes-nav" onClick={() => step(-1)} aria-label="Previous note"><ChevronLeft size={16} /></button>
+        <button className="notes-nav" onClick={() => step(-1)} aria-label="Previous cut"><ChevronLeft size={16} /></button>
         <div className="notes-meta">
-          {cur?.add ? <b>Post a note</b> : (
+          {cur?.add ? <b>Post a cut</b> : (
             <>
               <b>{cur.author.id === user?.id ? 'You' : cur.author.name}{cur.author.verificationStatus === 'VERIFIED' && <Verified size={12} />}</b>
               <span>{cur.stories[cur.stories.length - 1].caption || timeLeft(cur.stories[cur.stories.length - 1].expiresAt)}</span>
@@ -149,7 +149,7 @@ export default function NotesWheel() {
           )}
         </div>
         <div className="notes-pips" aria-hidden="true">{items.slice(0, 12).map((_, i) => <i key={i} className={i === active ? 'on' : ''} />)}</div>
-        <button className="notes-nav" onClick={() => step(1)} aria-label="Next note"><ChevronRight size={16} /></button>
+        <button className="notes-nav" onClick={() => step(1)} aria-label="Next cut"><ChevronRight size={16} /></button>
       </footer>
 
       {openAt !== null && (
@@ -193,17 +193,17 @@ function NoteAddModal({ onClose, onAdded }) {
       if (error) throw new Error('Photo upload failed. Check that the post-media bucket is set up.');
       const mediaUrl = supabase.storage.from('post-media').getPublicUrl(path).data.publicUrl;
       await Stories.create({ mediaUrl, caption: caption.trim() || undefined });
-      pushToast('Note posted for 12 hours.');
+      pushToast('Cut posted for 12 hours.');
       onAdded();
     } catch (e) {
-      pushToast(e.message || 'Could not post your note.', 'error');
+      pushToast(e.message || 'Could not post your cut.', 'error');
     } finally {
       setSaving(false);
     }
   };
 
   return (
-    <Modal title="Add a note" onClose={onClose}>
+    <Modal title="Add a cut" onClose={onClose}>
       <input ref={input} type="file" accept="image/*" hidden onChange={(e) => pick(e.target.files?.[0])} />
       {preview ? (
         <div className="vault-preview">
@@ -295,14 +295,14 @@ function NoteViewer({ groups, start, me, onSeen, onClose, onChanged }) {
     setPaused(true);
     try {
       await Stories.remove(story.id);
-      pushToast('Note removed.');
+      pushToast('Cut removed.');
       onChanged();
       onClose();
     } catch (e) { pushToast(e.message || 'Could not remove it.', 'error'); setPaused(false); }
   };
 
   return createPortal(
-    <div className="vv-backdrop" onClick={onClose} role="dialog" aria-modal="true" aria-label={`${g.author.name} 's note`}>
+    <div className="vv-backdrop" onClick={onClose} role="dialog" aria-modal="true" aria-label={`${g.author.name} 's cut`}>
       <button className="vv-close" onClick={onClose} aria-label="Close"><X size={22} /></button>
       <button className="vv-side" onClick={(e) => { e.stopPropagation(); prev(); }} aria-label="Previous" disabled={gi === 0 && si === 0}><ChevronLeft size={22} /></button>
       <div

@@ -91,3 +91,12 @@
 .home-rail .notes-head h3 svg{display:none}
 .home-rail .notes-sub{font-family:inherit;font-size:12px}
 .home-rail .notes-dot{animation:none;box-shadow:none}
+
+/* "Post a cut": a small diamond instead of a big card */
+.note-card.add{width:44px;height:44px}
+.note-card.add .note-face.add{width:34px;height:34px;margin:5px;border-radius:7px;transform:rotate(45deg);border:1.5px solid color-mix(in srgb,var(--blue) 70%,transparent);background:color-mix(in srgb,var(--blue) 10%,var(--panel));gap:0}
+.note-card.add .note-face.add svg{transform:rotate(-45deg)}
+.note-card.add.front .note-face{box-shadow:0 0 0 3px color-mix(in srgb,var(--blue) 18%,transparent)}
+.note-card.add .note-face::after{display:none}
+.notes-stage:has(.note-card.add.front:only-of-type){height:96px}
+.notes-empty{bottom:4px}
