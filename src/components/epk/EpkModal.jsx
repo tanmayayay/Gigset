@@ -22,6 +22,17 @@ export function TemplatePicker({ kit, value, onChange }) {
   );
 }
 
+/* Keeps what you type (commas and spaces included) and only parses it into tags for the saved value. */
+function TagsInput({ tags, onChange }) {
+  const [text, setText] = useState(() => (tags || []).join(', '));
+  const parse = (v) => v.split(/[,\n]/).map((x) => x.trim()).filter(Boolean).slice(0, 10);
+  return (
+    <label>Tags (separate with commas)
+      <input value={text} onChange={(e) => { setText(e.target.value); onChange(parse(e.target.value)); }} onBlur={() => setText(parse(text).join(', '))} placeholder="Techno, House, Live set" />
+    </label>
+  );
+}
+
 export function StrengthMeter({ strength }) {
   return (
     <div className="ekm-strength">
@@ -85,7 +96,7 @@ export default function EpkModal({ personId, person: given, onClose }) {
             <div className="ekm-form">
               <label>Headline<input maxLength={120} value={edits.headline} onChange={(e) => set({ headline: e.target.value })} placeholder={kit.headline} /></label>
               <label>Bio<textarea maxLength={590} value={edits.about} onChange={(e) => set({ about: e.target.value })} placeholder={kit.about} /><small>Leave blank to use your profile bio.</small></label>
-              <label>Tags (comma separated)<input value={edits.tags.join(', ')} onChange={(e) => set({ tags: e.target.value.split(',').map((x) => x.trim()).filter(Boolean).slice(0, 10) })} placeholder="Techno, House, Live set" /></label>
+              <TagsInput tags={edits.tags} onChange={(tags) => set({ tags })} />
               <label>Highlights (one per line, up to 6)<textarea value={edits.milestones.join('\n')} onChange={(e) => set({ milestones: e.target.value.split('\n').slice(0, 6) })} placeholder={'Opened for a big name\nHeadlined a sold-out night'} /></label>
               <div className="ekm-two">
                 <label>Booking email<input type="email" maxLength={120} value={edits.email} onChange={(e) => set({ email: e.target.value })} placeholder="bookings@you.com" /></label>
