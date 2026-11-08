@@ -227,7 +227,7 @@ function NoteAddModal({ onClose, onAdded }) {
       <div className="modal-actions">
         <button className="btn btn-ghost" onClick={onClose}>Cancel</button>
         <button className="btn btn-blue" disabled={!file || saving} onClick={submit}>
-          <Lock size={14} /> {saving ? 'Posting…' : 'Post note'}
+          <Lock size={14} /> {saving ? 'Posting…' : 'Post cut'}
         </button>
       </div>
     </Modal>
