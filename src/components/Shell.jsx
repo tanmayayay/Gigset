@@ -116,7 +116,7 @@ export default function Shell({ onOpenPalette, onNewPost, onNewOpp }) {
     Admin.me().then(() => setIsAdmin(true)).catch(() => setIsAdmin(false));
     Announcements.active().then((r) => setBanners(r.items || [])).catch(() => {});
   }, [userId]);
-  const seenBanners = (() => { try { return JSON.parse(localStorage.getItem('gigset.banners') || '[]'); } catch { return []; } })();
+  const seenBanners = (() => { try { const v = JSON.parse(localStorage.getItem('gigset.banners') || '[]'); return Array.isArray(v) ? v : []; } catch { return []; } })();
   const visibleBanners = banners.filter((b) => !seenBanners.includes(b.id));
   const hideBanner = (id) => { try { localStorage.setItem('gigset.banners', JSON.stringify([...seenBanners, id].slice(-30))); } catch { /* ignore */ } setBanners((b) => b.filter((x) => x.id !== id)); };
 

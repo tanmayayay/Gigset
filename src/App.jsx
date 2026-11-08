@@ -24,6 +24,7 @@ const Support = lazy(() => import('./pages/Support'));
 const Saved = lazy(() => import('./pages/Saved'));
 const AdminPage = lazy(() => import('./pages/Admin'));
 import EmailVerified from './pages/EmailVerified';
+import ErrorBoundary from './components/ErrorBoundary';
 
 /* Supabase email-confirmation links redirect to the Site URL with the
    session tokens in the URL fragment:
@@ -157,10 +158,12 @@ export default function App() {
   }
 
   return (
-    <HashRouter>
-      <StoreProvider>
-        <AppShell />
-      </StoreProvider>
-    </HashRouter>
+    <ErrorBoundary>
+      <HashRouter>
+        <StoreProvider>
+          <AppShell />
+        </StoreProvider>
+      </HashRouter>
+    </ErrorBoundary>
   );
 }

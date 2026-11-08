@@ -13,7 +13,7 @@ const SEEN_KEY = 'gigset.vaultSeen';
 const DURATION = 6000;
 const SPIN_MS = 3600;
 
-const readSeen = () => { try { return JSON.parse(localStorage.getItem(SEEN_KEY) || '[]'); } catch { return []; } };
+const readSeen = () => { try { const v = JSON.parse(localStorage.getItem(SEEN_KEY) || '[]'); return Array.isArray(v) ? v : []; } catch { return []; } };
 
 export function timeLeft(expiresAt) {
   const ms = Date.parse(expiresAt) - Date.now();
