@@ -1,3 +1,4 @@
+import { createPortal } from 'react-dom';
 import { useState } from 'react';
 import { BadgeCheck } from 'lucide-react';
 import { avatarColor, initials } from '../data/demo';
@@ -90,7 +91,8 @@ export function EmptyState({ icon, title, text, action }) {
 
 /* Generic modal */
 export function Modal({ title, onClose, children, wide }) {
-  return (
+  // Rendered on <body> so no parent (blurred cards, sticky rails) can clip or re-position it.
+  return createPortal((
     <div className="modal-backdrop" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
       <div className="modal" style={wide ? { width: 640 } : undefined} role="dialog" aria-modal="true">
         <div className="modal-head">
@@ -100,7 +102,7 @@ export function Modal({ title, onClose, children, wide }) {
         {children}
       </div>
     </div>
-  );
+  ), document.body);
 }
 
 /* Pure-SVG sparkline (no chart lib) */
