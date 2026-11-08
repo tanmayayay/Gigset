@@ -233,4 +233,17 @@ router.patch(
   })
 );
 
+// DELETE /api/opportunities/:id — only the poster. Applications go with it.
+router.delete(
+  '/:id',
+  auth,
+  asyncHandler(async (req, res) => {
+    const o = await prisma.opportunity.findUnique({ where: { id: req.params.id }, select: { id: true, posterId: true } });
+    if (!o) return notFound(res, 'Opportunity');
+    if (o.posterId !== req.user.id) return bad(res, 403, 'You can only delete your own gigs.');
+    await prisma.opportunity.delete({ where: { id: o.id } });
+    res.json({ ok: true });
+  })
+);
+
 export default router;

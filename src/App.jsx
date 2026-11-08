@@ -22,6 +22,7 @@ const Settings = lazy(() => import('./pages/Settings'));
 const About = lazy(() => import('./pages/About'));
 const Support = lazy(() => import('./pages/Support'));
 const Saved = lazy(() => import('./pages/Saved'));
+const Uploads = lazy(() => import('./pages/Uploads'));
 const AdminPage = lazy(() => import('./pages/Admin'));
 import EmailVerified from './pages/EmailVerified';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -122,6 +123,7 @@ function AppShell() {
           <Route path="/messages" element={<Messages />} />
           <Route path="/live" element={<Navigate to="/home" replace />} />
           <Route path="/saved" element={<Saved />} />
+          <Route path="/uploads" element={<Uploads />} />
           <Route path="/profile/:id" element={<Profile />} />
           <Route path="/search" element={<Search />} />
           <Route path="/notifications" element={<Notifications />} />

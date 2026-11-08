@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, Suspense } from 'react';
 import { NavLink, Outlet, useNavigate, useLocation, Link } from 'react-router-dom';
 import {
   Home, LayoutGrid, Handshake, Users, Newspaper, MessageCircle, Search,
-  User, Bell, Settings, Info, LifeBuoy, Plus, Moon, Sun, Bookmark, Menu, X, LogOut, ShieldCheck, Megaphone,
+  User, Bell, Settings, Info, LifeBuoy, Plus, Moon, Sun, Bookmark, Menu, X, LogOut, ShieldCheck, Megaphone, Grid3x3,
 } from 'lucide-react';
 import { Logo, Avatar } from './ui';
 import { useStore } from '../store/store';
@@ -122,6 +122,7 @@ export default function Shell({ onOpenPalette, onNewPost, onNewOpp }) {
 
   const NAV_YOU = [
     { to: `/profile/${userId}`, label: 'Profile', icon: User },
+    { to: '/uploads', label: 'Uploads', icon: Grid3x3 },
     { to: '/notifications', label: 'Notifications', icon: Bell, badgeKey: 'notifs' },
     { to: '/search', label: 'Search', icon: Search },
     ...(isAdmin ? [{ to: '/admin', label: 'Admin', icon: ShieldCheck }] : []),

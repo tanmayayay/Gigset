@@ -186,4 +186,30 @@ router.post(
   })
 );
 
+// DELETE /api/posts/comments/:commentId — the comment's author, or the owner of the post it sits on.
+router.delete(
+  '/comments/:commentId',
+  auth,
+  asyncHandler(async (req, res) => {
+    const c = await prisma.comment.findUnique({ where: { id: req.params.commentId }, include: { post: { select: { authorId: true } } } });
+    if (!c) return notFound(res, 'Comment');
+    if (c.authorId !== req.user.id && c.post.authorId !== req.user.id) return bad(res, 403, 'You can only delete your own comments.');
+    await prisma.comment.delete({ where: { id: c.id } });
+    res.json({ ok: true });
+  })
+);
+
+// DELETE /api/posts/:id — only the author. Likes and comments go with it.
+router.delete(
+  '/:id',
+  auth,
+  asyncHandler(async (req, res) => {
+    const post = await prisma.post.findUnique({ where: { id: req.params.id }, select: { id: true, authorId: true } });
+    if (!post) return notFound(res, 'Post');
+    if (post.authorId !== req.user.id) return bad(res, 403, 'You can only delete your own posts.');
+    await prisma.post.delete({ where: { id: post.id } });
+    res.json({ ok: true });
+  })
+);
+
 export default router;

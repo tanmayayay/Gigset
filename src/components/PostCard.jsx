@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Heart, MessageCircle, Repeat2, Bookmark, Send, Share2, MoreHorizontal, Flag, EyeOff, Link2, UserPlus, Check } from 'lucide-react';
+import { Heart, MessageCircle, Repeat2, Bookmark, Send, Share2, MoreHorizontal, Flag, EyeOff, Link2, UserPlus, Check, Trash2 } from 'lucide-react';
 import { Avatar, Verified } from './ui';
 import { useStore } from '../store/store';
 import { Posts, Profiles } from '../lib/api';
@@ -69,6 +69,7 @@ export default function PostCard({ post, onLike, onHide, following, onFollowChan
   const [reporting, setReporting] = useState(false);
   const [imgLoaded, setImgLoaded] = useState(false);
   const [imgFailed, setImgFailed] = useState(false);
+  const [gone, setGone] = useState(false);
   const lastTap = useRef(0);
 
   const author = post.author || {};
@@ -144,6 +145,25 @@ export default function PostCard({ post, onLike, onHide, following, onFollowChan
     }
   };
 
+  const removePost = async () => {
+    if (!window.confirm('Delete this post? This cannot be undone.')) return;
+    try {
+      await Posts.remove(post.id);
+      setGone(true);
+      onHide?.(post.id);
+      pushToast('Post deleted.');
+    } catch (e) { pushToast(e.message || 'Could not delete the post.', 'error'); }
+  };
+
+  const removeComment = async (c) => {
+    if (!window.confirm('Delete this comment?')) return;
+    try {
+      await Posts.removeComment(c.id);
+      setComments((cs) => (cs || []).filter((x) => x.id !== c.id));
+      setCommentCount((n) => Math.max(0, n - 1));
+    } catch (e) { pushToast(e.message || 'Could not delete the comment.', 'error'); }
+  };
+
   const shareLink = `${window.location.origin}${window.location.pathname}#/profile/${author.id || ''}`;
   const share = async () => {
     const text = `${author.name || 'Someone'} on Gigset: “${(post.body || '').slice(0, 120)}”`;
@@ -188,6 +208,8 @@ export default function PostCard({ post, onLike, onHide, following, onFollowChan
     </AnimatePresence>
   );
 
+  if (gone) return null;
+
   return (
     <article className="pc">
       <header className="pc-head">
@@ -214,6 +236,11 @@ export default function PostCard({ post, onLike, onHide, following, onFollowChan
                 <button role="menuitem" onClick={() => { setMenu(false); navigator.clipboard?.writeText(shareLink); pushToast('Profile link copied.'); }}>
                   <Link2 size={15} /> Copy link
                 </button>
+                {isMine && (
+                  <button role="menuitem" className="danger" onClick={() => { setMenu(false); removePost(); }}>
+                    <Trash2 size={15} /> Delete post
+                  </button>
+                )}
                 {!isMine && (
                   <button role="menuitem" onClick={() => { setMenu(false); setReporting(true); }}>
                     <Flag size={15} /> Report post
@@ -316,6 +343,9 @@ export default function PostCard({ post, onLike, onHide, following, onFollowChan
                 </b>
                 <div>{c.body}</div>
               </div>
+              {user && (c.author?.id === user.id || isMine) && (
+                <button className="pc-cdel" onClick={() => removeComment(c)} aria-label="Delete comment" title="Delete comment"><Trash2 size={13} /></button>
+              )}
             </div>
           ))}
           <div className="pc-comment-input">

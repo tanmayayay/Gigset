@@ -174,6 +174,12 @@ export const Posts = {
   unlike: (id) => api(`/api/posts/${id}/like`, { method: 'DELETE' }),
   comments: (id, params = {}) => api(`/api/posts/${id}/comments${qs(params)}`, { auth: false }),
   comment: (id, body) => api(`/api/posts/${id}/comments`, { method: 'POST', body: { body } }),
+  remove: (id) => api(`/api/posts/${id}`, { method: 'DELETE' }),
+  removeComment: (commentId) => api(`/api/posts/comments/${commentId}`, { method: 'DELETE' }),
+};
+
+export const Mine = {
+  uploads: () => api('/api/mine/uploads', { fresh: true }),
 };
 
 export const Stories = {
@@ -183,6 +189,7 @@ export const Stories = {
 };
 
 export const Opps = {
+  remove: (id) => api(`/api/opportunities/${id}`, { method: 'DELETE' }),
   list: (params = {}) => api(`/api/opportunities${qs(params)}`, { auth: 'optional' }),
   get: (id) => api(`/api/opportunities/${id}`, { auth: 'optional' }),
   create: (data) => api('/api/opportunities', { method: 'POST', body: data }),
