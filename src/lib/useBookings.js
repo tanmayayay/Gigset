@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Bookings } from './api';
+import { Bookings, Collabs } from './api';
 
 /** The signed-in person's booking requests: received (as host) and sent. */
 export function useBookings(enabled) {
   const [received, setReceived] = useState([]);
   const [sent, setSent] = useState([]);
+  const [collabs, setCollabs] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -14,6 +15,7 @@ export function useBookings(enabled) {
       const [h, r] = await Promise.all([Bookings.list({ role: 'host', take: 50 }), Bookings.list({ role: 'requester', take: 50 })]);
       setReceived(h.items || []);
       setSent(r.items || []);
+      try { const c = await Collabs.list(); setCollabs((c.items || []).filter((x) => x.status === 'SCHEDULED')); } catch { /* collabs are optional here */ }
       setError('');
     } catch (e) {
       setError(e.message || 'Could not load bookings.');
@@ -24,5 +26,5 @@ export function useBookings(enabled) {
 
   useEffect(() => { if (enabled) reload(); }, [enabled, reload]);
   const pending = useMemo(() => received.filter((b) => b.status === 'PENDING').length, [received]);
-  return { received, sent, loading, error, pending, reload };
+  return { received, sent, collabs, loading, error, pending, reload };
 }

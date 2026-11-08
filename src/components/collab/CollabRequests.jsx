@@ -86,12 +86,11 @@ export default function CollabRequests({ onChange }) {
   const incoming = items.filter((r) => r.hostId === userId && r.status === 'PENDING');
   const toPick = items.filter((r) => r.requesterId === userId && r.status === 'OFFERED');
   const waiting = items.filter((r) => (r.requesterId === userId && r.status === 'PENDING') || (r.hostId === userId && r.status === 'OFFERED'));
-  const planned = items.filter((r) => r.status === 'SCHEDULED');
   const past = items.filter((r) => ['DECLINED', 'CANCELLED'].includes(r.status)).slice(0, 6);
   const chat = (r) => r.conversationId && <button className="btn btn-ghost btn-sm" onClick={() => navigate(`/messages?c=${r.conversationId}`)}><MessageCircle size={14} /> Open chat</button>;
   const epk = (r) => r.requesterId !== userId && <a className="btn btn-ghost btn-sm" href={`#/epk/${r.requesterId}?t=${r.epkTemplate}`} target="_blank" rel="noopener noreferrer"><FileText size={14} /> Press kit</a>;
 
-  if (!items.length) return <EmptyState icon={<Sparkles size={22} />} title="No collab requests yet" text="Find someone you vibe with, hit Collab, and it will show up here." />;
+  if (!items.some((r) => r.status !== 'SCHEDULED')) return <EmptyState icon={<Sparkles size={22} />} title="No collab requests yet" text="Find someone you vibe with and send a collab request. Confirmed collabs live in the Bookings tab." />;
   return (
     <div className="cr">
       {incoming.length > 0 && <section><h4>Asking to collab with you</h4>{incoming.map((r) => (
@@ -101,11 +100,6 @@ export default function CollabRequests({ onChange }) {
       {toPick.length > 0 && <section><h4>They said yes. Pick a time</h4>{toPick.map((r) => (
         <Card key={r.id} r={r} me={userId}>
           <div className="cr-act">{chat(r)}<button className="btn btn-blue btn-sm" onClick={() => setPick(r)}><CalendarHeart size={14} /> Choose a time</button></div>
-        </Card>))}</section>}
-      {planned.length > 0 && <section><h4>Locked in</h4>{planned.map((r) => (
-        <Card key={r.id} r={r} me={userId}>
-          <p className="cr-when"><CalendarHeart size={15} /> {whenText(r.chosen)}</p>
-          <div className="cr-act">{chat(r)}<button className="btn btn-ghost btn-sm" onClick={() => act(() => Collabs.cancel(r.id), 'Cancelled.')}>Cancel</button></div>
         </Card>))}</section>}
       {waiting.length > 0 && <section><h4>Waiting</h4>{waiting.map((r) => (
         <Card key={r.id} r={r} me={userId}>

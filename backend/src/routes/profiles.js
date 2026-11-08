@@ -62,7 +62,7 @@ function recordView(profileId, viewerKey) {
 // confirmed booking sits on it. `pending` (owner-only) counts open requests per day.
 async function buildCalendar(userId, fromKey, days, { withPending = false } = {}) {
   const toKey = addDays(fromKey, days - 1);
-  const [busy, booked, pending] = await Promise.all([
+  const [busy, booked, pending, collabs] = await Promise.all([
     prisma.availability.findMany({ where: { userId, date: { gte: fromKey, lte: toKey } }, select: { date: true } }),
     prisma.booking.findMany({
       where: { hostId: userId, status: 'CONFIRMED', date: { gte: fromKey, lte: `${toKey}~` } },
@@ -74,9 +74,15 @@ async function buildCalendar(userId, fromKey, days, { withPending = false } = {}
           select: { date: true },
         })
       : Promise.resolve([]),
+    // Locked-in collabs (either side) also block the day.
+    prisma.collabRequest.findMany({ where: { status: 'SCHEDULED', OR: [{ hostId: userId }, { requesterId: userId }] }, select: { chosen: true } }),
   ]);
   const busySet = new Set(busy.map((b) => b.date));
   const bookedMap = new Map(booked.map((b) => [b.date.slice(0, 10), b.timeSlot || true]));
+  collabs.forEach((c) => {
+    const d = typeof c.chosen?.date === 'string' ? c.chosen.date.slice(0, 10) : null;
+    if (d && d >= fromKey && d <= toKey && !bookedMap.has(d)) bookedMap.set(d, c.chosen.slot || true);
+  });
   const pendingCount = {};
   pending.forEach((b) => { const k = b.date.slice(0, 10); pendingCount[k] = (pendingCount[k] || 0) + 1; });
   return Array.from({ length: days }, (_, i) => {

@@ -53,6 +53,9 @@ export default function Collab() {
   const [todo, setTodo] = useState(0);
   useEffect(() => { if (userId) Collabs.list().then((r) => setTodo(r.todo)).catch(() => {}); }, [userId]);
   const bookings = useBookings(!!userId);
+  const reloadBookings = bookings.reload;
+  // Fresh bookings and collabs every time the tab is opened.
+  useEffect(() => { if (tab === 'bookings' && userId) reloadBookings(); }, [tab, userId, reloadBookings]);
   const closeWith = () => setParams((p) => { const n = new URLSearchParams(p); n.delete('with'); return n; }, { replace: true });
   const [cityF, setCityF] = useState('all');
   const [genreF, setGenreF] = useState('all');
