@@ -207,6 +207,11 @@
   .home-composer-actions button{font-size:12px; gap:5px;}
   .home-composer-actions button:nth-child(4){display:none;}
   .pc-quote{padding:28px 26px;}
+  /* Feed tabs run edge to edge and share the width evenly */
+  .home-tabs{margin:6px -16px 12px; padding:0 8px; gap:0; background:var(--bg); backdrop-filter:none; border-radius:0;}
+  .home-tabs button{flex:1; justify-content:center; padding:12px 6px; font-size:13.5px; gap:6px;}
+  .home-tab-ink{left:18%; right:18%;}
+  .home-tagbar{margin-left:0; margin-right:0;}
 }
 
 /* Compact identity chip in the right rail */
