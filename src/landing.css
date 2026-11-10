@@ -59,7 +59,7 @@
 .dv-row strong{font-size:22px; letter-spacing:-.03em; color:#A86400;}
 .dv-cal{display:grid; grid-template-columns:repeat(7,1fr); gap:7px;}
 .dv-cal i{aspect-ratio:1; border-radius:11px; font-style:normal; font-size:13px; display:flex; align-items:center; justify-content:center; font-weight:600;}
-.dv-cal i.free{background:#e2f6ea; color:#127a42;} .dv-cal i.busy{background:#F3F0E9; color:#a1a5b5;} .dv-cal i.booked{background:#fde2e2; color:#c23030;}
+.dv-cal i.free{background:#e2f6ea; color:#127a42;} .dv-cal i.busy{background:#F3F0E9; color:#FFB020;} .dv-cal i.booked{background:#fde2e2; color:#c23030;}
 .dv-req{margin-top:18px; width:100%; border:none; border-radius:14px; padding:13px; background:var(--ink); color:#fff; font-size:15px; font-weight:600;}
 .dv-orbit{position:relative; height:230px; perspective:700px; display:flex; align-items:center; justify-content:center; margin-top:10px;}
 .dv-orbit span{position:absolute; width:130px; height:180px; border-radius:20px; opacity:.85; box-shadow:0 20px 40px -12px rgba(0,0,0,.35);} .dv-orbit span.front{opacity:1; box-shadow:0 24px 50px -10px rgba(232,154,0,.55);}

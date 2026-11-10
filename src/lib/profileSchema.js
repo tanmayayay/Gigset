@@ -32,13 +32,13 @@ export const ROLE_META = {
     bioHint: 'Say what you organise, who comes, and what you look for in talent.',
   },
   CREW: {
-    label: 'Crew', icon: Wrench, bookable: true, tint: '#A78BFA',
+    label: 'Crew', icon: Wrench, bookable: true, tint: '#FFD166',
     blurb: 'Sound, lights, stage, photo, video and production crew.',
     headlineHint: 'e.g. FOH sound engineer · festival ready',
     bioHint: 'Share the kind of shows you crew, your gear and how you work.',
   },
   INSTITUTION: {
-    label: 'Institution', icon: GraduationCap, bookable: false, tint: '#F472B6',
+    label: 'Institution', icon: GraduationCap, bookable: false, tint: '#B87300',
     blurb: 'Schools, academies, labels, media houses and collectives.',
     headlineHint: 'e.g. Music academy & recording studio · Pune',
     bioHint: 'What does your institution do, and who is it for?',

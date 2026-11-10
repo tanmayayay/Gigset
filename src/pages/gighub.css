@@ -32,7 +32,7 @@
 .gh-act{display:flex; flex-direction:column; align-items:center; gap:4px; background:none; border:none; color:#EAE7E0; cursor:pointer; font-size:11.5px; font-weight:600;}
 .gh-act svg{padding:0; filter:drop-shadow(0 2px 8px rgba(0,0,0,.5));}
 .gh-act:hover{color:#fff;}
-.gh-act.on{color:#ff6b8b;}
+.gh-act.on{color:#FFE29A;}
 .gh-act.av{margin-bottom:4px; border-radius:50%; box-shadow:0 0 0 2px rgba(241,182,59,.9), 0 0 16px rgba(233,158,9,.6);}
 
 /* audio screens */

@@ -7,9 +7,9 @@ import { Directory } from '../lib/api';
 import { useStore } from '../store/store';
 
 const GRADIENTS = [
-  'linear-gradient(135deg,#3b82f6,#8b5cf6)',
-  'linear-gradient(135deg,#FFD166,#6366f1)',
-  'linear-gradient(135deg,#8b5cf6,#ec4899)',
+  'linear-gradient(135deg,#FFB020,#FFD166)',
+  'linear-gradient(135deg,#FFD166,#8A5600)',
+  'linear-gradient(135deg,#FFD166,#E89A00)',
 ];
 
 export default function Live() {

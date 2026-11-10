@@ -1,12 +1,12 @@
 export const GRADIENTS = {
   indigo: ['#E89A00', '#E89A00', '#FFD166'],
-  sunset: ['#F97316', '#EC4899', '#8B5CF6'],
+  sunset: ['#F97316', '#E89A00', '#FFD166'],
   ocean: ['#FFD166', '#14B8A6', '#22C55E'],
   forest: ['#16A34A', '#65A30D', '#0D9488'],
-  rose: ['#F43F5E', '#EC4899', '#F59E0B'],
+  rose: ['#F43F5E', '#E89A00', '#F59E0B'],
   amber: ['#F59E0B', '#F97316', '#EF4444'],
-  violet: ['#7C3AED', '#A855F7', '#EC4899'],
-  slate: ['#3F3F3F', '#475569', '#FFD166'],
+  violet: ['#B87300', '#8A5600', '#E89A00'],
+  slate: ['#3F3F3F', '#FFE29A', '#FFD166'],
 };
 export const grad = (key) => {
   const g = GRADIENTS[key] || GRADIENTS.indigo;

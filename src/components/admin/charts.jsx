@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 
-export const PALETTE = ['#FFB020', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#06b6d4', '#ef4444', '#64748b'];
+export const PALETTE = ['#FFB020', '#FFD166', '#E89A00', '#f59e0b', '#10b981', '#CC8400', '#ef4444', '#FFB020'];
 export const fmt = (n) => (n == null ? '–' : n >= 10000 ? `${(n / 1000).toFixed(n >= 100000 ? 0 : 1)}k` : n.toLocaleString('en-IN'));
 const niceMax = (m) => { if (m <= 4) return 4; const p = 10 ** Math.floor(Math.log10(m)); const f = m / p; return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 5 ? 5 : 10) * p; };
 const shortDay = (d) => new Date(`${d}T00:00:00Z`).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', timeZone: 'UTC' });

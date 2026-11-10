@@ -42,7 +42,7 @@ export function StrengthMeter({ strength }) {
   );
 }
 
-const SWATCHES = ['#FFB020', '#8b5cf6', '#ec4899', '#ef4444', '#f59e0b', '#10b981', '#06b6d4', '#111111'];
+const SWATCHES = ['#FFB020', '#FFD166', '#E89A00', '#ef4444', '#f59e0b', '#10b981', '#CC8400', '#111111'];
 
 /** "Generate EPK": built from the profile, with a Template tab and (for the owner) an Edit tab. */
 export default function EpkModal({ personId, person: given, onClose }) {
@@ -102,7 +102,7 @@ export default function EpkModal({ personId, person: given, onClose }) {
                 <label>Booking email<input type="email" maxLength={120} value={edits.email} onChange={(e) => set({ email: e.target.value })} placeholder="bookings@you.com" /></label>
                 <label>Phone<input maxLength={40} value={edits.phone} onChange={(e) => set({ phone: e.target.value })} placeholder="+91 …" /></label>
               </div>
-              <label>Accent colour<div className="ekm-swatches">{SWATCHES.map((c) => <button key={c} type="button" aria-label={c} className={(edits.accent || '') === c ? 'on' : ''} style={{ background: c }} onClick={() => set({ accent: c })} />)}<button type="button" className={!edits.accent ? 'on' : ''} style={{ background: 'conic-gradient(#FFB020,#ec4899,#f59e0b,#10b981,#FFB020)' }} aria-label="Default colour" onClick={() => set({ accent: '' })} /></div></label>
+              <label>Accent colour<div className="ekm-swatches">{SWATCHES.map((c) => <button key={c} type="button" aria-label={c} className={(edits.accent || '') === c ? 'on' : ''} style={{ background: c }} onClick={() => set({ accent: c })} />)}<button type="button" className={!edits.accent ? 'on' : ''} style={{ background: 'conic-gradient(#FFB020,#E89A00,#f59e0b,#10b981,#FFB020)' }} aria-label="Default colour" onClick={() => set({ accent: '' })} /></div></label>
               <label>Show these sections<div className="ekm-checks">{EPK_SECTIONS.map(([id, name]) => (
                 <label key={id}><input type="checkbox" checked={!edits.hide.includes(id)} onChange={(e) => set({ hide: e.target.checked ? edits.hide.filter((h) => h !== id) : [...edits.hide, id] })} />{name}</label>
               ))}</div></label>

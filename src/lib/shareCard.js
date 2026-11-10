@@ -6,7 +6,7 @@ const W = 1080;
 const H = 1350;
 const FONT = 'Inter, "Helvetica Neue", Arial, sans-serif';
 
-const TINTS = { PERFORMER: '#DD9300', VENUE: '#14B8A6', BUYER: '#F59E0B', CREW: '#E09500', INSTITUTION: '#EC4899' };
+const TINTS = { PERFORMER: '#DD9300', VENUE: '#14B8A6', BUYER: '#F59E0B', CREW: '#E09500', INSTITUTION: '#E89A00' };
 const ROLE = { PERFORMER: 'Artist', VENUE: 'Venue', BUYER: 'Organiser', CREW: 'Crew', INSTITUTION: 'Institution' };
 
 function loadImage(src) {
@@ -194,7 +194,7 @@ export async function drawShareCard({ kind = 'profile', person, link, facts = []
   ctx.fillStyle = '#151515';
   ctx.font = `800 44px ${FONT}`;
   ctx.fillText(kind === 'booked' ? 'Booked on TheGigSet' : `Book ${person.name.split(' ')[0]}`, 360, fy + 98);
-  ctx.fillStyle = '#52607A';
+  ctx.fillStyle = '#E89A00';
   ctx.font = `500 29px ${FONT}`;
   ctx.fillText(kind === 'booked' ? 'Find and book India’s live talent.' : 'Scan to see availability & send a request.', 360, fy + 148);
   ctx.fillStyle = tint;
