@@ -1,29 +1,23 @@
 import { createPortal } from 'react-dom';
+import logoDarkText from '../assets/brand/logo-dark-text.png';
+import logoLightText from '../assets/brand/logo-light-text.png';
+import markForLight from '../assets/brand/mark-for-light.png';
+import markForDark from '../assets/brand/mark-for-dark.png';
 import { useState } from 'react';
 import { BadgeCheck } from 'lucide-react';
 import { avatarColor, initials } from '../data/demo';
 
 /* Brand logo: a "G" cut from a sound-wave ring, on a gradient tile. */
-export function LogoMark({ size = 28 }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" aria-hidden="true" style={{ flexShrink: 0 }}>
-      <defs>
-        <linearGradient id="gsg" x1="3" y1="2" x2="29" y2="30" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#4F46E5" /><stop offset=".55" stopColor="#2A63EE" /><stop offset="1" stopColor="#0EA5E9" />
-        </linearGradient>
-      </defs>
-      <rect width="32" height="32" rx="9" fill="url(#gsg)" />
-      <path d="M22.4 11.6A8 8 0 1 0 24 16h-7" stroke="#fff" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx="24" cy="9" r="1.7" fill="#fff" opacity=".9" />
-    </svg>
-  );
+export function LogoMark({ size = 28, dark = false }) {
+  return <img src={dark ? markForDark : markForLight} alt="" width={size} height={size} style={{ flexShrink: 0, display: 'block' }} />;
 }
 
+/* TheGigSet logo. `light` forces the white-text version (for dark panels). Otherwise it follows the theme. */
 export function Logo({ size = 26, light = false }) {
   return (
-    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 10, fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 21, letterSpacing: '-0.02em', color: light ? '#fff' : undefined }}>
-      <LogoMark size={size + 4} />
-      <span className={light ? '' : 'brand-gradient-text'}>Gigset</span>
+    <span className={`tgs-logo${light ? ' force-light' : ''}`} style={{ '--tgs-h': `${Math.round(size * 1.25)}px` }} role="img" aria-label="TheGigSet">
+      <img className="on-light" src={logoDarkText} alt="" />
+      <img className="on-dark" src={logoLightText} alt="" />
     </span>
   );
 }

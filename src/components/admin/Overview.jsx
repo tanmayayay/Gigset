@@ -39,7 +39,7 @@ export default function Overview({ go }) {
   return (
     <div className="ad-stack">
       <div className="ad-row-head">
-        <div><h2>How Gigset is doing</h2><p>Live numbers from your database. Click anything with a hover effect to dig in.</p></div>
+        <div><h2>How TheGigSet is doing</h2><p>Live numbers from your database. Click anything with a hover effect to dig in.</p></div>
         <div className="ad-seg">{RANGES.map((r) => <button key={r} className={days === r ? 'on' : ''} onClick={() => setDays(r)}>{r} days</button>)}</div>
       </div>
 
@@ -63,7 +63,7 @@ export default function Overview({ go }) {
       </section>
 
       <div className="ad-grid2">
-        <section className="ad-card"><h3>Who is on Gigset</h3><p className="ad-sub">Click a slice to see those people.</p>
+        <section className="ad-card"><h3>Who is on TheGigSet</h3><p className="ad-sub">Click a slice to see those people.</p>
           <Donut rows={d.breakdowns.role} format={(r) => roleLabel(r.key)} onPick={(r) => go('people', { type: r.key })} /></section>
         <section className="ad-card"><h3>Where they are</h3><p className="ad-sub">Top cities. Click a bar to list them.</p>
           <Bars rows={d.breakdowns.city} color={PALETTE[0]} onPick={(r) => r.key !== 'Not set' && go('people', { search: r.key })} /></section>

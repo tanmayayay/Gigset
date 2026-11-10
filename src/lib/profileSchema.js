@@ -14,7 +14,7 @@ import { Mic2, Building2, CalendarRange, Wrench, GraduationCap } from 'lucide-re
 
 export const ROLE_META = {
   PERFORMER: {
-    label: 'Artist', icon: Mic2, bookable: true, tint: '#5B86F5',
+    label: 'Artist', icon: Mic2, bookable: true, tint: '#FFB020',
     blurb: 'Singers, bands, DJs, instrumentalists and producers.',
     headlineHint: 'e.g. Indie-folk singer-songwriter · Mumbai',
     bioHint: 'Tell bookers who you are, your sound and the kind of shows you do.',

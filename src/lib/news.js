@@ -10,7 +10,7 @@ export const CATEGORY_LABELS = {
   rock: 'Rock & Alternative',
   electronic: 'Electronic & Dance',
   general: 'Music',
-  newsroom: 'Gigset newsroom',
+  newsroom: 'TheGigSet newsroom',
 };
 
 export const REGIONS = [
@@ -46,7 +46,7 @@ export function fromArticle(a) {
     body: a.body,
     category: 'newsroom',
     region: 'india',
-    source: a.author?.name || 'Gigset newsroom',
+    source: a.author?.name || 'TheGigSet newsroom',
     publishedAt: a.publishedAt || a.createdAt,
     image: '',
     isLive: false,

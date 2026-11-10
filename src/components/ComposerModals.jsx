@@ -184,7 +184,7 @@ export function OppModal({ onClose }) {
       <textarea value={details} onChange={(e) => setDetails(e.target.value)} placeholder="Describe what you're looking for…" />
       <label>Who can see it</label>
       <div className="vis-toggle">
-        <button type="button" className={visibility === 'PUBLIC' ? 'on' : ''} onClick={() => setVisibility('PUBLIC')}><b>Public</b><small>Anyone on Gigset</small></button>
+        <button type="button" className={visibility === 'PUBLIC' ? 'on' : ''} onClick={() => setVisibility('PUBLIC')}><b>Public</b><small>Anyone on TheGigSet</small></button>
         <button type="button" className={visibility === 'CONNECTIONS' ? 'on' : ''} onClick={() => setVisibility('CONNECTIONS')}><b>Connections</b><small>Only people you follow back</small></button>
       </div>
       <div className="modal-actions">

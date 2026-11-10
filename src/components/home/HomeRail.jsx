@@ -52,7 +52,7 @@ export function NewsCard({ items }) {
   if (!items?.length) return null;
   return (
     <div className="rail-card">
-      <h4><Newspaper size={15} /> Gigset Daily <span className="rail-live">LIVE</span></h4>
+      <h4><Newspaper size={15} /> TheGigSet Daily <span className="rail-live">LIVE</span></h4>
       <ul className="rail-news">
         {items.slice(0, 4).map((n, i) => (
           <li key={n.id || n.url || i}>
@@ -170,7 +170,7 @@ export function TrendingCard({ posts, onPick }) {
   if (!top.length) return null;
   return (
     <div className="rail-card">
-      <h4><Flame size={15} /> Trending on Gigset</h4>
+      <h4><Flame size={15} /> Trending on TheGigSet</h4>
       <div className="rail-tags">
         {top.map(([t, n]) => (
           <button key={t} onClick={() => onPick(t)}><Hash size={12} />{t}<span>{n}</span></button>
@@ -185,7 +185,7 @@ export function RailFooter() {
     <footer className="rail-foot">
       <Link to="/about">About</Link><Link to="/support">Help</Link><Link to="/support">Privacy</Link>
       <Link to="/support">Terms</Link><Link to="/settings">Settings</Link>
-      <span>© 2026 Gigset · Made in India</span>
+      <span>© 2026 TheGigSet · Made in India</span>
     </footer>
   );
 }
@@ -212,7 +212,7 @@ export function OppsStrip({ opps, user }) {
               </span>
               {fmtBudget(o) && <span className="opp-tile-budget">{fmtBudget(o)}</span>}
               <span className="opp-tile-by">
-                <Avatar name={o.poster?.name || 'Gigset'} size={20} /> {o.poster?.name || 'Gigset member'}
+                <Avatar name={o.poster?.name || 'TheGigSet'} size={20} /> {o.poster?.name || 'TheGigSet member'}
               </span>
             </button>
           );

@@ -6,7 +6,7 @@ const W = 1080;
 const H = 1350;
 const FONT = 'Inter, "Helvetica Neue", Arial, sans-serif';
 
-const TINTS = { PERFORMER: '#7C5CFF', VENUE: '#14B8A6', BUYER: '#F59E0B', CREW: '#3B82F6', INSTITUTION: '#EC4899' };
+const TINTS = { PERFORMER: '#DD9300', VENUE: '#14B8A6', BUYER: '#F59E0B', CREW: '#E09500', INSTITUTION: '#EC4899' };
 const ROLE = { PERFORMER: 'Artist', VENUE: 'Venue', BUYER: 'Organiser', CREW: 'Crew', INSTITUTION: 'Institution' };
 
 function loadImage(src) {
@@ -56,7 +56,7 @@ function wrap(ctx, text, maxWidth, maxLines) {
  */
 export async function drawShareCard({ kind = 'profile', person, link, facts = [], headline = '', founding = false, rating = null, booked = null }) {
   try { await document.fonts?.ready; } catch { /* fonts API missing */ }
-  const tint = TINTS[person.stakeholderType] || '#2A63EE';
+  const tint = TINTS[person.stakeholderType] || '#E89A00';
   const canvas = document.createElement('canvas');
   canvas.width = W;
   canvas.height = H;
@@ -64,8 +64,8 @@ export async function drawShareCard({ kind = 'profile', person, link, facts = []
 
   // Background: deep navy with a role-coloured glow.
   const bg = ctx.createLinearGradient(0, 0, W, H);
-  bg.addColorStop(0, '#0B1530');
-  bg.addColorStop(1, '#101E45');
+  bg.addColorStop(0, '#151515');
+  bg.addColorStop(1, '#1E1E1E');
   ctx.fillStyle = bg;
   ctx.fillRect(0, 0, W, H);
   const glow = ctx.createRadialGradient(W * 0.85, H * 0.12, 10, W * 0.85, H * 0.12, 640);
@@ -78,7 +78,7 @@ export async function drawShareCard({ kind = 'profile', person, link, facts = []
   ctx.fillStyle = '#fff';
   ctx.font = `800 44px ${FONT}`;
   ctx.textBaseline = 'alphabetic';
-  ctx.fillText('Gigset', 72, 112);
+  ctx.fillText('TheGigSet', 72, 112);
   ctx.fillStyle = 'rgba(255,255,255,.55)';
   ctx.font = `500 26px ${FONT}`;
   ctx.fillText('India’s music & live-event network', 72, 152);
@@ -109,7 +109,7 @@ export async function drawShareCard({ kind = 'profile', person, link, facts = []
     const s = Math.max((R * 2) / photo.width, (R * 2) / photo.height);
     ctx.drawImage(photo, cx - (photo.width * s) / 2, cy - (photo.height * s) / 2, photo.width * s, photo.height * s);
   } else {
-    ctx.fillStyle = '#1b2a57';
+    ctx.fillStyle = '#2B2B2B';
     ctx.fillRect(cx - R, cy - R, R * 2, R * 2);
     ctx.fillStyle = '#fff';
     ctx.font = `800 150px ${FONT}`;
@@ -183,7 +183,7 @@ export async function drawShareCard({ kind = 'profile', person, link, facts = []
   }
 
   // Footer: QR + call to action
-  const qr = await QRCode.toDataURL(link, { margin: 1, width: 280, color: { dark: '#0B1530', light: '#FFFFFF' } });
+  const qr = await QRCode.toDataURL(link, { margin: 1, width: 280, color: { dark: '#151515', light: '#FFFFFF' } });
   const qrImg = await loadImage(qr);
   const fy = 1010;
   ctx.fillStyle = '#fff';
@@ -191,9 +191,9 @@ export async function drawShareCard({ kind = 'profile', person, link, facts = []
   ctx.fill();
   if (qrImg) ctx.drawImage(qrImg, 100, fy + 22, 226, 226);
   ctx.textAlign = 'left';
-  ctx.fillStyle = '#0B1530';
+  ctx.fillStyle = '#151515';
   ctx.font = `800 44px ${FONT}`;
-  ctx.fillText(kind === 'booked' ? 'Booked on Gigset' : `Book ${person.name.split(' ')[0]}`, 360, fy + 98);
+  ctx.fillText(kind === 'booked' ? 'Booked on TheGigSet' : `Book ${person.name.split(' ')[0]}`, 360, fy + 98);
   ctx.fillStyle = '#52607A';
   ctx.font = `500 29px ${FONT}`;
   ctx.fillText(kind === 'booked' ? 'Find and book India’s live talent.' : 'Scan to see availability & send a request.', 360, fy + 148);

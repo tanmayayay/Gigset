@@ -71,7 +71,7 @@ function Detail({ id, onClose, onChanged }) {
         {!me && u.role !== 'ADMIN' && <button className="btn btn-danger btn-sm" onClick={() => setAsk('delete')}><Trash2 size={14} /> Delete account</button>}
       </div>
 
-      {ask === 'suspend' && <Confirm title={`Suspend ${u.name}?`} text="They are signed out and cannot use Gigset until you restore them. Their posts stay up." action="Suspend" danger onClose={() => setAsk(null)} onYes={() => run(() => Admin.userAction(u.id, 'suspend', { reason: text }), 'Suspended.')}>
+      {ask === 'suspend' && <Confirm title={`Suspend ${u.name}?`} text="They are signed out and cannot use TheGigSet until you restore them. Their posts stay up." action="Suspend" danger onClose={() => setAsk(null)} onYes={() => run(() => Admin.userAction(u.id, 'suspend', { reason: text }), 'Suspended.')}>
         <input className="ad-input" placeholder="Reason (they will see this)" value={text} onChange={(e) => setText(e.target.value)} /></Confirm>}
       {ask === 'delete' && <Confirm title={`Delete ${u.name} for good?`} text={`This permanently removes their account, posts, messages and bookings. It cannot be undone. Type their name (${u.name}) to confirm.`} action="Delete forever" danger onClose={() => setAsk(null)} onYes={async () => { try { await Admin.deleteUser(u.id, text); pushToast('Account deleted.'); onChanged(); onClose(); } catch (e) { pushToast(e.message, 'error'); } }}>
         <input className="ad-input" placeholder="Type their name" value={text} onChange={(e) => setText(e.target.value)} /></Confirm>}

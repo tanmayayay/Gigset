@@ -31,12 +31,12 @@ function typeLabel(t) {
 /* Brand-safe gradients for text-only "quote card" posts. Chosen
    deterministically from the post id so a post always looks the same. */
 const CANVASES = [
-  'linear-gradient(135deg,#0E2E6B 0%,#2A63EE 55%,#0EA5E9 100%)',
-  'linear-gradient(135deg,#1F1147 0%,#4F46E5 55%,#A855F7 100%)',
-  'linear-gradient(135deg,#3B0D2E 0%,#BE185D 50%,#F97316 100%)',
-  'linear-gradient(135deg,#052E2B 0%,#0F766E 55%,#22C55E 100%)',
-  'linear-gradient(135deg,#111827 0%,#334155 50%,#64748B 100%)',
-  'linear-gradient(135deg,#431407 0%,#C2410C 50%,#FBBF24 100%)',
+  'linear-gradient(135deg,#0A0A0A 0%,#3B2A00 55%,#B26F00 100%)',
+  'linear-gradient(135deg,#141414 0%,#5A3C00 55%,#C98000 100%)',
+  'linear-gradient(135deg,#0F0F0F 0%,#2B2B2B 50%,#6B4A00 100%)',
+  'linear-gradient(135deg,#1A1100 0%,#7A5200 55%,#E89A00 100%)',
+  'linear-gradient(135deg,#111111 0%,#3A3A3A 50%,#8A5A00 100%)',
+  'linear-gradient(135deg,#0A0A0A 0%,#4A3300 50%,#A86400 100%)',
 ];
 
 /* Short, single-thought posts become visual cards; long ones stay as text. */
@@ -166,10 +166,10 @@ export default function PostCard({ post, onLike, onHide, following, onFollowChan
 
   const shareLink = `${window.location.origin}${window.location.pathname}#/profile/${author.id || ''}`;
   const share = async () => {
-    const text = `${author.name || 'Someone'} on Gigset: “${(post.body || '').slice(0, 120)}”`;
+    const text = `${author.name || 'Someone'} on TheGigSet: “${(post.body || '').slice(0, 120)}”`;
     try {
       if (navigator.share) {
-        await navigator.share({ title: 'Gigset', text, url: shareLink });
+        await navigator.share({ title: 'TheGigSet', text, url: shareLink });
         return;
       }
       await navigator.clipboard.writeText(`${text}\n${shareLink}`);
@@ -284,7 +284,7 @@ export default function PostCard({ post, onLike, onHide, following, onFollowChan
       {quote && (
         <div className="pc-quote" style={{ background: canvas }} onClick={onMediaTap}>
           <p className={(post.body || '').length > 110 ? 'sm' : ''}><RichText text={post.body} /></p>
-          <span className="pc-quote-by">— {author.name || 'Gigset member'}</span>
+          <span className="pc-quote-by">— {author.name || 'TheGigSet member'}</span>
           {heartBurst}
         </div>
       )}

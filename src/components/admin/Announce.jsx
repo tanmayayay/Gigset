@@ -20,7 +20,7 @@ export default function Announce() {
       <div className="ad-row-head"><div><h2>Announcements</h2><p>Talk to everyone at once.</p></div></div>
       <section className="ad-card">
         <h3><Megaphone size={16} /> Banner at the top of the app</h3>
-        <p className="ad-sub">Shows to everyone who opens Gigset until you switch it off. Good for launches, maintenance and thank-yous.</p>
+        <p className="ad-sub">Shows to everyone who opens TheGigSet until you switch it off. Good for launches, maintenance and thank-yous.</p>
         <div className="ad-form"><input className="ad-input" placeholder="Headline" maxLength={100} value={f.title} onChange={(e) => setF({ ...f, title: e.target.value })} />
           <input className="ad-input" placeholder="More detail (optional)" maxLength={300} value={f.body} onChange={(e) => setF({ ...f, body: e.target.value })} />
           <div className="ad-two"><select className="ad-input" value={f.tone} onChange={(e) => setF({ ...f, tone: e.target.value })}>{TONES.map(([v, l]) => <option key={v} value={v}>{l}</option>)}</select>

@@ -13,7 +13,7 @@ const Log = lazy(() => import('../components/admin/Log'));
 
 const TABS = [['overview', 'Dashboard', BarChart3], ['people', 'People', Users], ['content', 'Content', FileText], ['reports', 'Reports', Flag], ['announce', 'Announce', Megaphone], ['log', 'Activity log', ScrollText]];
 
-/** The admin console: one place to see how Gigset is doing and to look after it. Only admins get in. */
+/** The admin console: one place to see how TheGigSet is doing and to look after it. Only admins get in. */
 export default function AdminPage() {
   const [ok, setOk] = useState(null);
   const [sp, setSp] = useSearchParams();

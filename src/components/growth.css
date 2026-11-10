@@ -45,7 +45,7 @@
 /* Samples */
 .sm-grid{display:grid; align-items:start; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:12px;}
 .sm-item iframe{width:100%; border:0; border-radius:12px; display:block; background:#000;}
-.sm-facade{position:relative; width:100%; border:1px solid var(--border); border-radius:12px; cursor:pointer; color:#fff; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,#1b2a57,#0b1530);}
+.sm-facade{position:relative; width:100%; border:1px solid var(--border); border-radius:12px; cursor:pointer; color:#fff; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,#2B2B2B,#151515);}
 .sm-item.spotify .sm-facade{background:linear-gradient(135deg,#1f6f43,#0e2a1b);}
 .sm-item.youtube .sm-facade{background:linear-gradient(135deg,#7a1d1d,#240c0c);}
 .sm-item.soundcloud .sm-facade{background:linear-gradient(135deg,#8a3b00,#2a1300);}

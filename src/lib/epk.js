@@ -83,7 +83,7 @@ export function buildEpk(person, { reviews = null, edits = null } = {}) {
 
   const headline = ed.headline || headlineOf(person) || [d.artistType || d.venueType, (d.genres || d.genresHosted || [])[0]].filter(Boolean).join(' · ') || label;
   const bio = (person.bio || '').trim();
-  const about = ed.about || bio || `${person.name} is ${/^[aeiou]/i.test(label) ? 'an' : 'a'} ${label.toLowerCase()}${person.city ? ` based in ${person.city}` : ''}${uniqueTags.length ? `, working with ${uniqueTags.slice(0, 3).join(', ')}` : ''}. Find them on Gigset to collaborate or book.`;
+  const about = ed.about || bio || `${person.name} is ${/^[aeiou]/i.test(label) ? 'an' : 'a'} ${label.toLowerCase()}${person.city ? ` based in ${person.city}` : ''}${uniqueTags.length ? `, working with ${uniqueTags.slice(0, 3).join(', ')}` : ''}. Find them on TheGigSet to collaborate or book.`;
 
   // How complete is the kit, and what would improve it?
   const checks = [

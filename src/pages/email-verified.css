@@ -16,7 +16,7 @@
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: 24px;
-  box-shadow: 0 24px 60px -24px rgba(42, 99, 238, 0.25);
+  box-shadow: 0 24px 60px -24px rgba(188,125,0, 0.25);
   max-width: 440px;
   width: 100%;
   padding: 44px 40px 40px;
@@ -60,7 +60,7 @@
 }
 
 .ev-lead strong {
-  color: var(--blue-strong);
+  color:var(--blue-text);
   overflow-wrap: anywhere;
 }
 
@@ -80,15 +80,15 @@
   padding: 15px 28px;
   font-size: 16px;
   font-weight: 700;
-  color: #fff;
+  color:var(--on-blue);
   background: var(--gradient-brand);
-  box-shadow: 0 10px 24px -8px rgba(42, 99, 238, 0.6);
+  box-shadow: 0 10px 24px -8px rgba(188,125,0, 0.6);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .ev-cta:hover {
   transform: translateY(-1px);
-  box-shadow: 0 14px 28px -8px rgba(42, 99, 238, 0.65);
+  box-shadow: 0 14px 28px -8px rgba(188,125,0, 0.65);
 }
 
 .ev-cta:active {

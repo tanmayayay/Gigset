@@ -82,7 +82,7 @@ export function checkText(text) {
   return { ok: true };
 }
 
-export const CLEAN_MESSAGE = 'Please keep it clean — abusive, hateful or adult language isn’t allowed on Gigset.';
+export const CLEAN_MESSAGE = 'Please keep it clean — abusive, hateful or adult language isn’t allowed on TheGigSet.';
 
 /** Check several fields at once; returns the first failure or { ok: true }. */
 export function checkAll(...texts) {

@@ -78,7 +78,7 @@ export default function EpkView({ kit, tpl = 'classic', compact = false }) {
         )}
       </div>
 
-      <footer className="ek-foot"><span>{kit.name}</span><span>Made with Gigset</span></footer>
+      <footer className="ek-foot"><span>{kit.name}</span><span>Made with TheGigSet</span></footer>
     </div>
   );
 }

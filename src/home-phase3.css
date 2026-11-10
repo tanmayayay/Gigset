@@ -39,7 +39,7 @@
 .moment-ring {
   padding: 3px;
   border-radius: 50%;
-  background: conic-gradient(from 200deg, var(--blue), #9a6cf0, #f09433, var(--blue));
+  background: conic-gradient(from 200deg, var(--blue), #EA9F0B, #f09433, var(--blue));
   transition: transform 0.16s ease;
   line-height: 0;
 }
@@ -91,7 +91,7 @@
 .feed-tab.active {
   background: var(--blue);
   border-color: var(--blue);
-  color: #fff;
+  color:var(--on-blue);
 }
 
 /* ---------------- Media grid (Media tab) ---------------- */
@@ -155,7 +155,7 @@
   color: var(--text);
 }
 .rail-title svg {
-  color: var(--blue);
+  color:var(--blue-text);
   flex: 0 0 auto;
 }
 .rail-head-link {
@@ -163,7 +163,7 @@
   font-family: var(--font-sans, inherit);
   font-size: 12.5px;
   font-weight: 600;
-  color: var(--blue);
+  color:var(--blue-text);
   text-decoration: none;
 }
 .rail-head-link:hover {
@@ -179,7 +179,7 @@
 .trend-chip {
   border: 1px solid var(--border);
   background: var(--panel-2);
-  color: var(--blue);
+  color:var(--blue-text);
   border-radius: 999px;
   padding: 6px 12px;
   font-size: 12.5px;
@@ -247,7 +247,7 @@
   background: var(--panel-2);
 }
 .opp-row:hover .opp-title {
-  color: var(--blue);
+  color:var(--blue-text);
 }
 .opp-title {
   font-weight: 600;
@@ -288,7 +288,7 @@
   overflow: hidden;
 }
 .pulse-row:hover .pulse-headline {
-  color: var(--blue);
+  color:var(--blue-text);
 }
 .pulse-source {
   font-size: 11.5px;
@@ -311,7 +311,7 @@
   text-decoration: none;
 }
 .rail-footer a:hover {
-  color: var(--blue);
+  color:var(--blue-text);
   text-decoration: underline;
 }
 
@@ -320,7 +320,7 @@
   position: fixed;
   inset: 0;
   z-index: 1000;
-  background: rgba(8, 10, 16, 0.9);
+  background: rgba(10,10,10, 0.9);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -446,7 +446,7 @@
   pointer-events: none;
 }
 .post-tag {
-  color: var(--blue);
+  color:var(--blue-text);
   font-weight: 600;
 }
 .post-action.pop svg {

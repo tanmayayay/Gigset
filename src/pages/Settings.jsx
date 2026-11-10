@@ -36,7 +36,7 @@ export default function Settings() {
   };
 
   const deleteAccount = async () => {
-    if (!window.confirm('Delete your Gigset account? Your profile, posts, stories and messages will be permanently removed. This cannot be undone.')) return;
+    if (!window.confirm('Delete your TheGigSet account? Your profile, posts, stories and messages will be permanently removed. This cannot be undone.')) return;
     if (window.prompt('Type DELETE to confirm.') !== 'DELETE') return;
     try {
       await Profiles.deleteMe();

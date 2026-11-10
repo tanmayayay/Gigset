@@ -33,12 +33,12 @@ export default function Epk() {
           ))}
           {kit && <button className="btn btn-ghost btn-sm" onClick={() => window.print()}><Printer size={14} /> PDF</button>}
           {kit && <button className="btn btn-ghost btn-sm" onClick={share}><Share2 size={14} /> Share</button>}
-          {kit && <Link className="btn btn-blue btn-sm" to={kit.profilePath}>Open in Gigset <ArrowRight size={14} /></Link>}
+          {kit && <Link className="btn btn-blue btn-sm" to={kit.profilePath}>Open in TheGigSet <ArrowRight size={14} /></Link>}
         </div>
       </div>
       {loading && <p className="epk-empty">Loading press kit…</p>}
       {!loading && (error || !kit) && (
-        <article className="epk-sheet"><EmptyState icon={<UserX size={22} />} title="Press kit not found" text="This press kit doesn't exist or the profile isn't public." action={<Link className="btn btn-blue btn-sm" to="/">Back to Gigset</Link>} /></article>
+        <article className="epk-sheet"><EmptyState icon={<UserX size={22} />} title="Press kit not found" text="This press kit doesn't exist or the profile isn't public." action={<Link className="btn btn-blue btn-sm" to="/">Back to TheGigSet</Link>} /></article>
       )}
       {kit && <div className="epk-stagewrap"><EpkView kit={kit} tpl={tpl} /></div>}
     </div>

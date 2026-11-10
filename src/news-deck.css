@@ -210,7 +210,7 @@
   border-color: var(--amber);
 }
 .deck-btn-open {
-  color: var(--blue);
+  color:var(--blue-text);
   border-color: var(--blue-dim);
 }
 .deck-btn-open:hover:not(:disabled) {
@@ -234,7 +234,7 @@
   justify-content: center;
   border-radius: 50%;
   background: var(--blue-dim);
-  color: var(--blue);
+  color:var(--blue-text);
 }
 .deck-end h3 {
   font-size: 21px;

@@ -8,7 +8,7 @@ import { uploadPostImage } from '../../lib/uploadImage';
 import { CommIcon } from './Bits';
 import { CATEGORIES, FLAIRS, GRADIENTS, grad, RULES_DEFAULT } from './meta';
 
-const CLEAN = 'Please keep it clean — abusive, hateful or adult language isn’t allowed on Gigset.';
+const CLEAN = 'Please keep it clean — abusive, hateful or adult language isn’t allowed on TheGigSet.';
 
 export function PostComposer({ communities, initialId, onClose, onPosted }) {
   const { pushToast, userId, user } = useStore();

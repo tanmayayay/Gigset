@@ -155,7 +155,7 @@ function isVideoUrl(url) {
 }
 
 const hueOf = (id) => String(id).split('').reduce((a, c) => a + c.charCodeAt(0), 0) % 360;
-const artFor = (id) => { const h = hueOf(id); return `radial-gradient(120% 90% at 20% 10%, hsl(${h},85%,55%), transparent 60%), radial-gradient(100% 100% at 90% 90%, hsl(${(h + 70) % 360},80%,45%), transparent 60%), #0a0f24`; };
+const artFor = (id) => { const h = hueOf(id); return `radial-gradient(120% 90% at 20% 10%, hsl(${h},85%,55%), transparent 60%), radial-gradient(100% 100% at 90% 90%, hsl(${(h + 70) % 360},80%,45%), transparent 60%), #101010`; };
 
 /** Mixes posts with media, tracks and live events into one stream. */
 function buildStream(posts, tracks, events) {

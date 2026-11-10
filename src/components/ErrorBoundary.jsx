@@ -12,7 +12,7 @@ export default class ErrorBoundary extends Component {
   static getDerivedStateFromError(error) { return { error }; }
 
   componentDidCatch(error) {
-    console.error('Gigset crashed:', error);
+    console.error('TheGigSet crashed:', error);
     if (!isChunkError(error)) return;
     try {
       const last = Number(sessionStorage.getItem(RELOAD_KEY) || 0);
@@ -34,10 +34,10 @@ export default class ErrorBoundary extends Component {
       window.location.reload();
     };
     return (
-      <div style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', padding: 24, background: 'var(--bg, #050a18)', color: 'var(--text, #fff)', fontFamily: 'inherit' }}>
+      <div style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', padding: 24, background: 'var(--bg, #0A0A0A)', color: 'var(--text, #fff)', fontFamily: 'inherit' }}>
         <div style={{ maxWidth: 440, textAlign: 'center' }}>
           <h2 style={{ margin: '0 0 8px' }}>Something went wrong</h2>
-          <p style={{ opacity: 0.7, margin: '0 0 18px' }}>Gigset hit a snag loading this page. Your data is safe.</p>
+          <p style={{ opacity: 0.7, margin: '0 0 18px' }}>TheGigSet hit a snag loading this page. Your data is safe.</p>
           <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
             <button className="btn btn-blue" onClick={hardReload}>Reload</button>
             <button className="btn btn-ghost" onClick={reset}>Try again</button>

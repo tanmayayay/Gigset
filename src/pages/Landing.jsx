@@ -52,7 +52,7 @@ function Nav({ onJoin, onLogin, onDemo }) {
   return (
     <nav className={`ap-nav${solid ? ' solid' : ''}`}>
       <div className="ap-nav-in">
-        <Link to="/" aria-label="Gigset home" className="ap-logo"><Logo /></Link>
+        <Link to="/" aria-label="TheGigSet home" className="ap-logo"><Logo /></Link>
         <div className="ap-links">
           <a href="#story">Overview</a>
           <a href="#roles">Who it&rsquo;s for</a>
@@ -88,7 +88,7 @@ function ScreenProfile() {
         <div className="dv-chips"><span>Bollywood</span><span>Sufi</span><span>Jazz</span></div>
         <div className="dv-stats"><div><b>2.4k</b><i>Followers</i></div><div><b>86</b><i>Gigs</i></div><div><b>4.9</b><i>Rating</i></div></div>
         <div className="dv-listen"><button aria-label="Play"><Play size={14} fill="currentColor" /></button><div className="dv-wave">{WAVE.map((h, i) => <i key={i} style={{ height: `${h}%`, animationDelay: `${(i % 8) * 0.1}s` }} />)}</div></div>
-        <div className="dv-tiles"><i style={{ background: 'linear-gradient(135deg,#6a5cff,#22d3ee)' }} /><i style={{ background: 'linear-gradient(135deg,#ff7ab6,#ffb86b)' }} /><i style={{ background: 'linear-gradient(135deg,#34d399,#2a63ee)' }} /></div>
+        <div className="dv-tiles"><i style={{ background: 'linear-gradient(135deg,#E89A00,#FFD166)' }} /><i style={{ background: 'linear-gradient(135deg,#FFB020,#FFD166)' }} /><i style={{ background: 'linear-gradient(135deg,#FFB020,#E89A00)' }} /></div>
       </div>
     </div>
   );
@@ -124,7 +124,7 @@ function ScreenNotes() {
     <div className="dv-screen pad">
       <h5><Radio size={14} /> Notes</h5>
       <div className="dv-orbit">
-        {[-1, 0, 1].map((d) => <span key={d} className={d === 0 ? 'front' : ''} style={{ zIndex: d === 0 ? 2 : 1, transform: `translateX(${d * 96}px) translateZ(${-Math.abs(d) * 60}px) rotateY(${-d * 30}deg)`, background: d === 0 ? 'linear-gradient(160deg,#6a5cff,#22d3ee)' : d < 0 ? 'linear-gradient(160deg,#ff7ab6,#7c5cff)' : 'linear-gradient(160deg,#34d399,#2a63ee)' }} />)}
+        {[-1, 0, 1].map((d) => <span key={d} className={d === 0 ? 'front' : ''} style={{ zIndex: d === 0 ? 2 : 1, transform: `translateX(${d * 96}px) translateZ(${-Math.abs(d) * 60}px) rotateY(${-d * 30}deg)`, background: d === 0 ? 'linear-gradient(160deg,#E89A00,#FFD166)' : d < 0 ? 'linear-gradient(160deg,#FFB020,#DD9300)' : 'linear-gradient(160deg,#FFB020,#E89A00)' }} />)}
       </div>
       <p className="dv-cap">Tonight&rsquo;s soundcheck <Heart size={12} /></p>
     </div>
@@ -159,7 +159,7 @@ function Hero({ onJoin, onDemo }) {
   return (
     <header className="ap-hero">
       <div className="ap-glow" aria-hidden="true" />
-      <motion.span className="ap-eyebrow" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, ease }}>Introducing Gigset</motion.span>
+      <motion.span className="ap-eyebrow" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, ease }}>Introducing TheGigSet</motion.span>
       <motion.h1 initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, delay: 0.08, ease }}>
         Your music career,<br /><span className="ap-grad">beautifully connected.</span>
       </motion.h1>
@@ -184,7 +184,7 @@ function Hero({ onJoin, onDemo }) {
    ============================================================ */
 const STEPS = [
   { id: 'profile', kicker: 'Portfolio', title: 'A profile that works like a portfolio.', copy: 'Your sound, your samples, your story and your rating, laid out like a showcase. Embed tracks and videos so people can hear you before they ever message you.' },
-  { id: 'match', kicker: 'Match', title: 'Gigs that find you.', copy: 'Every brief on Gigset is scored against your craft, city and past work. The right opportunities rise to the top, the noise stays out.' },
+  { id: 'match', kicker: 'Match', title: 'Gigs that find you.', copy: 'Every brief on TheGigSet is scored against your craft, city and past work. The right opportunities rise to the top, the noise stays out.' },
   { id: 'book', kicker: 'Collab and book', title: 'From hello to booked, in one place.', copy: 'Check live availability, send a request with a budget and a date, and confirm. No more lost enquiries in group chats.' },
   { id: 'notes', kicker: 'Notes', title: 'Stay in the moment.', copy: 'Drop a photo note from soundcheck. It orbits the community for 12 hours, then fades. Fresh, social and never a chore.' },
 ];
@@ -224,11 +224,11 @@ function StoryScroll() {
    Roles: horizontal showcase, like "take a closer look"
    ============================================================ */
 const ROLES = [
-  { icon: Mic, name: 'Artists', line: 'Bands, solo acts, DJs, producers.', tone: 'linear-gradient(140deg,#5b3df5,#22d3ee)', who: PEOPLE.find((p) => p.type === 'Performer') },
-  { icon: Building2, name: 'Venues', line: 'Clubs, cafes, studios, open air.', tone: 'linear-gradient(140deg,#0ea5a4,#2a63ee)', who: PEOPLE.find((p) => p.type === 'Venue') },
-  { icon: Briefcase, name: 'Organisers', line: 'Promoters, agencies, planners.', tone: 'linear-gradient(140deg,#f59e0b,#ef4444)', who: PEOPLE.find((p) => p.type === 'Buyer') },
-  { icon: SlidersHorizontal, name: 'Crew', line: 'Sound, light, stage and video.', tone: 'linear-gradient(140deg,#7c3aed,#ec4899)', who: PEOPLE.find((p) => p.type === 'Crew') },
-  { icon: GraduationCap, name: 'Institutions', line: 'Academies, labels, collectives.', tone: 'linear-gradient(140deg,#ec4899,#f97316)', who: PEOPLE.find((p) => p.type === 'Institution') },
+  { icon: Mic, name: 'Artists', line: 'Bands, solo acts, DJs, producers.', tone: 'linear-gradient(140deg,#141414,#B26F00)', who: PEOPLE.find((p) => p.type === 'Performer') },
+  { icon: Building2, name: 'Venues', line: 'Clubs, cafes, studios, open air.', tone: 'linear-gradient(140deg,#1a1a1a,#8A5A00)', who: PEOPLE.find((p) => p.type === 'Venue') },
+  { icon: Briefcase, name: 'Organisers', line: 'Promoters, agencies, planners.', tone: 'linear-gradient(140deg,#0f0f0f,#C98000)', who: PEOPLE.find((p) => p.type === 'Buyer') },
+  { icon: SlidersHorizontal, name: 'Crew', line: 'Sound, light, stage and video.', tone: 'linear-gradient(140deg,#1c1c1c,#6B4A00)', who: PEOPLE.find((p) => p.type === 'Crew') },
+  { icon: GraduationCap, name: 'Institutions', line: 'Academies, labels, collectives.', tone: 'linear-gradient(140deg,#151515,#A86400)', who: PEOPLE.find((p) => p.type === 'Institution') },
 ];
 function Roles({ onJoin }) {
   const rail = useRef(null);
@@ -331,7 +331,7 @@ function MatchWidget() {
    ============================================================ */
 const QUOTES = [
   {
-    quote: 'I stopped losing gig leads to WhatsApp chaos. On Gigset every enquiry lands on my profile with a budget and a date attached — I booked three sessions in my first week.',
+    quote: 'I stopped losing gig leads to WhatsApp chaos. On TheGigSet every enquiry lands on my profile with a budget and a date attached — I booked three sessions in my first week.',
     name: 'Meera Iyer', meta: 'Vocalist · Mumbai',
   },
   {
@@ -366,16 +366,16 @@ function Testimonials() {
 
 const FAQS = [
   {
-    q: 'Is Gigset free?',
+    q: 'Is TheGigSet free?',
     a: 'Yes — creating a profile, discovering people and getting match scores is free throughout Phase 1. Down the line we\'ll introduce optional paid tiers for promoters running high-volume hiring and for advanced analytics, but the core network will always be free for working artists and crew.',
   },
   {
-    q: 'Who is Gigset for?',
+    q: 'Who is TheGigSet for?',
     a: 'Everyone who makes live music happen in India: performers and bands, venues and studios, talent buyers (festivals, organisers, brands), crew and technical professionals, plus institutions and agencies like schools, societies and management firms.',
   },
   {
     q: 'How is this different from Instagram or WhatsApp?',
-    a: 'Instagram is for audiences; WhatsApp is for chaos. Gigset is for work: verified profiles with real skills and gig history, structured briefs with budgets and dates, AI match scores so the right people see the right opportunities, and outreach that arrives spam-free — no broadcast groups, no buried leads.',
+    a: 'Instagram is for audiences; WhatsApp is for chaos. TheGigSet is for work: verified profiles with real skills and gig history, structured briefs with budgets and dates, AI match scores so the right people see the right opportunities, and outreach that arrives spam-free — no broadcast groups, no buried leads.',
   },
   {
     q: 'What does Phase 1 include?',
@@ -423,7 +423,7 @@ function BigCta({ onJoin }) {
 function Footer() {
   return (
     <footer className="ap-foot">
-      <div><Logo /><small>&copy; 2026 Gigset. Free during Phase 1.</small></div>
+      <div><Logo /><small>&copy; 2026 TheGigSet. Free during Phase 1.</small></div>
       <div className="ap-foot-links"><Link to="/about">About</Link><Link to="/support">Support</Link></div>
     </footer>
   );

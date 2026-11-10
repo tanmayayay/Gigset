@@ -43,7 +43,7 @@
 .slot-chip.active {
   border-color: var(--blue);
   background: var(--blue-dim);
-  color: var(--blue);
+  color:var(--blue-text);
   box-shadow: 0 0 0 1px var(--blue);
 }
 
@@ -88,7 +88,7 @@
   font-size: 56px;
   font-weight: 800;
   line-height: 1;
-  color: var(--blue);
+  color:var(--blue-text);
 }
 .match-score-big span {
   font-size: 12.5px;
@@ -120,7 +120,7 @@
 .match-factor-fill {
   height: 100%;
   border-radius: 6px;
-  background: linear-gradient(90deg, #2A63EE, #0EA5E9);
+  background: linear-gradient(90deg, #E89A00, #FFD166);
 }
 .match-reasons {
   margin: 14px 4px 0;

@@ -1,7 +1,7 @@
 .uploads{max-width:860px}
 .up-tabs{display:flex;gap:6px;margin:6px 0 16px;flex-wrap:wrap}
 .up-tabs button{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:999px;border:1px solid var(--border);background:var(--panel);color:var(--text-dim);font-weight:600;font-size:13px;cursor:pointer}
-.up-tabs button.on{background:var(--blue-soft,rgba(42,99,238,.12));color:var(--blue);border-color:transparent}
+.up-tabs button.on{background:var(--blue-soft,rgba(232,154,0,.12));color:var(--blue-text);border-color:transparent}
 .up-tabs em{font-style:normal;font-size:11.5px;opacity:.7}
 .up-faint{color:var(--text-faint);font-size:13px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .up-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}

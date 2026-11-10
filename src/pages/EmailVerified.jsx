@@ -43,11 +43,11 @@ export default function EmailVerified({ result, onDone }) {
           <h1>This link has expired</h1>
           <p className="ev-lead">Verification links only work for a limited time.</p>
           <p className="ev-sub">
-            Head back to Gigset and sign in — we&rsquo;ll send you a fresh
+            Head back to TheGigSet and sign in — we&rsquo;ll send you a fresh
             verification email from there.
           </p>
           <button className="ev-cta" onClick={onDone}>
-            Back to Gigset <ArrowRight size={18} />
+            Back to TheGigSet <ArrowRight size={18} />
           </button>
         </motion.div>
       </div>
@@ -83,11 +83,11 @@ export default function EmailVerified({ result, onDone }) {
           .
         </p>
         <p className="ev-sub">
-          You can go back to your Gigset application now — you&rsquo;re
+          You can go back to your TheGigSet application now — you&rsquo;re
           already signed in.
         </p>
         <button className="ev-cta" onClick={onDone}>
-          Continue to Gigset <ArrowRight size={18} />
+          Continue to TheGigSet <ArrowRight size={18} />
         </button>
       </motion.div>
     </div>

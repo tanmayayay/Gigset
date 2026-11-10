@@ -81,7 +81,7 @@ function CardBody({ item, onReact }) {
       </div>
       <div className="deck-body">
         <div className="deck-src">
-          <b>{item.source || 'Gigset newsroom'}</b>
+          <b>{item.source || 'TheGigSet newsroom'}</b>
           {item.publishedAt && <span><Clock size={12} /> {timeAgo(item.publishedAt)}</span>}
           {!item.isLive && <span>· {readMins(item)} min read</span>}
         </div>
@@ -264,7 +264,7 @@ export default function SwipeDeck({ items, isSaved, onSave, onUnsave, onRead, on
             <button onClick={() => setPrefs({})}>Reset</button>
           </div>
         ) : (
-          <p className="deck-side-empty">Gigset learns what you like as you swipe and react, then brings those topics forward.</p>
+          <p className="deck-side-empty">TheGigSet learns what you like as you swipe and react, then brings those topics forward.</p>
         )}
       </div>
       <div className="deck-side-card">

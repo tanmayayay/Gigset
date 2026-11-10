@@ -8,7 +8,7 @@ import { useStore } from '../store/store';
 
 const GRADIENTS = [
   'linear-gradient(135deg,#3b82f6,#8b5cf6)',
-  'linear-gradient(135deg,#0ea5e9,#6366f1)',
+  'linear-gradient(135deg,#FFD166,#6366f1)',
   'linear-gradient(135deg,#8b5cf6,#ec4899)',
 ];
 
@@ -75,7 +75,7 @@ export default function Live() {
         </div>
         <div>
           <h4 style={{ marginBottom: 4 }}>What Live will include</h4>
-          <p style={{ fontSize: 13, color: 'var(--text-dim)' }}>One-tap going live, ticketed streams, saved broadcasts on your profile, and live Q&A with the audience — all wired into your Gigset network.</p>
+          <p style={{ fontSize: 13, color: 'var(--text-dim)' }}>One-tap going live, ticketed streams, saved broadcasts on your profile, and live Q&A with the audience — all wired into your TheGigSet network.</p>
         </div>
       </div>
     </div>

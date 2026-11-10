@@ -103,7 +103,7 @@ export default function News() {
     <div className="news-page">
       <header className="news-head">
         <div>
-          <span className="news-kicker"><span className="dot" /> Gigset Daily</span>
+          <span className="news-kicker"><span className="dot" /> TheGigSet Daily</span>
           <h1>Today in Indian music</h1>
           <p>
             {all.length} stories{updatedAt ? ` · updated ${timeAgo(updatedAt)}` : ''} · swipe right to open, up to save, left to pass

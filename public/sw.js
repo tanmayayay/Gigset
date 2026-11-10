@@ -12,8 +12,8 @@ self.addEventListener('push', (event) => {
     await self.registration.showNotification(data.title || 'Gigset', {
       body: data.body || '',
       tag: data.tag || 'gigset',
-      icon: './favicon.svg',
-      badge: './favicon.svg',
+      icon: './brand/icon-192.png',
+      badge: './brand/favicon-32.png',
       data: { url: data.url || '#/notifications' },
     });
   })());

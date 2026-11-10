@@ -1,5 +1,5 @@
 /* Apple-style portfolio profile */
-.pfo{--pf-tint:#0071e3; margin:-6px -4px 0; color:var(--text); }
+.pfo{--pf-tint:#B37700; margin:-6px -4px 0; color:var(--text); }
 .pfo-hero{position:relative; overflow:hidden; border-radius:28px; padding:72px 24px 56px; text-align:center; isolation:isolate;
   background:radial-gradient(120% 90% at 50% 0%, color-mix(in srgb, var(--pf-tint) 22%, var(--panel)) 0%, var(--panel) 62%);
   border:1px solid var(--border);}

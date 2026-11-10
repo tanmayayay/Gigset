@@ -37,7 +37,7 @@ function Reply({ onSubmit, onCancel, placeholder = 'Add to the conversation…',
     <div className="cm-reply">
       <textarea rows={2} autoFocus={autoFocus} value={text} maxLength={4000} placeholder={placeholder} onChange={(e) => setText(e.target.value)}
         onKeyDown={(e) => { if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') send(); }} />
-      {bad && <div className="cm-warn">Please keep it clean — abusive, hateful or adult language isn&rsquo;t allowed on Gigset.</div>}
+      {bad && <div className="cm-warn">Please keep it clean — abusive, hateful or adult language isn&rsquo;t allowed on TheGigSet.</div>}
       <div className="cm-reply-row">
         {onCancel && <button className="btn btn-ghost btn-xs" onClick={onCancel}>Cancel</button>}
         <button className="btn btn-blue btn-xs" disabled={!text.trim() || bad || busy} onClick={send}>{busy ? 'Posting…' : 'Comment'}</button>

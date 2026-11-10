@@ -21,7 +21,7 @@ export const PEOPLE = [
     tagline: 'Playback & session vocalist — Hindustani-trained, pop-fluent, available for session work across Mumbai.',
     bio: 'Meera has spent six years moving between playback sessions, jingle work, and her own live sets — trained in Hindustani classical vocals but just as comfortable fronting a pop or fusion band. She\u2019s currently building a small catalogue of original acoustic work alongside session bookings.',
     achievements: ['120+ sessions logged', 'Resident vocalist, Piano Man Studios', 'Verified on Gigset'],
-    heroGradient: 'linear-gradient(135deg,#123B82,#2A63EE 55%,#0EA5E9)',
+    heroGradient: 'linear-gradient(135deg,#3B2A00,#E89A00 55%,#FFD166)',
     experience: [
       { title: 'Resident vocalist', org: 'Piano Man Studios, Mumbai', period: '2022 — present' },
       { title: 'Session vocalist (playback & jingles)', org: 'Independent', period: '2020 — present' },
@@ -35,7 +35,7 @@ export const PEOPLE = [
     tagline: 'Live sound engineer — FOH and monitor world, festival and arena scale.',
     bio: 'Rohan has run front-of-house for festival mainstages and monitor world for touring acts across North India. He specialises in line-array systems and fast, clean festival load-ins.',
     achievements: ['40+ festival load-ins', 'Line-array certified', 'Verified on Gigset'],
-    heroGradient: 'linear-gradient(135deg,#0B2E63,#0EA5E9 60%,#38BDF8)',
+    heroGradient: 'linear-gradient(135deg,#0B2E63,#FFD166 60%,#FFD166)',
     experience: [
       { title: 'FOH engineer', org: 'Freelance — festivals & touring', period: '2021 — present' },
       { title: 'Monitor engineer', org: 'Depot 48 live calendar', period: '2019 — 2021' },
@@ -48,7 +48,7 @@ export const PEOPLE = [
     tagline: 'Session guitarist — nylon, steel-string and baritone, Pune-based.',
     bio: 'Anjali records session guitar parts for independent producers and film demos out of her home studio in Pune, with a growing sideline arranging folk melodies for acoustic guitar.',
     achievements: ['Featured session player, 3 independent EPs', 'Turnaround under 48 hours', 'Verified on Gigset'],
-    heroGradient: 'linear-gradient(135deg,#1E1B6B,#4F46E5 55%,#2A63EE)',
+    heroGradient: 'linear-gradient(135deg,#1E1B6B,#B26F00 55%,#E89A00)',
     experience: [
       { title: 'Session guitarist', org: 'Independent — film & indie', period: '2020 — present' },
       { title: 'Guitar faculty', org: 'Private studio, Pune', period: '2018 — present' },
@@ -61,7 +61,7 @@ export const PEOPLE = [
     tagline: 'Lighting designer for arena shows, college fests and the wedding circuit.',
     bio: 'Karan designs and operates lighting for arena-scale shows and high-volume wedding events across Punjab and North India. Known for fast rig plots and dependable wedding-season crews.',
     achievements: ['25+ arena shows', 'Wedding-season crew lead', 'Verified on Gigset'],
-    heroGradient: 'linear-gradient(135deg,#3B0764,#4F46E5 55%,#2A63EE)',
+    heroGradient: 'linear-gradient(135deg,#3B0764,#B26F00 55%,#E89A00)',
     experience: [
       { title: 'Lighting designer & operator', org: 'Freelance', period: '2020 — present' },
     ],
@@ -73,7 +73,7 @@ export const PEOPLE = [
     tagline: 'Mumbai\u2019s listening room — 200-cap venue, residencies and open mics.',
     bio: 'Piano Man Studios is one of Mumbai\u2019s best-known small-format live venues, hosting residencies, open mics and touring indie acts through the year. Bookers look for acts with tight 45-minute sets.',
     achievements: ['400+ shows hosted', 'December open-mic calendar live', 'Verified on Gigset'],
-    heroGradient: 'linear-gradient(135deg,#0E2E6B,#2A63EE 55%,#4F46E5)',
+    heroGradient: 'linear-gradient(135deg,#3B2A00,#E89A00 55%,#B26F00)',
     experience: [{ title: 'Live music venue', org: 'Mumbai', period: '2015 — present' }],
   },
   {
@@ -83,7 +83,7 @@ export const PEOPLE = [
     tagline: 'Delhi-NCR\u2019s festival-ground venue — big weekends, outdoor stage.',
     bio: 'Depot 48 runs some of Delhi-NCR\u2019s busiest live weekends — multi-act bills, festival-format load-ins and a 3,000-cap outdoor stage for seasonal programming.',
     achievements: ['Festival weekends year-round', '3,000-cap outdoor stage', 'Verified on Gigset'],
-    heroGradient: 'linear-gradient(135deg,#123B82,#0EA5E9 60%,#38BDF8)',
+    heroGradient: 'linear-gradient(135deg,#3B2A00,#FFD166 60%,#FFD166)',
     experience: [{ title: 'Live music venue', org: 'Delhi-NCR', period: '2014 — present' }],
   },
   {
@@ -93,7 +93,7 @@ export const PEOPLE = [
     tagline: 'Drummer — Carnatic-jazz crossover trio, session and live.',
     bio: 'Sana leads a Carnatic-jazz crossover trio in Bengaluru and takes session drum work across South India. Her trio\u2019s new single is picking up festival attention this season.',
     achievements: ['Trio single — festival circuit buzz', '96 live shows', 'Verified on Gigset'],
-    heroGradient: 'linear-gradient(135deg,#4F46E5,#0EA5E9 60%,#38BDF8)',
+    heroGradient: 'linear-gradient(135deg,#B26F00,#FFD166 60%,#FFD166)',
     experience: [
       { title: 'Drummer & bandleader', org: 'Sana Reddy Trio', period: '2021 — present' },
       { title: 'Session drummer', org: 'Independent', period: '2019 — present' },
@@ -106,7 +106,7 @@ export const PEOPLE = [
     tagline: 'Delhi-NCR music school — performance, production and live-sound training.',
     bio: 'Noida School of Rock runs performance and production programmes for working musicians, with term-end student showcases and short courses taught by touring engineers.',
     achievements: ['2,000+ students trained', 'January production workshop open', 'Verified on Gigset'],
-    heroGradient: 'linear-gradient(135deg,#1E1B6B,#4F46E5 55%,#0EA5E9)',
+    heroGradient: 'linear-gradient(135deg,#1E1B6B,#B26F00 55%,#FFD166)',
     experience: [{ title: 'Music education', org: 'Delhi-NCR', period: '2012 — present' }],
   },
   {
@@ -116,7 +116,7 @@ export const PEOPLE = [
     tagline: 'Stage manager — arena builds and multi-day festival operations.',
     bio: 'Vikram runs stage operations for arena builds and multi-day events around Bengaluru. Currently building a reliable stagehand roster for the wedding and fest season.',
     achievements: ['2-day arena builds', 'Crew coordination', 'ID-verified'],
-    heroGradient: 'linear-gradient(135deg,#0B2E63,#4F46E5 60%,#0284C7)',
+    heroGradient: 'linear-gradient(135deg,#0B2E63,#B26F00 60%,#0284C7)',
     experience: [{ title: 'Stage manager', org: 'Freelance — live events', period: '2020 — present' }],
   },
   {
@@ -126,7 +126,7 @@ export const PEOPLE = [
     tagline: 'DJ & producer — wedding and club circuit, Delhi-NCR.',
     bio: 'Arjun plays the Delhi-NCR wedding and club circuit through the season and produces EDM remixes of Bollywood catalogue tracks. High-volume, dependable, and quick on client briefs.',
     achievements: ['140+ club & wedding sets', 'Remix catalogue on streaming', 'Verified on Gigset'],
-    heroGradient: 'linear-gradient(135deg,#3B0764,#0EA5E9 60%,#38BDF8)',
+    heroGradient: 'linear-gradient(135deg,#3B0764,#FFD166 60%,#FFD166)',
     experience: [{ title: 'DJ & producer', org: 'Independent — Delhi-NCR circuit', period: '2019 — present' }],
   },
   {
@@ -136,7 +136,7 @@ export const PEOPLE = [
     tagline: 'Indie singer-songwriter from Hyderabad — originals in Hindi and English.',
     bio: 'Zoya writes and performs original indie-pop in Hindi and English, building a following through open mics and small-room gigs across Hyderabad. Her debut EP drops this winter.',
     achievements: ['Debut EP — winter 2026', '30+ open-mic & small-room gigs', 'ID-verified'],
-    heroGradient: 'linear-gradient(135deg,#7C2D12,#2A63EE 55%,#0EA5E9)',
+    heroGradient: 'linear-gradient(135deg,#7C2D12,#E89A00 55%,#FFD166)',
     experience: [{ title: 'Singer-songwriter', org: 'Independent', period: '2023 — present' }],
   },
   {
@@ -146,7 +146,7 @@ export const PEOPLE = [
     tagline: 'Tabla & percussion — Carnatic roots, fusion collaborations.',
     bio: 'Aditya is a Chennai-based tabla player working at the intersection of Carnatic tradition and contemporary fusion — session work, crossover bands and festival collaborations.',
     achievements: ['Festival fusion collaborations', 'Session percussion', 'Verified on Gigset'],
-    heroGradient: 'linear-gradient(135deg,#123B82,#4F46E5 55%,#38BDF8)',
+    heroGradient: 'linear-gradient(135deg,#3B2A00,#B26F00 55%,#FFD166)',
     experience: [{ title: 'Percussionist', org: 'Independent — Chennai', period: '2020 — present' }],
   },
   {
@@ -156,7 +156,7 @@ export const PEOPLE = [
     tagline: 'Brand partnerships at RealMe — music sponsorships & campus tours.',
     bio: 'Kavya leads music and youth-culture partnerships for RealMe in India — artist sponsorships, campus gig tours and festival brand activations across metros.',
     achievements: ['12 campus tours activated', 'Festival sponsorships', 'Verified on Gigset'],
-    heroGradient: 'linear-gradient(135deg,#0E2E6B,#2A63EE 55%,#0EA5E9)',
+    heroGradient: 'linear-gradient(135deg,#3B2A00,#E89A00 55%,#FFD166)',
     experience: [{ title: 'Brand partnerships', org: 'RealMe India', period: '2022 — present' }],
   },
   {
@@ -166,7 +166,7 @@ export const PEOPLE = [
     tagline: 'Independent talent booker — corporate events & weddings, East India.',
     bio: 'Imran sources artists and crew for corporate events and weddings across East India, working with a tight roster of dependable performers and vendors.',
     achievements: ['45+ events booked', 'East-India vendor network', 'ID-verified'],
-    heroGradient: 'linear-gradient(135deg,#1E1B6B,#0EA5E9 60%,#38BDF8)',
+    heroGradient: 'linear-gradient(135deg,#1E1B6B,#FFD166 60%,#FFD166)',
     experience: [{ title: 'Talent booker', org: 'Independent — Kolkata', period: '2021 — present' }],
   },
 ];
@@ -182,7 +182,7 @@ export function hashStr(s) {
 export function initials(name) {
   return name.split(' ').map((w) => w[0]).slice(0, 2).join('').toUpperCase();
 }
-const AVATAR_COLORS = ['#2A63EE', '#0EA5E9', '#4F46E5', '#3B82F6', '#0284C7', '#6366F1'];
+const AVATAR_COLORS = ['#0A0A0A', '#3B2A00', '#8A5A00', '#B26F00', '#1F1F1F', '#6B4A00'];
 export function avatarColor(name) { return AVATAR_COLORS[name.length % AVATAR_COLORS.length]; }
 
 // ---------- mock AI match score ----------
@@ -218,9 +218,9 @@ export function availability(id, days = 14) {
 }
 
 export const STAR_STORIES = [
-  { kicker: '\u2605 Star story', headline: 'Independent artist releases in India crossed a new high this quarter', deck: 'Streaming platforms report a steady rise in independent, non-label releases from Indian artists, with regional-language tracks leading growth outside metro listenership.', gradient: 'linear-gradient(135deg,#0B2E63,#2A63EE 55%,#0EA5E9)', time: 'Published 6:00 AM today', articleId: 'indie-releases-surge' },
-  { kicker: '\u2605 Star story', headline: 'Festival season bookings are up across second-tier cities', deck: 'Promoters point to growing demand in cities beyond the usual metro circuit, with venues in Chandigarh and Pune reporting earlier-than-usual booking activity.', gradient: 'linear-gradient(135deg,#123B82,#4F46E5 55%,#0EA5E9)', time: 'Published 6:00 AM today', articleId: 'festival-tier2-boom' },
-  { kicker: '\u2605 Star story', headline: 'Fusion acts blending classical and electronic sounds gain festival slots', deck: 'A wave of acts pairing Hindustani and Carnatic training with electronic production are being booked across major festival line-ups this season.', gradient: 'linear-gradient(135deg,#0E2E6B,#0EA5E9 55%,#38BDF8)', time: 'Published 6:15 AM today', articleId: 'fusion-acts-rise' },
+  { kicker: '\u2605 Star story', headline: 'Independent artist releases in India crossed a new high this quarter', deck: 'Streaming platforms report a steady rise in independent, non-label releases from Indian artists, with regional-language tracks leading growth outside metro listenership.', gradient: 'linear-gradient(135deg,#0B2E63,#E89A00 55%,#FFD166)', time: 'Published 6:00 AM today', articleId: 'indie-releases-surge' },
+  { kicker: '\u2605 Star story', headline: 'Festival season bookings are up across second-tier cities', deck: 'Promoters point to growing demand in cities beyond the usual metro circuit, with venues in Chandigarh and Pune reporting earlier-than-usual booking activity.', gradient: 'linear-gradient(135deg,#3B2A00,#B26F00 55%,#FFD166)', time: 'Published 6:00 AM today', articleId: 'festival-tier2-boom' },
+  { kicker: '\u2605 Star story', headline: 'Fusion acts blending classical and electronic sounds gain festival slots', deck: 'A wave of acts pairing Hindustani and Carnatic training with electronic production are being booked across major festival line-ups this season.', gradient: 'linear-gradient(135deg,#3B2A00,#FFD166 55%,#FFD166)', time: 'Published 6:15 AM today', articleId: 'fusion-acts-rise' },
 ];
 
 export const HOME_FEED = [
@@ -236,15 +236,15 @@ export const HOME_FEED = [
 ];
 
 export const MEDIA_ITEMS = [
-  { id: 'm1', who: 'Meera Iyer', pid: 'meera', role: 'Vocalist · Mumbai', type: 'video', kind: 'Performance', caption: 'Closing set from Friday\u2019s Piano Man show — full band, live strings.', likes: 214, gradient: 'linear-gradient(135deg,#123B82,#4F46E5)' },
-  { id: 'm2', who: 'Anjali Kulkarni', pid: 'anjali', role: 'Session guitarist · Pune', type: 'photo', kind: 'Service showcase', caption: 'Studio rig for this week\u2019s session bookings — nylon, steel-string and a baritone.', likes: 88, gradient: 'linear-gradient(135deg,#0EA5E9,#4F46E5)' },
-  { id: 'm3', who: 'Karan Bedi', pid: 'karan', role: 'Lighting designer · Chandigarh', type: 'photo', kind: 'Service showcase', caption: 'Rig plot from last weekend\u2019s arena show — full RGBW wash and haze.', likes: 56, gradient: 'linear-gradient(135deg,#4F46E5,#2A63EE)' },
-  { id: 'm4', who: 'Sana Reddy', pid: 'sana', role: 'Drummer · Bengaluru', type: 'video', kind: 'Performance', caption: 'Carnatic-jazz crossover trio — new single, live take.', likes: 301, gradient: 'linear-gradient(135deg,#4F46E5,#0EA5E9)' },
-  { id: 'm5', who: 'Depot 48', pid: 'depot48', role: 'Venue · Delhi-NCR', type: 'video', kind: 'Performance', caption: 'Recap reel from last month\u2019s festival weekend.', likes: 449, gradient: 'linear-gradient(135deg,#123B82,#0EA5E9)' },
-  { id: 'm6', who: 'Rohan Verma', pid: 'rohan', role: 'Live sound engineer · Delhi-NCR', type: 'photo', kind: 'Service showcase', caption: 'FOH setup for a 3,000-cap outdoor stage — line array and monitor world.', likes: 64, gradient: 'linear-gradient(135deg,#0EA5E9,#3B82F6)' },
-  { id: 'm7', who: 'Aditya Rao', pid: 'aditya', role: 'Tabla & percussionist · Chennai', type: 'video', kind: 'Performance', caption: 'Tabla × modular synth — rehearsal excerpt for the December fusion bill.', likes: 187, gradient: 'linear-gradient(135deg,#123B82,#4F46E5)' },
-  { id: 'm8', who: 'Noida School of Rock', pid: 'nsr', role: 'Music school · Delhi-NCR', type: 'video', kind: 'Performance', caption: 'Student showcase from this term\u2019s live-performance workshop.', likes: 126, gradient: 'linear-gradient(135deg,#123B82,#4F46E5)' },
-  { id: 'm9', who: 'Piano Man Studios', pid: 'pianoman', role: 'Venue · Mumbai', type: 'video', kind: 'Performance', caption: 'Open mic highlight — new vocalist we\u2019re watching this month.', likes: 180, gradient: 'linear-gradient(135deg,#2A63EE,#4F46E5)' },
+  { id: 'm1', who: 'Meera Iyer', pid: 'meera', role: 'Vocalist · Mumbai', type: 'video', kind: 'Performance', caption: 'Closing set from Friday\u2019s Piano Man show — full band, live strings.', likes: 214, gradient: 'linear-gradient(135deg,#3B2A00,#B26F00)' },
+  { id: 'm2', who: 'Anjali Kulkarni', pid: 'anjali', role: 'Session guitarist · Pune', type: 'photo', kind: 'Service showcase', caption: 'Studio rig for this week\u2019s session bookings — nylon, steel-string and a baritone.', likes: 88, gradient: 'linear-gradient(135deg,#FFD166,#B26F00)' },
+  { id: 'm3', who: 'Karan Bedi', pid: 'karan', role: 'Lighting designer · Chandigarh', type: 'photo', kind: 'Service showcase', caption: 'Rig plot from last weekend\u2019s arena show — full RGBW wash and haze.', likes: 56, gradient: 'linear-gradient(135deg,#B26F00,#E89A00)' },
+  { id: 'm4', who: 'Sana Reddy', pid: 'sana', role: 'Drummer · Bengaluru', type: 'video', kind: 'Performance', caption: 'Carnatic-jazz crossover trio — new single, live take.', likes: 301, gradient: 'linear-gradient(135deg,#B26F00,#FFD166)' },
+  { id: 'm5', who: 'Depot 48', pid: 'depot48', role: 'Venue · Delhi-NCR', type: 'video', kind: 'Performance', caption: 'Recap reel from last month\u2019s festival weekend.', likes: 449, gradient: 'linear-gradient(135deg,#3B2A00,#FFD166)' },
+  { id: 'm6', who: 'Rohan Verma', pid: 'rohan', role: 'Live sound engineer · Delhi-NCR', type: 'photo', kind: 'Service showcase', caption: 'FOH setup for a 3,000-cap outdoor stage — line array and monitor world.', likes: 64, gradient: 'linear-gradient(135deg,#FFD166,#3B82F6)' },
+  { id: 'm7', who: 'Aditya Rao', pid: 'aditya', role: 'Tabla & percussionist · Chennai', type: 'video', kind: 'Performance', caption: 'Tabla × modular synth — rehearsal excerpt for the December fusion bill.', likes: 187, gradient: 'linear-gradient(135deg,#3B2A00,#B26F00)' },
+  { id: 'm8', who: 'Noida School of Rock', pid: 'nsr', role: 'Music school · Delhi-NCR', type: 'video', kind: 'Performance', caption: 'Student showcase from this term\u2019s live-performance workshop.', likes: 126, gradient: 'linear-gradient(135deg,#3B2A00,#B26F00)' },
+  { id: 'm9', who: 'Piano Man Studios', pid: 'pianoman', role: 'Venue · Mumbai', type: 'video', kind: 'Performance', caption: 'Open mic highlight — new vocalist we\u2019re watching this month.', likes: 180, gradient: 'linear-gradient(135deg,#E89A00,#B26F00)' },
 ];
 
 export const OPPORTUNITIES = [
@@ -263,7 +263,7 @@ export const NEWS_ARTICLES = [
     id: 'indie-releases-surge', cat: 'Industry', time: '6:00 AM',
     title: 'Independent artist releases in India crossed a new high this quarter',
     deck: 'Streaming platforms report a steady rise in independent, non-label releases from Indian artists, with regional-language tracks leading growth outside metro listenership.',
-    author: 'Gigset Newsroom', gradient: 'linear-gradient(135deg,#0B2E63,#2A63EE 55%,#0EA5E9)',
+    author: 'Gigset Newsroom', gradient: 'linear-gradient(135deg,#0B2E63,#E89A00 55%,#FFD166)',
     body: [
       'Independent, non-label releases from Indian artists hit a new quarterly high, according to streaming data shared with Gigset this week — continuing a run that has seen the indie catalogue roughly double in three years.',
       'The most striking part of the growth is where it is coming from. Regional-language tracks — Punjabi, Tamil, Telugu, Bengali and Marathi — are leading the expansion, with listenership growth strongest outside the metro cities that once defined the industry\u2019s centre of gravity.',
@@ -276,7 +276,7 @@ export const NEWS_ARTICLES = [
     id: 'festival-tier2-boom', cat: 'Events', time: '6:00 AM',
     title: 'Festival season bookings are up across second-tier cities',
     deck: 'Promoters point to growing demand in cities beyond the usual metro circuit, with venues in Chandigarh and Pune reporting earlier-than-usual booking activity.',
-    author: 'Gigset Newsroom', gradient: 'linear-gradient(135deg,#123B82,#4F46E5 55%,#0EA5E9)',
+    author: 'Gigset Newsroom', gradient: 'linear-gradient(135deg,#3B2A00,#B26F00 55%,#FFD166)',
     body: [
       'Promoters across Chandigarh, Pune, Kochi and Indore say festival-season bookings are running ahead of last year\u2019s pace — with several venues reporting that prime October–December weekends sold out weeks earlier than usual.',
       'The shift reflects a maturing live market. Audiences in second-tier cities, long served by touring metro acts, are now sustaining home-grown bills — and local crews, sound vendors and stage managers are seeing steadier calendars as a result.',
@@ -288,7 +288,7 @@ export const NEWS_ARTICLES = [
     id: 'fusion-acts-rise', cat: 'Pop culture', time: '6:15 AM',
     title: 'Fusion acts blending classical and electronic sounds gain festival slots',
     deck: 'A wave of acts pairing Hindustani and Carnatic training with electronic production are being booked across major festival line-ups this season.',
-    author: 'Gigset Newsroom', gradient: 'linear-gradient(135deg,#0E2E6B,#0EA5E9 55%,#38BDF8)',
+    author: 'Gigset Newsroom', gradient: 'linear-gradient(135deg,#3B2A00,#FFD166 55%,#FFD166)',
     body: [
       'Festival programmers say one of the clearest booking trends this season is the rise of fusion acts — artists pairing Hindustani or Carnatic training with electronic production, live looping and modular synthesis.',
       'The format travels well: it reads as distinctly Indian to international bookers while feeling current to younger domestic audiences. Several such acts have moved from afternoon discovery slots to evening main-stage billing in a single season.',
@@ -300,7 +300,7 @@ export const NEWS_ARTICLES = [
     id: 'session-demand-remote', cat: 'Industry', time: '7:00 AM',
     title: 'Session musician demand rises as home-studio production grows',
     deck: 'More independent producers are hiring session players remotely, changing how session work gets booked outside traditional studio networks.',
-    author: 'Gigset Newsroom', gradient: 'linear-gradient(135deg,#1E1B6B,#2A63EE 55%,#0EA5E9)',
+    author: 'Gigset Newsroom', gradient: 'linear-gradient(135deg,#1E1B6B,#E89A00 55%,#FFD166)',
     body: [
       'The home-studio boom has quietly rewired session work. Independent producers who once booked a day at a commercial studio now hire guitarists, percussionists and vocalists remotely — stems in, stems out, no travel.',
       'Session players say the new workflow rewards speed and communication over studio pedigree: 48-hour turnarounds, clean DI tracks, and the ability to take direction over a video call.',
@@ -312,7 +312,7 @@ export const NEWS_ARTICLES = [
     id: 'college-openmic-record', cat: 'Events', time: '7:20 AM',
     title: 'College music societies report record turnout for open-mic circuits',
     deck: 'Campus-level gig circuits are increasingly acting as a first stage for upcoming performers before they reach commercial venues.',
-    author: 'Gigset Newsroom', gradient: 'linear-gradient(135deg,#0B2E63,#0EA5E9 60%,#38BDF8)',
+    author: 'Gigset Newsroom', gradient: 'linear-gradient(135deg,#0B2E63,#FFD166 60%,#FFD166)',
     body: [
       'College music societies across Delhi-NCR, Pune and Bengaluru report record turnout for open-mic nights this semester — with several circuits now running weekly bills that draw crowds in the hundreds.',
       'For upcoming artists, the campus circuit has become the de facto first stage: low stakes, real audiences, and a direct line to the city\u2019s commercial venues, whose bookers increasingly scout college bills.',
@@ -324,7 +324,7 @@ export const NEWS_ARTICLES = [
     id: 'brand-music-spends', cat: 'Industry', time: '8:05 AM',
     title: 'Brands raise music sponsorship budgets ahead of wedding season',
     deck: 'Electronics and beverage brands are expanding artist partnerships and campus tours as the October–February live calendar fills up.',
-    author: 'Gigset Newsroom', gradient: 'linear-gradient(135deg,#123B82,#2A63EE 55%,#4F46E5)',
+    author: 'Gigset Newsroom', gradient: 'linear-gradient(135deg,#3B2A00,#E89A00 55%,#B26F00)',
     body: [
       'Brand managers say music sponsorship budgets for the October–February season are up year-on-year, with electronics and beverage brands leading the expansion into campus tours and indie-artist partnerships.',
       'The playbook has shifted from logo-on-stage to artist-led content: brands want acts who can carry a campus tour, generate social content, and show up reliably across a dozen cities.',
@@ -336,7 +336,7 @@ export const NEWS_ARTICLES = [
     id: 'wedding-season-economics', cat: 'Industry', time: '8:40 AM',
     title: 'The economics of wedding-season gigging, explained by the people playing it',
     deck: 'December weddings remain the single biggest paycheque in Indian live music — but the circuit rewards reliability more than virtuosity.',
-    author: 'Gigset Newsroom', gradient: 'linear-gradient(135deg,#3B0764,#4F46E5 55%,#2A63EE)',
+    author: 'Gigset Newsroom', gradient: 'linear-gradient(135deg,#3B0764,#B26F00 55%,#E89A00)',
     body: [
       'Ask working musicians where the money is and most will point to the same place: the December wedding season, when a tight band can earn in six weeks what a club residency pays in six months.',
       'But the circuit has its own physics. Bandleaders say clients book reliability — on-time load-ins, clean Bollywood and Punjabi sets, zero drama — far more than they book virtuosity. The best wedding musicians are logistics people who happen to play well.',
@@ -348,7 +348,7 @@ export const NEWS_ARTICLES = [
     id: 'playback-ai-debate', cat: 'Pop culture', time: '9:15 AM',
     title: 'Playback singers and AI vocals: where the industry draws the line',
     deck: 'As synthetic vocals improve, music directors and singers are negotiating new norms — and new contracts — around AI in playback.',
-    author: 'Gigset Newsroom', gradient: 'linear-gradient(135deg,#0E2E6B,#4F46E5 55%,#0EA5E9)',
+    author: 'Gigset Newsroom', gradient: 'linear-gradient(135deg,#3B2A00,#B26F00 55%,#FFD166)',
     body: [
       'Few topics divide the industry right now like AI vocals. Demo-quality synthetic singing is already common in pre-production; the argument is about what happens next — and who gets paid.',
       'Singers\u2019 associations are pushing for consent-and-compensation norms: no synthetic replica of a voice without permission, and a fee structure when replicas are used. Several recent contracts reviewed by Gigset now include AI clauses as standard.',
@@ -360,7 +360,7 @@ export const NEWS_ARTICLES = [
     id: 'venue-licensing-guide', cat: 'Industry', time: '9:50 AM',
     title: 'What it actually takes to open a live music venue in India',
     deck: 'Licensing, sound limits, and the economics of a 200-cap room — a practical primer for aspiring venue operators.',
-    author: 'Gigset Newsroom', gradient: 'linear-gradient(135deg,#1E1B6B,#0EA5E9 60%,#38BDF8)',
+    author: 'Gigset Newsroom', gradient: 'linear-gradient(135deg,#1E1B6B,#FFD166 60%,#FFD166)',
     body: [
       'Everyone loves the idea of opening a venue; fewer love the paperwork. Operators say licensing — excise, performance permissions, fire and safety — is the first mountain, and it varies sharply by city and state.',
       'Then comes the sound question. Residential noise complaints are the most common reason small venues curtail programming, which is why the successful rooms invest early in acoustic treatment and strict curfews rather than fighting neighbours show by show.',
@@ -372,7 +372,7 @@ export const NEWS_ARTICLES = [
     id: 'crew-shortage-season', cat: 'Events', time: '10:30 AM',
     title: 'The crew crunch: why good sound engineers are booked out first every season',
     deck: 'Experienced FOH engineers, lighting designers and stage managers are the scarcest resource in the live calendar — and the least visible.',
-    author: 'Gigset Newsroom', gradient: 'linear-gradient(135deg,#0B2E63,#2A63EE 55%,#38BDF8)',
+    author: 'Gigset Newsroom', gradient: 'linear-gradient(135deg,#0B2E63,#E89A00 55%,#FFD166)',
     body: [
       'Every festival season surfaces the same bottleneck: there are more stages than there are experienced crew to run them. FOH engineers and lighting designers with arena credits are typically booked out weeks before the artists they mix.',
       'The pipeline problem is structural. Sound and lighting have no glamour layer — no streaming royalties, no fan followings — so young talent drifts toward performance or production, and the crew bench stays thin.',
@@ -475,10 +475,10 @@ export const HASHTAGS = [
 
 // Upcoming gigs for countdown cards (Oct 2026 — after the Sept 26 demo)
 export const UPCOMING_GIGS = [
-  { id: 'g1', title: 'Monsoon Sessions — Live at Piano Man', venue: 'Piano Man Studios, Mumbai', date: '2026-10-03T19:00:00', gradient: 'linear-gradient(135deg,#123B82,#2A63EE 60%,#0EA5E9)', note: 'Full-band set with live strings' },
-  { id: 'g2', title: 'Thursday Jazz Night', venue: 'Bengaluru (venue TBA)', date: '2026-10-09T20:00:00', gradient: 'linear-gradient(135deg,#1E1B6B,#4F46E5 60%,#0EA5E9)', note: 'Carnatic-jazz trio residency' },
-  { id: 'g3', title: 'Depot 48 Festival Weekend', venue: 'Depot 48, Delhi-NCR', date: '2026-10-17T16:00:00', gradient: 'linear-gradient(135deg,#0B2E63,#0EA5E9 60%,#38BDF8)', note: '3-day outdoor stage' },
-  { id: 'g4', title: 'Wedding Expo Showcase', venue: 'Chandigarh', date: '2026-10-24T18:00:00', gradient: 'linear-gradient(135deg,#3B0764,#4F46E5 60%,#2A63EE)', note: 'Vendor showcase + live demo' },
+  { id: 'g1', title: 'Monsoon Sessions — Live at Piano Man', venue: 'Piano Man Studios, Mumbai', date: '2026-10-03T19:00:00', gradient: 'linear-gradient(135deg,#3B2A00,#E89A00 60%,#FFD166)', note: 'Full-band set with live strings' },
+  { id: 'g2', title: 'Thursday Jazz Night', venue: 'Bengaluru (venue TBA)', date: '2026-10-09T20:00:00', gradient: 'linear-gradient(135deg,#1E1B6B,#B26F00 60%,#FFD166)', note: 'Carnatic-jazz trio residency' },
+  { id: 'g3', title: 'Depot 48 Festival Weekend', venue: 'Depot 48, Delhi-NCR', date: '2026-10-17T16:00:00', gradient: 'linear-gradient(135deg,#0B2E63,#FFD166 60%,#FFD166)', note: '3-day outdoor stage' },
+  { id: 'g4', title: 'Wedding Expo Showcase', venue: 'Chandigarh', date: '2026-10-24T18:00:00', gradient: 'linear-gradient(135deg,#3B0764,#B26F00 60%,#E89A00)', note: 'Vendor showcase + live demo' },
 ];
 
 export const INTEREST_TAGS = ['Live sound', 'Session work', 'Weddings & events', 'Festivals', 'Music schools', 'Lighting & staging', 'Independent releases', 'Collaboration'];

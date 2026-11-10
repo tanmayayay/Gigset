@@ -5,11 +5,11 @@ import { CATEGORY_LABELS } from '../../lib/news';
 /* Generated editorial cover for stories that ship without an image.
    Brand motif: flowing "strings" over a deep gradient, with a category icon. */
 const PALETTES = [
-  ['#071634', '#2A63EE', '#0EA5E9'],
-  ['#1F1147', '#4F46E5', '#A855F7'],
+  ['#151515', '#E89A00', '#FFD166'],
+  ['#1B1B1B', '#E89A00', '#E89A01'],
   ['#3B0D2E', '#BE185D', '#F97316'],
   ['#052E2B', '#0F766E', '#22C55E'],
-  ['#0B1020', '#334155', '#94A3B8'],
+  ['#101010', '#3F3F3F', '#94A3B8'],
   ['#2A0A0A', '#B91C1C', '#FB923C'],
 ];
 
@@ -54,7 +54,7 @@ export default function NewsCover({ item, height = '100%', large = false }) {
         ))}
       </svg>
       <span className="nc-icon"><Icon size={large ? 38 : 26} strokeWidth={1.6} /></span>
-      <span className="nc-mark">{(item.source || 'Gigset').replace(/^The /, '').slice(0, 1)}</span>
+      <span className="nc-mark">{(item.source || 'TheGigSet').replace(/^The /, '').slice(0, 1)}</span>
     </div>
   );
 }

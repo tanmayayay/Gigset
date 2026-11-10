@@ -50,7 +50,7 @@ export default function Uploads() {
 
   return (
     <div className="uploads">
-      <PageHead title="Your uploads" sub="Everything you have shared on Gigset. Delete anything you no longer want up." />
+      <PageHead title="Your uploads" sub="Everything you have shared on TheGigSet. Delete anything you no longer want up." />
       <div className="up-tabs" role="tablist">
         {tabs.map((t) => (
           <button key={t.id} role="tab" aria-selected={tab === t.id} className={tab === t.id ? 'on' : ''} onClick={() => { setTab(t.id); setAsk(null); }}>
