@@ -96,6 +96,22 @@ export default function Home() {
     return () => window.removeEventListener('gigset:post-created', load);
   }, [load]);
 
+  // Quietly pick up new posts every 120s — no spinner, no jump. Only when you're at the top of the feed,
+  // the tab is visible and you're not typing or in a dialog; the list is only swapped if something changed.
+  useEffect(() => {
+    const id = setInterval(async () => {
+      const a = document.activeElement;
+      const typing = a && (a.tagName === 'INPUT' || a.tagName === 'TEXTAREA' || a.isContentEditable);
+      if (document.hidden || typing || window.scrollY > 120 || document.querySelector('.modal-backdrop, .photo-lightbox')) return;
+      try {
+        const res = await Posts.list({ take: 40, _t: Date.now() });
+        const next = res.items || [];
+        setPosts((cur) => (JSON.stringify(cur.map((p) => [p.id, p.likes ?? p.likeCount, p.comments ?? p.commentCount])) === JSON.stringify(next.map((p) => [p.id, p.likes ?? p.likeCount, p.comments ?? p.commentCount])) ? cur : next));
+      } catch { /* stay quiet */ }
+    }, 120000);
+    return () => clearInterval(id);
+  }, []);
+
   // Side modules load in parallel and fail soft.
   useEffect(() => {
     let off = false;
