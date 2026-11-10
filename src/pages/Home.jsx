@@ -41,7 +41,19 @@ function FeedSkeleton() {
 /* Settle quietly: a failing side-module must never break the feed. */
 const soft = (p, fallback) => p.then((r) => r).catch(() => fallback);
 
+function useNarrow(q = '(max-width:1180px)') {
+  const [m, setM] = useState(() => typeof window !== 'undefined' && window.matchMedia(q).matches);
+  useEffect(() => {
+    const mq = window.matchMedia(q);
+    const on = () => setM(mq.matches);
+    mq.addEventListener('change', on);
+    return () => mq.removeEventListener('change', on);
+  }, [q]);
+  return m;
+}
+
 export default function Home() {
+  const narrow = useNarrow();
   const { user, pushToast, isBookmarked, toggleBookmark } = useStore();
   const { openPost, openOpp } = useOutletContext();
   const navigate = useNavigate();
@@ -228,6 +240,8 @@ export default function Home() {
           </div>
         </div>
 
+        {narrow && <div className="home-cuts-mobile"><NotesWheel /></div>}
+
         <div className="home-tabs" role="tablist" aria-label="Feed">
           {TABS.map((t) => (
             <button key={t.id} role="tab" aria-selected={tab === t.id} className={tab === t.id ? 'on' : ''} onClick={() => setTab(t.id)}>
@@ -283,7 +297,7 @@ export default function Home() {
 
       <aside className="home-rail" aria-label="Highlights">
         <MeCard user={user} postCount={myCounts?.posts} followingCount={myCounts?.following ?? following.size} />
-        <NotesWheel />
+        {!narrow && <NotesWheel />}
         <NewsCard items={news} />
         <TrendingCard posts={posts} onPick={(t) => { setTag(t); setTab('foryou'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} />
         <NearbyCard events={events} venues={venues} city={user?.city} />

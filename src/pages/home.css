@@ -220,3 +220,7 @@
   background:conic-gradient(var(--blue) calc(var(--p) * 1%), var(--border) 0);}
 .me-ring .avatar{box-shadow:0 0 0 2px var(--panel);}
 .me-mini .me-name{font-size:13.5px;} .me-mini .me-sub{font-size:11.5px;}
+
+/* Cuts on phones and tablets (the side rail is hidden there) */
+.home-cuts-mobile{margin:0 0 14px}
+@media (max-width:600px){ .home-cuts-mobile{margin:0 0 12px} }
