@@ -3,7 +3,7 @@ import logoDarkText from '../assets/brand/logo-dark-text.png';
 import logoLightText from '../assets/brand/logo-light-text.png';
 import markForLight from '../assets/brand/mark-for-light.png';
 import markForDark from '../assets/brand/mark-for-dark.png';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { BadgeCheck } from 'lucide-react';
 import { avatarColor, initials } from '../data/demo';
 
@@ -23,24 +23,42 @@ export function Logo({ size = 26, light = false }) {
 }
 
 /* Initials avatar */
-export function Avatar({ name, size = 36, style, gradient, src }) {
+export function Avatar({ name, size = 36, style, gradient, src, zoom = false }) {
   const fs = Math.round(size * 0.38);
   const [broken, setBroken] = useState(false);
+  const [open, setOpen] = useState(false);
   const showImg = !!src && !broken;
+  const canZoom = zoom && showImg;
+  useEffect(() => {
+    if (!open) return undefined;
+    const onKey = (e) => { if (e.key === 'Escape') setOpen(false); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [open]);
   return (
-    <div
-      className="avatar"
-      style={{
-        width: size, height: size, fontSize: fs,
-        background: gradient || avatarColor(name || '?'),
-        overflow: 'hidden',
-        ...style,
-      }}
-    >
-      {showImg
-        ? <img src={src} alt="" loading="lazy" onError={() => setBroken(true)} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-        : initials(name || '?')}
-    </div>
+    <>
+      <div
+        className="avatar"
+        style={{
+          width: size, height: size, fontSize: fs,
+          background: gradient || avatarColor(name || '?'),
+          overflow: 'hidden',
+          ...(canZoom ? { cursor: 'zoom-in' } : null),
+          ...style,
+        }}
+        {...(canZoom ? { role: 'button', tabIndex: 0, 'aria-label': `View ${name || 'profile'} photo`, onClick: (e) => { e.stopPropagation(); setOpen(true); }, onKeyDown: (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setOpen(true); } } } : null)}
+      >
+        {showImg
+          ? <img src={src} alt="" loading="lazy" onError={() => setBroken(true)} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+          : initials(name || '?')}
+      </div>
+      {open && createPortal((
+        <div className="photo-lightbox" onClick={() => setOpen(false)} role="dialog" aria-modal="true" aria-label={`${name || 'Profile'} photo`}>
+          <button className="close-x" onClick={() => setOpen(false)} aria-label="Close">✕</button>
+          <img src={src} alt={name || 'Profile photo'} onClick={(e) => e.stopPropagation()} />
+        </div>
+      ), document.body)}
+    </>
   );
 }
 

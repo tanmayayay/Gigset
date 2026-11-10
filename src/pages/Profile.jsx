@@ -220,7 +220,7 @@ export default function Profile() {
         <div className="pfo-orb a" aria-hidden="true" /><div className="pfo-orb b" aria-hidden="true" /><div className="pfo-grain" aria-hidden="true" />
         <motion.div className="pfo-hero-in" initial={{ opacity: 0, y: 26 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease: [0.2, 0.7, 0.2, 1] }}>
           <div className="pfo-photo">
-            <Avatar name={person.name} src={person.avatarUrl} size={148} />
+            <Avatar name={person.name} src={person.avatarUrl} size={148} zoom />
             {isSelf && (
               <>
                 <input ref={photoInput} type="file" accept="image/*" hidden onChange={(e) => { quickPhoto(e.target.files?.[0]); e.target.value = ''; }} />
