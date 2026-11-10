@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { prisma } from '../lib/prisma.js';
 import { auth } from '../middleware/auth.js';
 import { asyncHandler, bad, tooLong } from '../lib/http.js';
+import { notify } from '../lib/notify.js';
 
 const router = Router();
 
@@ -31,7 +32,28 @@ router.post('/reports', auth, asyncHandler(async (req, res) => {
     }
   }
   res.status(201).json({ ok: true });
+  // Tell every admin (bell, push and email) — after replying, so reporting never feels slow or fails.
+  alertAdmins(req.user.id, { targetType, targetId, reason, details: typeof details === 'string' ? details.trim() : '' }).catch(() => {});
 }));
+
+async function alertAdmins(reporterId, { targetType, targetId, reason, details }) {
+  const envList = (process.env.ADMIN_EMAILS || '').split(',').map((e) => e.trim().toLowerCase()).filter(Boolean);
+  const [reporter, admins] = await Promise.all([
+    prisma.user.findUnique({ where: { id: reporterId }, select: { name: true } }),
+    prisma.user.findMany({
+      where: { suspendedAt: null, OR: [{ role: 'ADMIN' }, ...(envList.length ? [{ email: { in: envList, mode: 'insensitive' } }] : [])] },
+      select: { id: true, email: true },
+    }),
+  ]);
+  const what = targetType.replace('_', ' ').toLowerCase();
+  const reasonText = reason.charAt(0) + reason.slice(1).toLowerCase();
+  const title = `New report: ${what} (${reasonText})`;
+  const body = `${reporter?.name || 'Someone'} reported a ${what} for ${reasonText.toLowerCase()}.${details ? ` “${details.slice(0, 280)}”` : ''} ID: ${targetId}`;
+  await Promise.all(admins.filter((a) => a.id !== reporterId).map((a) => notify(a.id, {
+    type: 'admin', title, body, link: '/admin?tab=reports',
+    email: { subject: title, intro: body, cta: 'Review report' },
+  })));
+}
 
 // GET /api/blocks — people I blocked.
 router.get('/blocks', auth, asyncHandler(async (req, res) => {
