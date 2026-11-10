@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import { Logo, Avatar } from './ui';
 import { useStore } from '../store/store';
-import { Notifs, Account, Admin, Announcements } from '../lib/api';
+import { Notifs, Account, Admin, Announcements, clearApiCache } from '../lib/api';
 import { pendingRef, clearRef } from '../lib/ref';
 import { useLiveInbox, startLiveInbox, stopLiveInbox, dismissPopup, setMessagePopupsMuted } from '../lib/liveInbox';
 import { timeAgo, resolveNotifLink } from '../lib/format';
@@ -51,6 +51,29 @@ export default function Shell({ onOpenPalette, onNewPost, onNewOpp }) {
   const [recent, setRecent] = useState([]);
   const navigate = useNavigate();
   const { pathname } = useLocation();
+
+  // Keep the page fresh: every 120 seconds (and when you come back to the tab after a while) reload the
+  // current page's data quietly. Skipped while you're typing, a dialog is open, or on Messages (it updates live).
+  const [refreshTick, setRefreshTick] = useState(0);
+  useEffect(() => {
+    let last = Date.now();
+    const busy = () => {
+      const a = document.activeElement;
+      const typing = a && (a.tagName === 'INPUT' || a.tagName === 'TEXTAREA' || a.tagName === 'SELECT' || a.isContentEditable);
+      return typing || !!document.querySelector('.modal-backdrop, .photo-lightbox') || window.location.hash.startsWith('#/messages');
+    };
+    const refresh = () => {
+      if (document.hidden || busy()) return;
+      last = Date.now();
+      clearApiCache();
+      setRefreshTick((n) => n + 1);
+    };
+    const id = setInterval(() => { if (Date.now() - last >= 119000) refresh(); }, 15000);
+    const onVis = () => { if (!document.hidden && Date.now() - last >= 120000) refresh(); };
+    document.addEventListener('visibilitychange', onVis);
+    return () => { clearInterval(id); document.removeEventListener('visibilitychange', onVis); };
+  }, []);
+  useEffect(() => { /* a manual navigation counts as fresh */ setRefreshTick(0); }, [pathname]);
 
   // Don't let the page scroll behind the open drawer.
   useEffect(() => {
@@ -259,7 +282,7 @@ export default function Shell({ onOpenPalette, onNewPost, onNewOpp }) {
           ))}
           <div className="content-inner wide">
             <Suspense fallback={<div className="page-loading"><span className="spinner" /></div>}>
-              <div key={pathname} className="page-fade">
+              <div key={`${pathname}:${refreshTick}`} className={refreshTick ? '' : 'page-fade'}>
                 <Outlet context={{ openPost: onNewPost, openOpp: onNewOpp }} />
               </div>
             </Suspense>
