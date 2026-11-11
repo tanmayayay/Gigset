@@ -103,3 +103,14 @@
     font-size: 26px;
   }
 }
+
+/* Reset-password form */
+.rp-form{display:grid;gap:8px;width:100%;text-align:left}
+.rp-form .ev-tick{margin:0 auto 6px}.rp-form h1,.rp-form .ev-lead{text-align:center}
+.rp-form label{font-size:12.5px;font-weight:700;margin-top:6px}
+.rp-form input{width:100%;font-size:16px}
+.rp-err{margin:2px 0 0;font-size:13px;font-weight:600;color:#d93025}
+.rp-form .ev-cta{margin-top:10px;justify-content:center}
+.rp-form input{box-sizing:border-box;padding:12px 14px;border:1px solid #e3dccb;border-radius:12px;background:#fff;color:#111;font-family:inherit;outline:none}
+.rp-form input:focus{border-color:#E89A00;box-shadow:0 0 0 3px rgba(255,176,32,.25)}
+.rp-form .ev-lead{margin:0 0 6px}

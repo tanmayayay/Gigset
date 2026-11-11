@@ -824,3 +824,7 @@ img{max-width:100%; display:block;}
 .bubble-cut{display:block;width:120px;margin:0 0 6px;border-radius:12px;overflow:hidden;position:relative;text-decoration:none}
 .bubble-cut img{display:block;width:100%;aspect-ratio:3/4;object-fit:cover}
 .bubble-cut span{position:absolute;left:6px;bottom:6px;font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#fff;background:rgba(0,0,0,.55);padding:2px 7px;border-radius:99px}
+
+.auth-forgot{all:unset;cursor:pointer;display:block;margin:8px 0 0 auto;font-size:12.5px;font-weight:600;color:var(--blue-text)}
+.auth-forgot:hover{text-decoration:underline}
+.auth-forgot.back{margin:12px auto 0;color:var(--text-faint)}

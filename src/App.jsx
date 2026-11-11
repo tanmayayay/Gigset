@@ -26,6 +26,7 @@ const Saved = lazy(() => import('./pages/Saved'));
 const Uploads = lazy(() => import('./pages/Uploads'));
 const AdminPage = lazy(() => import('./pages/Admin'));
 import EmailVerified from './pages/EmailVerified';
+import ResetPassword from './pages/ResetPassword';
 import ErrorBoundary from './components/ErrorBoundary';
 
 /* Supabase email-confirmation links redirect to the Site URL with the
@@ -42,8 +43,8 @@ function getEmailCallback() {
     return { status: 'error', message: params.get('error_description') || 'This link is invalid or has expired.' };
   }
   const type = params.get('type') || '';
-  // Only confirmation-style links get the thank-you page; a recovery link
-  // has no reset-password UI to hand off to, so let the router handle it.
+  if (params.get('access_token') && type === 'recovery') return { status: 'recovery' };
+  // Confirmation-style links get the thank-you page; recovery links get the reset-password page (above).
   if (params.get('access_token') && ['signup', 'email_change', 'magiclink', 'invite'].includes(type)) {
     return { status: 'ok', type };
   }
@@ -158,6 +159,7 @@ export default function App() {
     setEmailCallback(null);
   }, []);
 
+  if (emailCallback?.status === 'recovery') return <ResetPassword onDone={dismissEmailCallback} />;
   if (emailCallback) {
     return <EmailVerified result={emailCallback} onDone={dismissEmailCallback} />;
   }

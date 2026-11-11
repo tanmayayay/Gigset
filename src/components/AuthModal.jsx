@@ -11,14 +11,15 @@ import { Logo } from './ui';
  * Props: { open: bool, onClose: fn, initialTab?: 'signin' | 'signup' }
  */
 export default function AuthModal({ open, onClose, initialTab = 'signin' }) {
-  const { signIn, signUp, pushToast } = useStore();
+  const { signIn, signUp, resetPassword, pushToast } = useStore();
   const navigate = useNavigate();
-  const [tab, setTab] = useState(initialTab); // 'signin' | 'signup'
+  const [tab, setTab] = useState(initialTab); // 'signin' | 'signup' | 'forgot'
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [checkEmail, setCheckEmail] = useState(false);
+  const [sentReset, setSentReset] = useState(false);
 
   // Whenever the modal is opened, reset to the requested tab.
   useEffect(() => {
@@ -26,6 +27,7 @@ export default function AuthModal({ open, onClose, initialTab = 'signin' }) {
       setTab(initialTab);
       setError('');
       setCheckEmail(false);
+      setSentReset(false);
       setBusy(false);
     }
   }, [open, initialTab]);
@@ -33,6 +35,7 @@ export default function AuthModal({ open, onClose, initialTab = 'signin' }) {
   const reset = () => {
     setError('');
     setCheckEmail(false);
+    setSentReset(false);
     setBusy(false);
   };
 
@@ -44,6 +47,18 @@ export default function AuthModal({ open, onClose, initialTab = 'signin' }) {
   const submit = async (e) => {
     e.preventDefault();
     setError('');
+    if (tab === 'forgot') {
+      if (!/^\S+@\S+\.\S+$/.test(email.trim())) { setError('Enter the email address you signed up with.'); return; }
+      setBusy(true);
+      try {
+        await resetPassword(email.trim());
+        setSentReset(true);
+      } catch (err) {
+        const m = (err?.message || '').toLowerCase();
+        setError(m.includes('rate') || m.includes('seconds') ? 'Please wait a minute before asking for another email.' : (err?.message || 'Could not send the email. Please try again.'));
+      } finally { setBusy(false); }
+      return;
+    }
     if (!email.trim() || !password) {
       setError('Enter your email and password.');
       return;
@@ -97,11 +112,13 @@ export default function AuthModal({ open, onClose, initialTab = 'signin' }) {
           >
             <button className="close-x auth-close" onClick={close} aria-label="Close">×</button>
             <div className="auth-brand"><Logo size={30} /></div>
-            <h3>{tab === 'signin' ? 'Welcome back to TheGigSet' : 'Join TheGigSet'}</h3>
+            <h3>{tab === 'signin' ? 'Welcome back to TheGigSet' : tab === 'forgot' ? 'Reset your password' : 'Join TheGigSet'}</h3>
             <p className="auth-sub">
               {tab === 'signin'
                 ? 'Sign in to your network, gigs and messages.'
-                : 'Create your account — then set up your profile.'}
+                : tab === 'forgot'
+                  ? 'Enter your email and we will send you a link to choose a new password.'
+                  : 'Create your account — then set up your profile.'}
             </p>
 
             {!isSupabaseConfigured && (
@@ -119,7 +136,14 @@ export default function AuthModal({ open, onClose, initialTab = 'signin' }) {
               </button>
             </div>
 
-            {checkEmail ? (
+            {tab === 'forgot' && sentReset ? (
+              <div>
+                <p className="auth-sub" style={{ marginTop: 8 }}>
+                  If an account exists for <b>{email.trim()}</b>, a reset link is on its way. It can take a minute, and check your spam folder too.
+                </p>
+                <button className="btn btn-ghost auth-submit" onClick={() => { setTab('signin'); reset(); }}>Back to sign in</button>
+              </div>
+            ) : checkEmail ? (
               <div>
                 <p className="auth-sub" style={{ marginTop: 8 }}>
                   We sent a confirmation link to <b>{email}</b>. Click it, then sign in here.
@@ -134,15 +158,17 @@ export default function AuthModal({ open, onClose, initialTab = 'signin' }) {
                   <label htmlFor="auth-email">Email address</label>
                   <input id="auth-email" type="email" placeholder="you@studio.com" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" />
                 </div>
-                <div className="field">
+                {tab !== 'forgot' && (<div className="field">
                   <label htmlFor="auth-pass">Password</label>
                   <input id="auth-pass" type="password" placeholder={tab === 'signup' ? 'Min. 6 characters' : '••••••••'} value={password} onChange={(e) => setPassword(e.target.value)} autoComplete={tab === 'signup' ? 'new-password' : 'current-password'} />
-                </div>
+                  {tab === 'signin' && <button type="button" className="auth-forgot" onClick={() => { setTab('forgot'); setError(''); setPassword(''); }}>Forgot password?</button>}
+                </div>)}
                 {error && <p className="auth-fine" style={{ color: 'var(--danger, #c0392b)' }}>{error}</p>}
                 <button type="submit" className="btn btn-blue auth-submit" disabled={busy || !isSupabaseConfigured}>
                   {busy ? <Loader2 size={15} className="spin" /> : <ArrowRight size={15} />}
-                  {tab === 'signin' ? 'Sign in' : 'Create account'}
+                  {tab === 'signin' ? 'Sign in' : tab === 'forgot' ? 'Send reset link' : 'Create account'}
                 </button>
+                {tab === 'forgot' && <button type="button" className="auth-forgot back" onClick={() => { setTab('signin'); setError(''); }}>Back to sign in</button>}
               </form>
             )}
 

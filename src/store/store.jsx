@@ -117,6 +117,13 @@ export function StoreProvider({ children }) {
     return data;
   }, []);
 
+  // Sends the "reset your password" email. The link brings the person back here to choose a new one.
+  const resetPassword = useCallback(async (email) => {
+    const redirectTo = `${window.location.origin}${window.location.pathname}`;
+    const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
+    if (error) throw error;
+  }, []);
+
   // The app's "user" is the Prisma profile (id, name, stakeholderType, ...).
   const user = profile;
   const profilePending = Boolean(session) && (profileLoading || profileFor !== (session?.user?.id ?? null));
@@ -162,7 +169,7 @@ export function StoreProvider({ children }) {
     theme, toggleTheme,
     // auth
     session, authUser, authLoading, profile, profileLoading: profilePending, refreshProfile,
-    user, userId, signIn, signUp, signOut,
+    user, userId, signIn, signUp, signOut, resetPassword,
     logout: signOut, // alias used by older components
     // local state
     draft, setDraft,
@@ -174,7 +181,7 @@ export function StoreProvider({ children }) {
   }), [
     theme, toggleTheme,
     session, authUser, authLoading, profile, profilePending, refreshProfile,
-    user, userId, signIn, signUp, signOut,
+    user, userId, signIn, signUp, signOut, resetPassword,
     draft, setDraft,
     bookmarks, toggleBookmark, isBookmarked,
     joined, setJoined, wallExtra, setWallExtra,
