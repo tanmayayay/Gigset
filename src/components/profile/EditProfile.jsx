@@ -78,7 +78,7 @@ export default function EditProfile({ person, onClose, onSaved }) {
               </div>
 
               <div className="pf-field">
-                <label>I am on Strings as</label>
+                <label>I am on TheGigSet as</label>
                 <div className="pf-roles">
                   {ROLE_ORDER.map((r) => {
                     const m = ROLE_META[r];
@@ -129,7 +129,7 @@ export default function EditProfile({ person, onClose, onSaved }) {
             <div className="pf-field">
               <label htmlFor="pf-vis">Who can see my profile</label>
               <select id="pf-vis" value={visibility} onChange={(e) => setVisibility(e.target.value)}>
-                <option value="PUBLIC">Everyone on Strings (and search)</option>
+                <option value="PUBLIC">Everyone on TheGigSet (and search)</option>
                 <option value="CONNECTIONS">Only people I connect with</option>
                 <option value="PRIVATE">Only me</option>
               </select>

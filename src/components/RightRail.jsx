@@ -200,7 +200,7 @@ export default function RightRail({ posts = [], followedIds = null }) {
       <Upcoming />
       <Pulse />
       <div className="rail-footer">
-        <span>© 2026 Strings</span>
+        <span>© 2026 TheGigSet</span>
         <Link to="/about">About</Link>
         <Link to="/support">Support</Link>
       </div>
