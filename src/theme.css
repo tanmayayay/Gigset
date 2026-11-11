@@ -128,7 +128,7 @@ img{max-width:100%; display:block;}
 /* ---------- tags / chips ---------- */
 .tag{display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:600; padding:3px 9px; border-radius:20px; line-height:1.5;}
 .tag-blue{background:var(--blue-dim); color:var(--blue-text);}
-.tag-sky{background:var(--sky-dim); color:var(--sky);}
+.tag-sky{background:var(--sky-dim); color:#8A5600;}
 [data-theme="dark"] .tag-sky{color:#F3BD4B;}
 .tag-indigo{background:var(--indigo-dim); color:var(--indigo);}
 .tag-green{background:var(--green-dim); color:var(--green);}
@@ -810,3 +810,17 @@ img{max-width:100%; display:block;}
 .photo-lightbox img{max-width:min(92vw,720px);max-height:86vh;width:auto;height:auto;border-radius:18px;object-fit:contain;box-shadow:0 20px 60px rgba(0,0,0,.5);border:2px solid rgba(255,176,32,.55)}
 .photo-lightbox .close-x{position:absolute;top:18px;right:18px;width:40px;height:40px;border-radius:50%;border:0;background:rgba(255,255,255,.14);color:#fff;font-size:18px;cursor:pointer}
 @keyframes plfade{from{opacity:0}to{opacity:1}}
+
+/* Followers / following list */
+.fl-list{display:grid;gap:4px;max-height:60vh;overflow:auto;margin:-4px}
+.fl-row{display:flex;align-items:center;gap:10px;padding:6px 4px;border-radius:12px}
+.fl-row:hover{background:var(--panel-2,rgba(128,128,128,.08))}
+.fl-who{all:unset;cursor:pointer;display:flex;align-items:center;gap:12px;flex:1;min-width:0}
+.fl-who b{display:flex;align-items:center;gap:5px;font-size:14px}.fl-who small{display:block;font-size:12.5px;color:var(--text-faint)}
+.pfo-stats .stat-btn{all:unset;cursor:pointer;text-align:inherit;display:block}
+.pfo-stats .stat-btn:hover span{text-decoration:underline}
+
+/* A cut shown inside a chat bubble */
+.bubble-cut{display:block;width:120px;margin:0 0 6px;border-radius:12px;overflow:hidden;position:relative;text-decoration:none}
+.bubble-cut img{display:block;width:100%;aspect-ratio:3/4;object-fit:cover}
+.bubble-cut span{position:absolute;left:6px;bottom:6px;font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#fff;background:rgba(0,0,0,.55);padding:2px 7px;border-radius:99px}

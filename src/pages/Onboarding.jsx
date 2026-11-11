@@ -1,6 +1,6 @@
 import '../auth.css';
 import { useEffect, useRef, useState } from 'react';
-import { birthError } from '../lib/age';
+import AgeGate from '../components/AgeGate';
 import { useNavigate, Link, Navigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -87,7 +87,7 @@ function EqBars() {
 }
 
 export default function Onboarding() {
-  const { userId, refreshProfile, pushToast, authLoading, session } = useStore();
+  const { userId, user, refreshProfile, pushToast, authLoading, session } = useStore();
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [dir, setDir] = useState(1);
@@ -101,7 +101,6 @@ export default function Onboarding() {
   const [visibility, setVisibility] = useState('PUBLIC');
   const [data, setData] = useState({});
   const fileRef = useRef(null);
-  const [birth, setBirth] = useState('');
   const [busy, setBusy] = useState(false);
   const [quoteIdx, setQuoteIdx] = useState(0);
 
@@ -132,15 +131,13 @@ export default function Onboarding() {
   const next = () => {
     if (step === 2) {
       if (!name.trim()) { pushToast('Please add your name.', 'error'); return; }
-      if (!birth) { pushToast('Please add your date of birth.', 'error'); return; }
-      if (birthError(birth)) { pushToast(birthError(birth), 'error'); return; }
     }
     go(step + 1);
   };
 
   const finish = async () => {
     if (!userId || busy) return;
-    if (!name.trim() || !birth || birthError(birth)) { setStep(2); pushToast(birthError(birth) || 'Please add your name and date of birth.', 'error'); return; }
+    if (!name.trim()) { setStep(2); pushToast('Please add your name.', 'error'); return; }
     setBusy(true);
     try {
       const detail = { ...data };
@@ -154,7 +151,6 @@ export default function Onboarding() {
         visibility,
         avatarUrl,
         detail,
-        birthDate: birth,
       });
       await refreshProfile();
       pushToast('Welcome to TheGigSet. Your profile is live.');
@@ -170,6 +166,8 @@ export default function Onboarding() {
 
   // Onboarding requires a signed-in user — the AuthModal sends new signups here.
   if (!authLoading && !session) return <Navigate to="/" replace />;
+  // Age is the very first thing we ask, before any profile questions.
+  if (session && user?.content && !user.content.hasBirthDate) return <AgeGate />;
 
   return (
     <div className="onb-root">
@@ -318,18 +316,11 @@ export default function Onboarding() {
                     </div>
                     <div className="onb-field-row">
                       <div className="field">
-                        <label htmlFor="onb-birth">Date of birth</label>
-                        <input id="onb-birth" type="date" value={birth} max={new Date().toISOString().slice(0, 10)} onChange={(e) => setBirth(e.target.value)} autoComplete="bday" />
-                      </div>
-                      <div className="field">
                         <label htmlFor="onb-city">City</label>
                         <input id="onb-city" type="text" list="onb-cities" value={city} maxLength={80} onChange={(e) => setCity(e.target.value)} placeholder="e.g. Mumbai" />
                         <datalist id="onb-cities">{CITIES.map((c) => <option key={c} value={c} />)}</datalist>
                       </div>
                     </div>
-                    <small style={{ display: 'block', margin: '-6px 0 12px', color: birthError(birth) ? 'var(--danger, #ff6b6b)' : 'var(--text-faint)' }}>
-                      {birthError(birth) || 'Your birth date is never shown to anyone. We use it to keep what you see suited to your age.'}
-                    </small>
                     <div className="field">
                       <label htmlFor="onb-headline">Headline</label>
                       <input id="onb-headline" type="text" value={headline} maxLength={100} onChange={(e) => setHeadline(e.target.value)} placeholder={meta.headlineHint} />

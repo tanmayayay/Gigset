@@ -205,7 +205,7 @@ export default function Shell({ onOpenPalette, onNewPost, onNewOpp }) {
                     <div
                       key={n.id}
                       style={{ padding: '12px 16px', borderBottom: '1px solid var(--border-soft)', fontSize: 13, display: 'flex', gap: 10, cursor: 'pointer' }}
-                      onClick={() => { setNotifOpen(false); navigate(resolveNotifLink(n.link)); }}
+                      onClick={() => { setNotifOpen(false); navigate(resolveNotifLink(n.link, n)); }}
                     >
                       {!n.read && <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--blue)', marginTop: 6, flexShrink: 0 }} />}
                       <div>

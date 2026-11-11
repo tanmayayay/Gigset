@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { parseCut, plainBody } from '../lib/cutRef';
 import { Send, MessageCircle, Plus, ChevronLeft, Check, CheckCheck, Clock, AlertCircle, Users, UserPlus, LogOut, Inbox } from 'lucide-react';
 import { PageHead, Avatar, EmptyState, Modal } from '../components/ui';
 import { useStore } from '../store/store';
@@ -273,7 +274,7 @@ export default function Messages() {
                   {g ? <span className="msg-gavatar"><Users size={18} /></span> : <Avatar name={o?.name || '?'} src={o?.avatarUrl} size={38} />}
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <b>{g ? c.title : o?.name}{g && <small className="msg-gcount">{c.memberCount}</small>}{c.status === 'REQUEST' && c.createdById === userId && <small className="msg-pending">Pending</small>}</b>
-                    <p className={c.unread > 0 ? 'unread' : ''}>{c.lastMessage?.body}</p>
+                    <p className={c.unread > 0 ? 'unread' : ''}>{plainBody(c.lastMessage?.body || '')}</p>
                   </div>
                   {c.unread > 0 && c.id !== activeId && <span className="msg-unread">{c.unread > 99 ? '99+' : c.unread}</span>}
                 </button>
@@ -305,7 +306,12 @@ export default function Messages() {
                   return (
                     <div key={m.id} className={`bubble ${mine ? 'me' : 'them'}${m._state === 'failed' ? ' failed' : ''}`}>
                       {isGroup && !mine && <span className="bubble-from">{m.sender?.name}</span>}
-                      <span className="bubble-text">{m.body}</span>
+                      {(() => { const { cut, text } = parseCut(m.body); return (
+                        <>
+                          {cut && <a className="bubble-cut" href={cut} target="_blank" rel="noopener noreferrer"><img src={cut} alt="Cut" loading="lazy" /><span>Cut</span></a>}
+                          <span className="bubble-text">{text}</span>
+                        </>
+                      ); })()}
                       <span className="bubble-meta">
                         {m._state === 'failed' ? (
                           <button className="bubble-retry" onClick={() => retry(m)}>Not sent · Retry</button>

@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
-import { Lock, Plus, X, ImagePlus, Trash2, MessageCircle, ChevronLeft, ChevronRight, Radio } from 'lucide-react';
+import { Lock, Plus, X, ImagePlus, Trash2, Send, ChevronLeft, ChevronRight, Radio } from 'lucide-react';
 import { Avatar, Modal, Verified } from '../ui';
 import { downscale } from '../ComposerModals';
 import { Convos, Stories } from '../../lib/api';
+import { withCut } from '../../lib/cutRef';
 import { supabase } from '../../lib/supabase';
 import { useStore } from '../../store/store';
 import './notes.css';
@@ -153,7 +154,7 @@ export default function NotesWheel() {
       </footer>
 
       {openAt !== null && (
-        <NoteViewer groups={ordered} start={openAt} me={user} onSeen={markSeen} onClose={() => setOpenAt(null)} onChanged={load} />
+        <NoteViewer groups={ordered} start={openAt} seen={seen} me={user} onSeen={markSeen} onClose={() => setOpenAt(null)} onChanged={load} />
       )}
       {adding && <NoteAddModal onClose={() => setAdding(false)} onAdded={() => { setAdding(false); load(); }} />}
     </section>
@@ -235,9 +236,20 @@ function NoteAddModal({ onClose, onAdded }) {
 }
 
 /* Full-screen viewer: one image at a time, progress bars, tap zones, keyboard. */
-function NoteViewer({ groups, start, me, onSeen, onClose, onChanged }) {
+function NoteViewer({ groups: groupsProp, start, seen, me, onSeen, onClose, onChanged }) {
+  // The list re-sorts as cuts get marked seen; keep the order it had when you opened it so next/prev stay in step.
+  const [groups] = useState(groupsProp);
+  // Like Instagram: pick up at the first cut you haven't watched yet (or the beginning if you've seen them all).
+  const seenAtOpen = useRef(seen);
+  const firstUnseen = useCallback((grp) => {
+    if (!grp) return 0;
+    const i = grp.stories.findIndex((x) => !seenAtOpen.current.includes(x.id));
+    return i === -1 ? 0 : i;
+  }, []);
   const [gi, setGi] = useState(start);
-  const [si, setSi] = useState(0);
+  const [si, setSi] = useState(() => firstUnseen(groups[start]));
+  const [reply, setReply] = useState('');
+  const [sending, setSending] = useState(false);
   const [progress, setProgress] = useState(0);
   const [paused, setPaused] = useState(false);
   const navigate = useNavigate();
@@ -249,9 +261,9 @@ function NoteViewer({ groups, start, me, onSeen, onClose, onChanged }) {
   const next = useCallback(() => {
     setProgress(0);
     if (g && si < g.stories.length - 1) { setSi(si + 1); return; }
-    if (gi < groups.length - 1) { setGi(gi + 1); setSi(0); return; }
+    if (gi < groups.length - 1) { setGi(gi + 1); setSi(firstUnseen(groups[gi + 1])); return; }
     onClose();
-  }, [g, si, gi, groups.length, onClose]);
+  }, [g, si, gi, groups, onClose, firstUnseen]);
 
   const prev = useCallback(() => {
     setProgress(0);
@@ -278,6 +290,8 @@ function NoteViewer({ groups, start, me, onSeen, onClose, onChanged }) {
 
   useEffect(() => {
     const onKey = (e) => {
+      const typing = e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA');
+      if (typing) { if (e.key === 'Escape') e.target.blur(); return; }
       if (e.key === 'Escape') onClose();
       else if (e.key === 'ArrowRight') next();
       else if (e.key === 'ArrowLeft') prev();
@@ -290,6 +304,20 @@ function NoteViewer({ groups, start, me, onSeen, onClose, onChanged }) {
 
   if (!g || !story) return null;
   const mine = g.author.id === me?.id;
+
+  // Reply to the cut right here; it lands in their messages together with the cut.
+  const sendReply = async (text) => {
+    const t = (text ?? reply).trim();
+    if (!t || sending) return;
+    setSending(true);
+    try {
+      const c = await Convos.open(g.author.id);
+      await Convos.send(c.id, withCut(story.mediaUrl, t.slice(0, 1500)));
+      setReply('');
+      pushToast(`Sent to ${g.author.name.split(' ')[0]}.`);
+    } catch (e) { pushToast(e.message || 'Could not send your reply.', 'error'); }
+    finally { setSending(false); setPaused(false); }
+  };
 
   const remove = async () => {
     setPaused(true);
@@ -332,13 +360,25 @@ function NoteViewer({ groups, start, me, onSeen, onClose, onChanged }) {
         <div className="vv-bottom">
           {story.caption && <p>{story.caption}</p>}
           {!mine && (
-            <div className="vv-actions">
-              <button className="vv-btn" onClick={async () => {
-                try { const c = await Convos.open(g.author.id); onClose(); navigate(`/messages?c=${c.id}`); }
-                catch { onClose(); navigate(`/profile/${g.author.id}`); }
-              }}><MessageCircle size={15} /> Message</button>
-              <button className="vv-btn ghost" onClick={() => { onClose(); navigate(`/profile/${g.author.id}`); }}>View profile</button>
-            </div>
+            <form className="vv-reply" onSubmit={(e) => { e.preventDefault(); sendReply(); }} onPointerDown={(e) => e.stopPropagation()} onPointerUp={(e) => e.stopPropagation()} onPointerLeave={(e) => e.stopPropagation()}>
+              <div className="vv-quick">
+                {['\u2764\uFE0F', '\uD83D\uDD25', '\uD83D\uDC4F', '\uD83D\uDE4C'].map((em) => (
+                  <button type="button" key={em} onClick={() => sendReply(em)} disabled={sending} aria-label={`Send ${em}`}>{em}</button>
+                ))}
+              </div>
+              <div className="vv-input">
+                <input
+                  value={reply}
+                  maxLength={1500}
+                  onChange={(e) => setReply(e.target.value)}
+                  onFocus={() => setPaused(true)}
+                  onBlur={() => setPaused(false)}
+                  placeholder={`Reply to ${g.author.name.split(' ')[0]}\u2026`}
+                  aria-label={`Reply to ${g.author.name}`}
+                />
+                <button type="submit" disabled={!reply.trim() || sending} aria-label="Send reply"><Send size={16} /></button>
+              </div>
+            </form>
           )}
         </div>
       </div>

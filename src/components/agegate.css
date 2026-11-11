@@ -1,0 +1,13 @@
+.ag-root{position:fixed;inset:0;z-index:2000;display:grid;place-items:center;padding:20px;background:var(--bg);overflow:auto}
+.ag-card{width:min(440px,100%);display:grid;gap:12px;padding:28px 26px;border:1px solid var(--border);border-radius:22px;background:var(--panel);box-shadow:var(--shadow-card)}
+.ag-icon{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:color-mix(in srgb,var(--blue) 18%,transparent);color:var(--blue-text);margin-top:6px}
+.ag-card h1{margin:0;font-size:24px;font-family:var(--font-display)}
+.ag-lead{margin:0;font-size:14px;line-height:1.5;color:var(--text-dim)}
+.ag-label{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;margin-top:6px}
+.ag-card input[type=date]{width:100%;font-size:16px}
+.ag-err{margin:0;font-size:13px;color:var(--danger,#d93025);font-weight:600}
+.ag-check{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--text-dim);cursor:pointer}
+.ag-check input{margin-top:2px;accent-color:var(--blue)}
+.ag-go{width:100%;justify-content:center;margin-top:4px}
+.ag-out{all:unset;cursor:pointer;text-align:center;font-size:13px;color:var(--text-faint);padding:6px}
+.ag-out:hover{text-decoration:underline}

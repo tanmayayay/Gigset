@@ -4,27 +4,24 @@ import { MessageCircle, X, ExternalLink, Lock, UserPlus, UserCheck, FileText, Se
 import { Avatar, Verified } from '../ui';
 import { Profiles, Convos, Collabs } from '../../lib/api';
 import { metaFor, roleLabel } from '../../lib/profileSchema';
-import { savedTemplate, saveTemplate } from '../../lib/epk';
+import { ownerTemplate } from '../../lib/epk';
 import { VIBES } from '../../lib/collab';
-import EpkModal, { TemplatePicker } from '../epk/EpkModal';
-import useKit from '../epk/useKit';
+import EpkModal from '../epk/EpkModal';
 import { useStore } from '../../store/store';
 import '../profile/profile.css';
 
 /** Opens when you arrive from a profile or the Collab lists: a relaxed way to ask someone to make something with you. */
 export default function BookPanel({ id, onClose, onSent }) {
-  const { userId, pushToast } = useStore();
+  const { user, userId, pushToast } = useStore();
   const navigate = useNavigate();
   const [person, setPerson] = useState(null);
   const [missing, setMissing] = useState(false);
   const [vibe, setVibe] = useState('JAM');
   const [note, setNote] = useState('');
-  const [tpl, setTpl] = useState(savedTemplate);
-  const [showTpl, setShowTpl] = useState(false);
+  const tpl = ownerTemplate(user); // your press kit is always sent in the look you chose for it
   const [epkOpen, setEpkOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(false);
-  const { kit } = useKit(userId);
 
   useEffect(() => {
     let alive = true;
@@ -91,10 +88,8 @@ export default function BookPanel({ id, onClose, onSent }) {
           <textarea value={note} onChange={(e) => setNote(e.target.value)} maxLength={500} aria-label="Your message" />
           <div className="collab-epk">
             <FileText size={14} /> Your press kit goes along ·
-            <button type="button" className="pfo-link" onClick={() => setShowTpl((v) => !v)}>{showTpl ? 'hide' : `${tpl === 'classic' ? 'Pop' : tpl === 'stage' ? 'Neon' : 'Mono'} · change`}</button>
-            <button type="button" className="pfo-link" onClick={() => setEpkOpen(true)}>preview / edit</button>
+            <button type="button" className="pfo-link" onClick={() => setEpkOpen(true)}>preview / edit / change theme</button>
           </div>
-          {showTpl && kit && <TemplatePicker kit={kit} value={tpl} onChange={(t) => { setTpl(t); saveTemplate(t); }} />}
           <button className="btn btn-blue" disabled={busy || !note.trim()} onClick={send}><Send size={14} /> Send collab request</button>
         </div>
       )}

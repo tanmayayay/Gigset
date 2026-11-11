@@ -7,11 +7,10 @@ export const EPK_TEMPLATES = [
   { id: 'minimal', name: 'Mono', blurb: 'Black and white, huge type. Straight to the point.' },
 ];
 export const isTemplate = (t) => EPK_TEMPLATES.some((x) => x.id === t);
-const KEY = 'gigset.epkTemplate';
-export const savedTemplate = () => { try { const t = localStorage.getItem(KEY); return isTemplate(t) ? t : 'classic'; } catch { return 'classic'; } };
-export const saveTemplate = (t) => { try { localStorage.setItem(KEY, t); } catch { /* ignore */ } };
+/** The look of someone's press kit is chosen by its owner (saved on their profile). Everyone else just sees it. */
+export const ownerTemplate = (person) => { const t = person?.detail?.data?.epkTemplate; return isTemplate(t) ? t : 'classic'; };
 /** Public link to someone's press kit (HashRouter). */
-export const epkUrl = (id, tpl) => `${location.origin}${location.pathname}#/epk/${id}${tpl ? `?t=${tpl}` : ''}`;
+export const epkUrl = (id) => `${location.origin}${location.pathname}#/epk/${id}`;
 
 const safeHref = (u) => { try { const x = new URL(u); return /^https?:$/.test(x.protocol) ? x.href : null; } catch { return null; } };
 

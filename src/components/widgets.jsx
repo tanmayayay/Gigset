@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { oppMeta } from '../lib/oppMeta';
 import { motion, AnimatePresence, animate } from 'framer-motion';
 import { Sparkles, Check, ShieldCheck, BadgeCheck, Star, Zap, X } from 'lucide-react';
 import { availability } from '../data/demo';
@@ -45,7 +46,7 @@ export function computeMatchScore(opp, viewer) {
     ...(Array.isArray(detailData.skills) ? detailData.skills : []),
     ...(Array.isArray(detailData.instruments) ? detailData.instruments : []),
   ].map(String);
-  const text = `${opp.title || ''} ${opp.description || ''} ${opp.requirements || ''} ${opp.genre || ''}`.toLowerCase();
+  const text = `${opp.title || ''} ${opp.description || ''} ${oppMeta(opp).text} ${opp.genre || ''}`.toLowerCase();
   const hits = viewerTerms.filter((t) =>
     t.toLowerCase().split(' ').some((w) => w.length > 3 && text.includes(w.toLowerCase()))
   );

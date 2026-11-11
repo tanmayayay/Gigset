@@ -4,7 +4,7 @@ import { auth, optionalAuth } from '../middleware/auth.js';
 import { asyncHandler, bad, notFound, pagination, tooLong, jsonTooBig, isOwnMediaUrl } from '../lib/http.js';
 import { cleanDetail } from '../lib/profileDetail.js';
 import { notify } from '../lib/notify.js';
-import { isBlockedBetween } from '../lib/blocks.js';
+import { isBlockedBetween, blockedIdsFor } from '../lib/blocks.js';
 import { connectionIds, relationBetween } from '../lib/connections.js';
 import { contentInfo, parseBirthDate } from '../lib/contentRating.js';
 
@@ -249,6 +249,28 @@ router.get(
   })
 );
 
+
+// GET /api/profiles/:id/followers and /:id/following — who follows them / who they follow (public lists).
+const listUserSelect = { id: true, name: true, stakeholderType: true, avatarUrl: true, city: true, verificationStatus: true };
+for (const kind of ['followers', 'following']) {
+  router.get(
+    `/:id/${kind}`,
+    optionalAuth,
+    asyncHandler(async (req, res) => {
+      const id = req.params.id;
+      const hide = req.user ? await blockedIdsFor(req.user.id) : [];
+      const followersList = kind === 'followers';
+      const rows = await prisma.connection.findMany({
+        where: followersList ? { followeeId: id, kind: 'FOLLOW' } : { followerId: id, kind: 'FOLLOW' },
+        include: { [followersList ? 'follower' : 'followee']: { select: listUserSelect } },
+        orderBy: { createdAt: 'desc' },
+        take: 300,
+      });
+      const items = rows.map((r) => (followersList ? r.follower : r.followee)).filter((u) => u && !hide.includes(u.id));
+      res.json({ items });
+    })
+  );
+}
 
 // GET /api/profiles/me/analytics?days=14  (auth) — real numbers for the owner's Insights tab.
 router.get(

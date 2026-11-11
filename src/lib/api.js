@@ -156,6 +156,8 @@ export const Profiles = {
   me: () => api('/api/profiles/me', { fresh: true }),
   create: (data) => api('/api/profiles', { method: 'POST', body: data }),
   update: (id, data) => api(`/api/profiles/${id}`, { method: 'PATCH', body: data }),
+  followersOf: (id) => api(`/api/profiles/${id}/followers`, { fresh: true, auth: 'optional' }),
+  followingOf: (id) => api(`/api/profiles/${id}/following`, { fresh: true, auth: 'optional' }),
   follow: (id) => api(`/api/profiles/${id}/follow`, { method: 'POST' }),
   unfollow: (id) => api(`/api/profiles/${id}/follow`, { method: 'DELETE' }),
   /** People the caller follows — for the Messages "new conversation" picker. */
@@ -194,6 +196,7 @@ export const Opps = {
   get: (id) => api(`/api/opportunities/${id}`, { auth: 'optional' }),
   create: (data) => api('/api/opportunities', { method: 'POST', body: data }),
   apply: (id, message, intent) => api(`/api/opportunities/${id}/apply`, { method: 'POST', body: { message, intent } }),
+  withdraw: (id) => api(`/api/opportunities/${id}/apply`, { method: 'DELETE' }),
   applications: (id, params = {}) => api(`/api/opportunities/${id}/applications${qs(params)}`),
   setApplicationStatus: (appId, status) =>
     api(`/api/opportunities/applications/${appId}`, { method: 'PATCH', body: { status } }),

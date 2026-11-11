@@ -20,8 +20,10 @@ export function timeAgo(iso) {
  * frontend route (e.g. /opportunities/:id from the seed data). Map those to
  * the closest real page so taps never land on a dead route.
  */
-export function resolveNotifLink(link) {
+export function resolveNotifLink(link, n) {
   if (!link) return '/';
+  // Older application notifications pointed at Gighub; they belong on the Collab page.
+  if (link === '/gighub' && n?.type === 'application') return '/collab';
   if (link.startsWith('/opportunities')) return '/collab';
   return link;
 }

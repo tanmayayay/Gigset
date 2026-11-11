@@ -308,7 +308,7 @@ router.post(
     // Browsers that enabled push also get a system notification (the service worker skips it if Gigset is open and focused).
     const groupTitle = convoRow.kind === 'GROUP' ? (await prisma.conversation.findUnique({ where: { id: req.params.id }, select: { title: true } }))?.title : null;
     for (const o of others) {
-      pushTo(o.userId, { title: groupTitle ? `${groupTitle} · ${msg.sender.name}` : msg.sender.name, body: msg.body, url: `#/messages?c=${req.params.id}`, tag: `msg-${req.params.id}` });
+      pushTo(o.userId, { title: groupTitle ? `${groupTitle} · ${msg.sender.name}` : msg.sender.name, body: msg.body.replace(/^\[cut:[^\]]+\]\n?/, '↩ Replied to your cut: '), url: `#/messages?c=${req.params.id}`, tag: `msg-${req.params.id}` });
     }
     res.status(201).json(msg);
   })

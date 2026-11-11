@@ -47,7 +47,7 @@ export default function Notifications() {
       }
       setItems((prev) => prev.map((x) => (x.id === n.id ? { ...x, read: true } : x)));
     }
-    navigate(resolveNotifLink(n.link));
+    navigate(resolveNotifLink(n.link, n));
   };
 
   return (

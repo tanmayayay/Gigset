@@ -88,7 +88,7 @@ export default function CollabRequests({ onChange }) {
   const waiting = items.filter((r) => (r.requesterId === userId && r.status === 'PENDING') || (r.hostId === userId && r.status === 'OFFERED'));
   const past = items.filter((r) => ['DECLINED', 'CANCELLED'].includes(r.status)).slice(0, 6);
   const chat = (r) => r.conversationId && <button className="btn btn-ghost btn-sm" onClick={() => navigate(`/messages?c=${r.conversationId}`)}><MessageCircle size={14} /> Open chat</button>;
-  const epk = (r) => r.requesterId !== userId && <a className="btn btn-ghost btn-sm" href={`#/epk/${r.requesterId}?t=${r.epkTemplate}`} target="_blank" rel="noopener noreferrer"><FileText size={14} /> Press kit</a>;
+  const epk = (r) => r.requesterId !== userId && <a className="btn btn-ghost btn-sm" href={`#/epk/${r.requesterId}`} target="_blank" rel="noopener noreferrer"><FileText size={14} /> Press kit</a>;
 
   if (!items.some((r) => r.status !== 'SCHEDULED')) return <EmptyState icon={<Sparkles size={22} />} title="No collab requests yet" text="Find someone you vibe with and send a collab request. Confirmed collabs live in the Bookings tab." />;
   return (

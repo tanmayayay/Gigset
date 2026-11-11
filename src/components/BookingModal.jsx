@@ -3,9 +3,7 @@ import { motion } from 'framer-motion';
 import { CalendarCheck, Clock, Wallet, MessageSquare, Send, X, FileText } from 'lucide-react';
 import { Bookings } from '../lib/api';
 import { useStore } from '../store/store';
-import { TemplatePicker } from './epk/EpkModal';
-import useKit from './epk/useKit';
-import { savedTemplate, saveTemplate } from '../lib/epk';
+import { ownerTemplate } from '../lib/epk';
 import './booking.css';
 
 const pad = (n) => String(n).padStart(2, '0');
@@ -15,10 +13,8 @@ const SLOTS = ['10 AM–12 PM', '2–4 PM', '6–8 PM', '8–10 PM'];
 const BUDGETS = ['Under ₹15k', '₹15k–30k', '₹30k–60k', '₹60k+'];
 
 export default function BookingModal({ person, day, onClose }) {
-  const { pushToast, userId } = useStore();
-  const { kit } = useKit(userId);
-  const [tpl, setTpl] = useState(savedTemplate);
-  const [showTpl, setShowTpl] = useState(false);
+  const { pushToast, user } = useStore();
+  const tpl = ownerTemplate(user);
   const [slot, setSlot] = useState(SLOTS[0]);
   const [budget, setBudget] = useState(BUDGETS[1]);
   const [message, setMessage] = useState('');
@@ -115,8 +111,6 @@ export default function BookingModal({ person, day, onClose }) {
 
         <div className="field">
           <label><FileText size={13} style={{ verticalAlign: -2, marginRight: 6 }} />Your press kit <span style={{ fontWeight: 400, color: 'var(--text-faint)' }}>(sent automatically)</span></label>
-          <button type="button" className="btn btn-ghost btn-sm" onClick={() => setShowTpl((v) => !v)}>{showTpl ? 'Hide templates' : `Template: ${tpl[0].toUpperCase() + tpl.slice(1)} · change`}</button>
-          {showTpl && kit && <div style={{ marginTop: 10 }}><TemplatePicker kit={kit} value={tpl} onChange={(t) => { setTpl(t); saveTemplate(t); }} /></div>}
         </div>
 
         <div className="booking-summary" aria-live="polite">

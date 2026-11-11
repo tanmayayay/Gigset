@@ -1,4 +1,5 @@
 import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
+import AgeGate from './components/AgeGate';
 import { HashRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { StoreProvider, useStore } from './store/store';
 import Shell from './components/Shell';
@@ -61,6 +62,8 @@ function RequireAuth({ children }) {
   // sign-in bounces to "/" before refreshProfile() finishes.
   if (authLoading || (session && profileLoading)) return <div className="auth-boot"><span className="spinner" /></div>;
   if (!user) return <Navigate to="/" replace />;
+  // Age comes first: nothing else in the app opens until a birth date is saved.
+  if (user.content && !user.content.hasBirthDate) return <AgeGate />;
   return children;
 }
 

@@ -4,6 +4,7 @@ import { Modal, Avatar } from './ui';
 import { supabase } from '../lib/supabase';
 import { useStore } from '../store/store';
 import { CITIES } from '../data/demo';
+import { GENRES } from '../lib/profileSchema';
 import { Posts, Opps } from '../lib/api';
 import './postcard.css';
 
@@ -143,6 +144,13 @@ export function OppModal({ onClose }) {
   const [title, setTitle] = useState('');
   const [city, setCity] = useState('Mumbai');
   const [details, setDetails] = useState('');
+  const [genre, setGenre] = useState('');
+  const [venue, setVenue] = useState('');
+  const [date, setDate] = useState('');
+  const [time, setTime] = useState('');
+  const [endTime, setEndTime] = useState('');
+  const [budgetMin, setBudgetMin] = useState('');
+  const [budgetMax, setBudgetMax] = useState('');
   const [visibility, setVisibility] = useState('PUBLIC');
   const [saving, setSaving] = useState(false);
 
@@ -155,11 +163,17 @@ export function OppModal({ onClose }) {
     try {
       // The single details field feeds both backend text fields; the old
       // "type" select and free-text "budget" have no backend equivalent.
+      const min = budgetMin === '' ? undefined : Math.max(0, Number(budgetMin));
+      const max = budgetMax === '' ? undefined : Math.max(0, Number(budgetMax));
+      if (min != null && max != null && min > max) { pushToast('Minimum budget is higher than the maximum.', 'error'); setSaving(false); return; }
       await Opps.create({
         title: title.trim(),
         description: text,
-        requirements: text,
+        requirements: { text, venue: venue.trim() || undefined, date: date || undefined, time: time || undefined, endTime: endTime || undefined },
         city,
+        genre: genre || undefined,
+        budgetMin: min,
+        budgetMax: max,
         visibility,
       });
       window.dispatchEvent(new Event('gigset:opp-created'));
@@ -180,8 +194,24 @@ export function OppModal({ onClose }) {
       <select value={city} onChange={(e) => setCity(e.target.value)}>
         {CITIES.slice(0, 5).map((c) => <option key={c}>{c}</option>)}
       </select>
-      <label>Requirements</label>
-      <textarea value={details} onChange={(e) => setDetails(e.target.value)} placeholder="Describe what you're looking for…" />
+      <label>Venue</label>
+      <input type="text" value={venue} onChange={(e) => setVenue(e.target.value)} placeholder="e.g. Depot 48, Delhi (optional)" maxLength={160} />
+      <div className="opp-form-row">
+        <div><label>Date</label><input type="date" value={date} onChange={(e) => setDate(e.target.value)} /></div>
+        <div><label>Starts</label><input type="time" value={time} onChange={(e) => setTime(e.target.value)} /></div>
+        <div><label>Ends</label><input type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} /></div>
+      </div>
+      <label>Genre</label>
+      <select value={genre} onChange={(e) => setGenre(e.target.value)}>
+        <option value="">Any / not specified</option>
+        {GENRES.map((g) => <option key={g}>{g}</option>)}
+      </select>
+      <div className="opp-form-row two">
+        <div><label>Budget from (₹)</label><input type="number" min="0" inputMode="numeric" value={budgetMin} onChange={(e) => setBudgetMin(e.target.value)} placeholder="optional" /></div>
+        <div><label>Budget up to (₹)</label><input type="number" min="0" inputMode="numeric" value={budgetMax} onChange={(e) => setBudgetMax(e.target.value)} placeholder="optional" /></div>
+      </div>
+      <label>Details</label>
+      <textarea value={details} onChange={(e) => setDetails(e.target.value)} placeholder="What's the event, and who are you looking for?" />
       <label>Who can see it</label>
       <div className="vis-toggle">
         <button type="button" className={visibility === 'PUBLIC' ? 'on' : ''} onClick={() => setVisibility('PUBLIC')}><b>Public</b><small>Anyone on TheGigSet</small></button>

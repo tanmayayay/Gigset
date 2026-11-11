@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { oppText } from '../lib/oppMeta';
 import { useNavigate } from 'react-router-dom';
 import { Search as SearchIcon, MapPin, ExternalLink } from 'lucide-react';
 import { PageHead, Avatar, Tag, Verified, EmptyState } from '../components/ui';
@@ -65,8 +66,7 @@ export default function Search() {
 
   const ql = q.trim().toLowerCase();
   const gigResults = opps.filter((o) =>
-    !ql || [o.title, o.description, o.requirements, o.city, o.genre, o.poster?.name]
-      .filter(Boolean).join(' ').toLowerCase().includes(ql)
+    !ql || oppText(o).toLowerCase().includes(ql)
   );
   const venues = liveVenues.filter((v) =>
     (city === 'all' || (v.city || '') === city) &&

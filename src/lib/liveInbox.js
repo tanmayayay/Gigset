@@ -1,5 +1,6 @@
 // Live inbox: one small poll that keeps message badges, the bell and pop-ups fresh.
 // A module-level store (not React state) so Shell and Messages share the same pulse.
+import { plainBody } from './cutRef';
 import { useSyncExternalStore } from 'react';
 import { Convos } from './api';
 
@@ -69,7 +70,7 @@ export async function refreshLive() {
       if (toShow.length) {
         const add = toShow.slice(-3).map((m) => ({
           id: `p${++popSeq}`, conversationId: m.conversationId, name: m.sender?.name || 'New message',
-          avatarUrl: m.sender?.avatarUrl, body: m.body,
+          avatarUrl: m.sender?.avatarUrl, body: plainBody(m.body),
         }));
         set({ popups: [...state.popups, ...add].slice(-3) });
         add.forEach((p) => setTimeout(() => dismissPopup(p.id), 7000));

@@ -4,15 +4,15 @@ import { Modal } from '../ui';
 import { useStore } from '../../store/store';
 import EpkView from './EpkView';
 import useKit from './useKit';
-import { EPK_TEMPLATES, EPK_SECTIONS, buildEpk, readEdits, editsToDetail, savedTemplate, saveTemplate, epkUrl } from '../../lib/epk';
+import { EPK_TEMPLATES, EPK_SECTIONS, buildEpk, readEdits, editsToDetail, ownerTemplate, epkUrl } from '../../lib/epk';
 import { Profiles } from '../../lib/api';
 
 /** Template picker with live miniature previews. Reused by the generator and the booking flow. */
-export function TemplatePicker({ kit, value, onChange }) {
+export function TemplatePicker({ kit, value, onChange, readOnly = false }) {
   return (
     <div className="ekm-tpls" role="radiogroup" aria-label="Press kit template">
-      {EPK_TEMPLATES.map((t) => (
-        <button key={t.id} type="button" role="radio" aria-checked={value === t.id} className={`ekm-tpl${value === t.id ? ' on' : ''}`} onClick={() => onChange(t.id)}>
+      {EPK_TEMPLATES.filter((t) => !readOnly || t.id === value).map((t) => (
+        <button key={t.id} type="button" role="radio" disabled={readOnly} style={readOnly ? { cursor: 'default' } : undefined} aria-checked={value === t.id} className={`ekm-tpl${value === t.id ? ' on' : ''}`} onClick={() => onChange(t.id)}>
           <span className="ekm-thumb"><span className="ekm-scale"><EpkView kit={kit} tpl={t.id} compact /></span></span>
           <b>{t.name}{value === t.id && <Check size={14} />}</b>
           <small>{t.blurb}</small>
@@ -50,13 +50,24 @@ export default function EpkModal({ personId, person: given, onClose }) {
   const { kit: baseKit, person, reviews, loading } = useKit(personId, given);
   const mine = personId === userId;
   const [tab, setTab] = useState('template');
-  const [tpl, setTpl] = useState(savedTemplate);
+  const [picked, setPicked] = useState(null);
+  const tpl = picked || ownerTemplate(person || given);
   const [draft, setDraft] = useState(null);
   const [saving, setSaving] = useState(false);
   const edits = draft || (person ? readEdits(person.detail?.data) : null);
   const kit = useMemo(() => (person ? buildEpk(person, { reviews, edits }) : baseKit), [person, reviews, edits, baseKit]);
   const set = (patch) => setDraft({ ...edits, ...patch });
-  const pick = (t) => { setTpl(t); saveTemplate(t); };
+  // Only the owner can change the theme; it is saved on their profile and is what everyone else sees.
+  const pick = async (t) => {
+    if (!mine || !person) return;
+    const prev = picked;
+    setPicked(t);
+    try {
+      await Profiles.update(person.id, { detail: { ...(person.detail?.data || {}), epkTemplate: t } });
+      await refreshProfile?.();
+      pushToast('Press kit theme saved. Everyone sees your kit in this look.');
+    } catch (e) { setPicked(prev); pushToast(e.message, 'error'); }
+  };
   const link = epkUrl(personId, tpl);
   const copy = async () => { try { await navigator.clipboard.writeText(link); pushToast('Press-kit link copied.'); } catch { pushToast(link); } };
   const print = () => { window.open(`${link}${link.includes('?') ? '&' : '?'}print=1`, '_blank', 'noopener'); };
@@ -65,7 +76,7 @@ export default function EpkModal({ personId, person: given, onClose }) {
     setSaving(true);
     try {
       const keep = Object.fromEntries(Object.entries(person.detail?.data || {}).filter(([k]) => !/^epk[A-Z]/.test(k)));
-      await Profiles.update(person.id, { detail: { ...keep, ...editsToDetail(edits) } });
+      await Profiles.update(person.id, { detail: { ...keep, ...editsToDetail(edits), epkTemplate: tpl } });
       await refreshProfile?.();
       pushToast('Press kit saved.');
       setDraft(null);
@@ -83,10 +94,15 @@ export default function EpkModal({ personId, person: given, onClose }) {
 
           {tab === 'template' || !mine ? (
             <>
-              <h4 className="ekm-h">Choose a template</h4>
-              <TemplatePicker kit={kit} value={tpl} onChange={pick} />
+              <h4 className="ekm-h">{mine ? 'Your press kit theme' : 'How their press kit looks'}</h4>
+              {mine
+                ? <p className="ekm-lead" style={{ marginTop: 0 }}>Pick the look you want. This is your default, and it is the only way people see your press kit.</p>
+                : null}
+              {mine
+                ? <TemplatePicker kit={kit} value={tpl} onChange={pick} />
+                : <TemplatePicker kit={kit} value={tpl} onChange={() => {}} readOnly />}
               <div className="ekm-actions">
-                <a className="btn btn-blue" href={`#/epk/${personId}?t=${tpl}`} target="_blank" rel="noopener noreferrer"><ExternalLink size={15} /> Open full size</a>
+                <a className="btn btn-blue" href={`#/epk/${personId}`} target="_blank" rel="noopener noreferrer"><ExternalLink size={15} /> Open full size</a>
                 <button className="btn btn-ghost" onClick={copy}><Copy size={15} /> Copy link</button>
                 <button className="btn btn-ghost" onClick={print}><Printer size={15} /> Save as PDF</button>
                 {draft && mine && <button className="btn btn-ghost" onClick={() => setTab('edit')}>Unsaved edits</button>}

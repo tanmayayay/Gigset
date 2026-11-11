@@ -7,7 +7,8 @@
 // Each person gets a "level" from their birth date (and, for adults, an opt-in preference):
 //   gentle    13-15   family only
 //   teen      16-17   family + sensitive
-//   standard  18+ (default, and anyone who has not said their age)   family + sensitive
+//   gentle    also anyone who has not said their age yet             family only
+//   standard  18+ (default)                                           family + sensitive
 //   open      18+ who chose "show everything"                         all three
 // Keyword rules are a first line of defence, not a guarantee: they will miss some stories and
 // over-block a few. `node scripts/audit-news.mjs` lists what each rating catches so the lists can be tuned.
@@ -63,7 +64,7 @@ export function ageFrom(birthDate, now = new Date()) {
 
 export function levelFor({ birthDate, contentOpen } = {}) {
   const age = ageFrom(birthDate);
-  if (age == null) return 'standard';
+  if (age == null) return 'gentle'; // no birth date yet: family-friendly only (the app asks for it right after login)
   if (age < 16) return 'gentle';
   if (age < 18) return 'teen';
   return contentOpen ? 'open' : 'standard';
@@ -95,6 +96,6 @@ export function parseBirthDate(input) {
   if (Number.isNaN(d.getTime()) || d.toISOString().slice(0, 10) !== input) return { error: 'That birth date does not look right.' };
   const age = ageFrom(d);
   if (age == null || age > 110) return { error: 'That birth date does not look right.' };
-  if (age < MIN_AGE) return { error: `Gigset is for people ${MIN_AGE} and over.`, underAge: true };
+  if (age < MIN_AGE) return { error: `TheGigSet is for people ${MIN_AGE} and over.`, underAge: true };
   return { value: d };
 }

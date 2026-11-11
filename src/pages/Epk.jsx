@@ -5,17 +5,16 @@ import { Logo, EmptyState } from '../components/ui';
 import { useStore } from '../store/store';
 import EpkView from '../components/epk/EpkView';
 import useKit from '../components/epk/useKit';
-import { EPK_TEMPLATES, isTemplate, savedTemplate } from '../lib/epk';
+import { ownerTemplate } from '../lib/epk';
 import './epk.css';
 
-/** Press kit page. Public (outside RequireAuth). `?t=classic|stage|minimal` picks the look; `?print=1` opens the print dialog. */
+/** Press kit page. Public (outside RequireAuth). It always uses the look its owner chose; `?print=1` opens the print dialog. */
 export default function Epk() {
   const { id } = useParams();
-  const [sp, setSp] = useSearchParams();
+  const [sp] = useSearchParams();
   const { pushToast } = useStore();
-  const { kit, loading, error } = useKit(id);
-  const t = sp.get('t');
-  const tpl = isTemplate(t) ? t : savedTemplate();
+  const { kit, person, loading, error } = useKit(id);
+  const tpl = ownerTemplate(person);
   const print = sp.get('print') === '1';
 
   useEffect(() => { if (print && kit) { const h = setTimeout(() => window.print(), 600); return () => clearTimeout(h); } return undefined; }, [print, kit]);
@@ -28,9 +27,6 @@ export default function Epk() {
       <div className="epk-bar epk-noprint">
         <Logo />
         <div className="epk-tools">
-          {kit && EPK_TEMPLATES.map((x) => (
-            <button key={x.id} className={`epk-chip${tpl === x.id ? ' on' : ''}`} onClick={() => setSp({ t: x.id }, { replace: true })}>{x.name}</button>
-          ))}
           {kit && <button className="btn btn-ghost btn-sm" onClick={() => window.print()}><Printer size={14} /> PDF</button>}
           {kit && <button className="btn btn-ghost btn-sm" onClick={share}><Share2 size={14} /> Share</button>}
           {kit && <Link className="btn btn-blue btn-sm" to={kit.profilePath}>Open in TheGigSet <ArrowRight size={14} /></Link>}

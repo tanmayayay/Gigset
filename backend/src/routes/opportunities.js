@@ -25,6 +25,25 @@ const posterSelect = {
   verificationStatus: true,
 };
 
+// Attach the viewer's own application (status + intent) so the app can show Applied / Attending / You're invited.
+const mineInclude = (me) => (me ? { applications: { where: { applicantId: me }, select: { id: true, status: true, intent: true } } } : {});
+function withMine(o) {
+  if (!o) return o;
+  const { applications, ...rest } = o;
+  return { ...rest, myApplication: Array.isArray(applications) && applications[0] ? applications[0] : null };
+}
+// requirements can be plain text (older gigs) or an object { text, venue, date, time } — keep it small.
+function cleanRequirements(r) {
+  if (r == null) return null;
+  if (typeof r === 'string') return r.slice(0, 4000);
+  if (typeof r !== 'object' || Array.isArray(r)) return null;
+  const t = (v, n) => (typeof v === 'string' && v.trim() ? v.trim().slice(0, n) : undefined);
+  const out = { text: t(r.text, 4000), venue: t(r.venue, 160), date: t(r.date, 20), time: t(r.time, 10), endTime: t(r.endTime, 10), address: t(r.address, 240) };
+  Object.keys(out).forEach((k) => out[k] === undefined && delete out[k]);
+  return Object.keys(out).length ? out : null;
+}
+const reqText = (r) => (r == null ? '' : typeof r === 'string' ? r : Object.values(r).filter((v) => typeof v === 'string').join(' '));
+
 // GET /api/opportunities?status=OPEN&city=Mumbai&genre=&take=20&skip=0
 router.get(
   '/',
@@ -51,6 +70,7 @@ router.get(
         include: {
           poster: { select: posterSelect },
           _count: { select: { applications: true } },
+          ...mineInclude(me),
         },
         orderBy: { createdAt: 'desc' },
         take,
@@ -59,7 +79,7 @@ router.get(
       prisma.opportunity.count({ where }),
     ]);
 
-    res.json({ items, total, take, skip });
+    res.json({ items: items.map(withMine), total, take, skip });
   })
 );
 
@@ -72,7 +92,7 @@ router.post(
     if (visibility !== undefined && !VISIBILITIES.includes(visibility)) {
       return bad(res, 400, `Field "visibility" must be one of: ${VISIBILITIES.join(', ')}`);
     }
-    if (!checkAll(title, description, typeof requirements === 'string' ? requirements : '').ok) return bad(res, 422, CLEAN_MESSAGE);
+    if (!checkAll(title, description, reqText(requirements)).ok) return bad(res, 422, CLEAN_MESSAGE);
 
     if (!title || typeof title !== 'string' || !title.trim()) {
       return bad(res, 400, 'Field "title" is required.');
@@ -90,7 +110,7 @@ router.post(
         visibility: visibility ?? 'PUBLIC',
         title: title.trim(),
         description: description.trim(),
-        requirements: requirements ?? null,
+        requirements: cleanRequirements(requirements),
         city: city ?? null,
         genre: genre ?? null,
         budgetMin: budgetMin ?? null,
@@ -113,10 +133,11 @@ router.get(
       include: {
         poster: { select: posterSelect },
         _count: { select: { applications: true } },
+        ...mineInclude(req.user?.id),
       },
     });
     if (!opp || !(await canSee(opp, req.user?.id))) return notFound(res, 'Opportunity');
-    res.json(opp);
+    res.json(withMine(opp));
   })
 );
 
@@ -155,8 +176,8 @@ router.post(
             userId: opp.posterId,
             type: 'application',
             title: 'New application',
-            body: `${me?.name ?? 'Someone'} applied to "${opp.title}".`,
-            link: '/gighub',
+            body: `${me?.name ?? 'Someone'} ${intent === 'ATTEND' ? 'is attending' : 'applied to'} "${opp.title}".`,
+            link: `/collab?tab=mine&opp=${opp.id}`,
           },
         })
         .catch(() => {});
@@ -164,6 +185,34 @@ router.post(
     } catch {
       return bad(res, 409, 'You have already applied to this opportunity.');
     }
+  })
+);
+
+// DELETE /api/opportunities/:id/apply  (auth) — take back your own application / "I'm attending" / invite.
+router.delete(
+  '/:id/apply',
+  auth,
+  asyncHandler(async (req, res) => {
+    const app = await prisma.application.findUnique({
+      where: { opportunityId_applicantId: { opportunityId: req.params.id, applicantId: req.user.id } },
+      include: { opportunity: { select: { id: true, posterId: true, title: true } } },
+    });
+    if (!app) return notFound(res, 'Application');
+    await prisma.application.delete({ where: { id: app.id } });
+    const me = await prisma.user.findUnique({ where: { id: req.user.id }, select: { name: true } });
+    const what = app.status === 'SHORTLISTED' ? "can't make it to" : app.intent === 'ATTEND' ? 'is no longer attending' : 'withdrew from';
+    await prisma.notification
+      .create({
+        data: {
+          userId: app.opportunity.posterId,
+          type: 'application',
+          title: 'Application withdrawn',
+          body: `${me?.name ?? 'Someone'} ${what} "${app.opportunity.title}".`,
+          link: `/collab?tab=mine&opp=${app.opportunity.id}`,
+        },
+      })
+      .catch(() => {});
+    res.json({ ok: true });
   })
 );
 
@@ -207,7 +256,7 @@ router.patch(
     }
     const app = await prisma.application.findUnique({
       where: { id: req.params.appId },
-      include: { opportunity: { select: { posterId: true, title: true } } },
+      include: { opportunity: { select: { id: true, posterId: true, title: true } } },
     });
     if (!app) return notFound(res, 'Application');
     if (app.opportunity.posterId !== req.user.id) {
@@ -223,9 +272,9 @@ router.patch(
         data: {
           userId: app.applicantId,
           type: 'application',
-          title: status === 'SHORTLISTED' ? 'You were shortlisted' : 'Application update',
+          title: status === 'SHORTLISTED' ? "You're invited" : 'Application update',
           body: `${me?.name ?? 'The poster'} ${status === 'SHORTLISTED' ? 'shortlisted you' : 'updated your application'} for "${app.opportunity.title}".`,
-          link: '/gighub',
+          link: `/collab?opp=${app.opportunity.id}`,
         },
       })
       .catch(() => {});

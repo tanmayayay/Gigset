@@ -8,12 +8,14 @@ import CollabRequests from '../components/collab/CollabRequests';
 import { Collabs } from '../lib/api';
 import '../components/collab/collab.css';
 import { useBookings } from '../lib/useBookings';
-import { Plus, MapPin, Wallet, Users as UsersIcon, Check, Bookmark, Briefcase, Search as SearchIcon, Lock } from 'lucide-react';
+import { Plus, MapPin, Wallet, Users as UsersIcon, Bookmark, Briefcase, Search as SearchIcon, Lock, CalendarDays } from 'lucide-react';
+import OppDetail, { OppActions } from '../components/collab/OppDetail';
+import { oppMeta, oppText, fmtWhen } from '../lib/oppMeta';
 import { PageHead, Avatar, Tag, EmptyState, Verified } from '../components/ui';
 import { MatchScore, computeMatchScore } from '../components/widgets';
 import { CITIES } from '../data/demo';
 import { cityDistanceKm } from '../data/cityCoords';
-import { Opps, Profiles } from '../lib/api';
+import { Opps, Profiles, Convos } from '../lib/api';
 import { useStore } from '../store/store';
 
 function OppSkeleton() {
@@ -64,12 +66,15 @@ export default function Collab() {
   const [opps, setOpps] = useState([]);
   const [genreOptions, setGenreOptions] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [appliedList, setAppliedList] = useState([]); // session-local snapshots {id,title,city,intent}
-  const appliedIds = useMemo(() => new Set(appliedList.map((a) => a.id)), [appliedList]);
-  const appliedIntentById = useMemo(
-    () => new Map(appliedList.map((a) => [a.id, a.intent || 'PERFORM'])),
-    [appliedList]
-  );
+  // The server tells us each gig's status for you (o.myApplication). `override` holds changes made just now.
+  const [override, setOverride] = useState({}); // oppId -> application | null
+  const [busyId, setBusyId] = useState(null);
+  const myApp = useCallback((o) => (o.id in override ? override[o.id] : (o.myApplication || null)), [override]);
+  const [detailId, setDetailId] = useState(params.get('opp'));
+  const [extraOpp, setExtraOpp] = useState(null); // a gig opened from a notification that isn't in the list
+  const oppParam = params.get('opp');
+  useEffect(() => { if (oppParam) setDetailId(oppParam); }, [oppParam]);
+  const closeDetail = () => { setDetailId(null); setParams((p) => { const n = new URLSearchParams(p); n.delete('opp'); return n; }, { replace: true }); };
   const [expandedOppId, setExpandedOppId] = useState(null);
   const [appsByOpp, setAppsByOpp] = useState({});
   const [appsLoadingId, setAppsLoadingId] = useState(null);
@@ -141,8 +146,7 @@ export default function Collab() {
     const radiusKm = radiusF === 'any' ? null : Number(radiusF);
     const radiusActive = radiusKm != null && !!userCity;
     const list = opps.filter((o) => {
-      if (ql && ![o.title, o.description, o.requirements, o.city, o.genre, o.poster?.name]
-        .filter(Boolean).join(' ').toLowerCase().includes(ql)) return false;
+      if (ql && !oppText(o).toLowerCase().includes(ql)) return false;
       if (!radiusActive) return true;
       const d = cityDistanceKm(userCity, o.city);
       return d != null && d <= radiusKm;
@@ -154,26 +158,55 @@ export default function Collab() {
   }, [opps, ql, radiusF, userCity]);
 
   // sort by AI match score for the viewer
+  const yours = useMemo(() => opps.map((o) => ({ o, a: myApp(o) })).filter((x) => x.a), [opps, myApp]);
+
+  // The gig being viewed: from the list, or fetched (e.g. opened from a notification).
+  const detailOpp = opps.find((o) => o.id === detailId) || (extraOpp?.id === detailId ? extraOpp : null);
+  useEffect(() => {
+    if (!detailId || opps.some((o) => o.id === detailId) || extraOpp?.id === detailId) return;
+    Opps.get(detailId).then(setExtraOpp).catch(() => { pushToast('That event is no longer available.', 'error'); closeDetail(); });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [detailId, opps]);
+
   const sorted = useMemo(() =>
     [...filtered].sort((a, b) => computeMatchScore(b, user).score - computeMatchScore(a, user).score),
   [filtered, user]);
 
   const apply = async (opp, intent = 'PERFORM') => {
-    if (appliedIds.has(opp.id)) return;
+    if (myApp(opp)) return;
+    setBusyId(opp.id);
     try {
-      await Opps.apply(opp.id, '', intent);
-      setAppliedList((prev) => [...prev, { id: opp.id, title: opp.title, city: opp.city, intent }]);
+      const a = await Opps.apply(opp.id, '', intent);
+      setOverride((m) => ({ ...m, [opp.id]: { id: a?.id, status: 'PENDING', intent } }));
       pushToast(intent === 'ATTEND'
-        ? `You're on the list for \u201C${opp.title}\u201D. Enjoy the show!`
-        : `Applied to \u201C${opp.title}\u201D. The poster usually responds within 2 days.`);
+        ? `You're on the list for \u201C${opp.title}\u201D. You can undo this any time.`
+        : `Applied to \u201C${opp.title}\u201D. You can withdraw any time.`);
     } catch (e) {
       if (e.status === 409) {
-        setAppliedList((prev) => prev.some((a) => a.id === opp.id) ? prev : [...prev, { id: opp.id, title: opp.title, city: opp.city, intent: 'PERFORM' }]);
+        setOverride((m) => ({ ...m, [opp.id]: { status: 'PENDING', intent } }));
         pushToast("You've already applied", 'error');
+        fetchOpps();
       } else {
         pushToast(e.message, 'error');
       }
-    }
+    } finally { setBusyId(null); }
+  };
+
+  const withdraw = async (opp) => {
+    const cur = myApp(opp);
+    setBusyId(opp.id);
+    try {
+      await Opps.withdraw(opp.id);
+      setOverride((m) => ({ ...m, [opp.id]: null }));
+      pushToast(cur?.status === 'SHORTLISTED' ? "Okay, the host knows you can't make it."
+        : cur?.intent === 'ATTEND' ? "You're no longer attending." : 'Application withdrawn.');
+    } catch (e) {
+      pushToast(e.message, 'error');
+    } finally { setBusyId(null); }
+  };
+
+  const messageHost = async (id) => {
+    try { const c = await Convos.open(id); closeDetail(); navigate(`/messages?c=${c.id}`); } catch (e) { pushToast(e.message, 'error'); }
   };
 
   const loadApplications = async (oppId) => {
@@ -283,7 +316,9 @@ export default function Collab() {
               text={tab === 'mine' ? 'Post your first opportunity to see applications here.' : 'Try widening your filters \u2014 new call-outs land here daily.'}
             />
           ) : sorted.map((o) => {
-            const done = appliedIds.has(o.id);
+            const mine = myApp(o);
+            const when = fmtWhen(oppMeta(o));
+            const venue = oppMeta(o).venue;
             const saved = isBookmarked('opp', o.id);
             const poster = o.poster || null;
             const isMine = poster?.id === userId;
@@ -292,7 +327,7 @@ export default function Collab() {
             const performerCount = apps.filter((a) => (a.intent || 'PERFORM') === 'PERFORM').length;
             const attendingCount = apps.filter((a) => a.intent === 'ATTEND').length;
             return (
-              <div className="opp-card" key={o.id}>
+              <div className="opp-card" key={o.id} onClick={() => setDetailId(o.id)} role="button" tabIndex={0} onKeyDown={(e) => { if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); setDetailId(o.id); } }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
                   <div style={{ minWidth: 0 }}>
                     <b style={{ fontSize: 15.5 }}>{o.title}</b>
@@ -300,6 +335,8 @@ export default function Collab() {
                       {o.genre && <Tag color="blue">{o.genre}</Tag>}
                       {o.city && <Tag color="sky"><MapPin size={11} /> {o.city}</Tag>}
                       {budget && <Tag color="gray"><Wallet size={11} /> {budget}</Tag>}
+                      {when && <Tag color="gray"><CalendarDays size={11} /> {when}</Tag>}
+                      {venue && <Tag color="gray"><Briefcase size={11} /> {venue}</Tag>}
                       {tab === 'mine' && <Tag color={o.status === 'OPEN' ? 'green' : 'gray'}>{o.status}</Tag>}
                       {o.visibility === 'CONNECTIONS' && <Tag color="gray"><Lock size={11} /> Connections only</Tag>}
                     </div>
@@ -315,7 +352,7 @@ export default function Collab() {
                     </button>
                   ) : null}
                   <span style={{ fontSize: 12, color: 'var(--text-faint)', display: 'flex', alignItems: 'center', gap: 4 }}><UsersIcon size={12} /> {o._count?.applications ?? 0} applied</span>
-                  <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
+                  <div style={{ marginLeft: 'auto', display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }} onClick={(e) => e.stopPropagation()}>
                     <button
                       className={`btn btn-xs ${saved ? 'btn-ghost' : 'btn-ghost'}`}
                       onClick={() => { const s = toggleBookmark('opp', o.id); pushToast(s ? 'Saved to your bookmarks.' : 'Removed from bookmarks.'); }}
@@ -328,21 +365,12 @@ export default function Collab() {
                         {expandedOppId === o.id ? 'Hide applications' : `Applications (${o._count?.applications ?? 0})`}
                       </button>
                     ) : !isMine ? (
-                      done ? (
-                        <button className="btn btn-sm btn-ghost" disabled>
-                          <Check size={14} /> {appliedIntentById.get(o.id) === 'ATTEND' ? 'Attending' : 'Applied'}
-                        </button>
-                      ) : (
-                        <>
-                          <button className="btn btn-sm btn-blue" onClick={() => apply(o, 'PERFORM')}>Apply to perform</button>
-                          <button className="btn btn-sm btn-ghost" onClick={() => apply(o, 'ATTEND')}>I&apos;m attending</button>
-                        </>
-                      )
+                      <OppActions app={mine} busy={busyId === o.id} closed={o.status !== 'OPEN'} onApply={(intent) => apply(o, intent)} onWithdraw={() => withdraw(o)} />
                     ) : null}
                   </div>
                 </div>
                 {tab === 'mine' && expandedOppId === o.id && (
-                  <div style={{ marginTop: 12, borderTop: '1px solid var(--border)', paddingTop: 12 }}>
+                  <div onClick={(e) => e.stopPropagation()} style={{ marginTop: 12, borderTop: '1px solid var(--border)', paddingTop: 12 }}>
                     {appsLoadingId === o.id ? (
                       <p style={{ fontSize: 12.5, color: 'var(--text-faint)' }}>Loading applications…</p>
                     ) : apps.length === 0 ? (
@@ -407,17 +435,31 @@ export default function Collab() {
           </div>
           <div className="side-card">
             <h4>Your applications</h4>
-            {appliedList.length === 0 ? (
+            {yours.length === 0 ? (
               <p style={{ fontSize: 12.5, color: 'var(--text-faint)' }}>Apply to an opportunity to track it here.</p>
-            ) : appliedList.map((a) => (
-              <div className="mini-list-item" key={a.id} style={{ cursor: 'default' }}>
-                <Tag color={a.intent === 'ATTEND' ? 'green' : 'sky'}>{a.intent === 'ATTEND' ? 'Attending' : 'Pending'}</Tag>
-                <div><b style={{ fontWeight: 500 }}>{a.title}</b><span>{a.city}</span></div>
+            ) : yours.map(({ o, a }) => (
+              <div className="mini-list-item" key={o.id} onClick={() => setDetailId(o.id)} style={{ cursor: 'pointer' }}>
+                <Tag color={a.status === 'SHORTLISTED' ? 'green' : a.status === 'REJECTED' ? 'gray' : a.intent === 'ATTEND' ? 'green' : 'sky'}>
+                  {a.status === 'SHORTLISTED' ? "You're invited" : a.status === 'REJECTED' ? 'Not selected' : a.intent === 'ATTEND' ? 'Attending' : 'Applied'}
+                </Tag>
+                <div><b style={{ fontWeight: 500 }}>{o.title}</b><span>{o.city}</span></div>
               </div>
             ))}
           </div>
         </div>
       </div>
+      {detailId && detailOpp && (
+        <OppDetail
+          opp={detailOpp} app={myApp(detailOpp)} userId={userId} busy={busyId === detailOpp.id}
+          saved={isBookmarked('opp', detailOpp.id)}
+          onSave={() => { const sv = toggleBookmark('opp', detailOpp.id); pushToast(sv ? 'Saved to your bookmarks.' : 'Removed from bookmarks.'); }}
+          onClose={closeDetail}
+          onApply={(intent) => apply(detailOpp, intent)} onWithdraw={() => withdraw(detailOpp)}
+          onProfile={(id) => { closeDetail(); navigate(`/profile/${id}`); }}
+          onMessage={messageHost}
+          onManage={() => { closeDetail(); setTab('mine'); loadApplications(detailOpp.id); }}
+        />
+      )}
     </div>
   );
 }

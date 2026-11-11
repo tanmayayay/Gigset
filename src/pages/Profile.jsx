@@ -19,14 +19,16 @@ import { useStore } from '../store/store';
 import { uploadAvatar } from '../lib/uploadImage';
 import { metaFor, glanceFacts, headlineOf, completeness } from '../lib/profileSchema';
 import { useCountUp } from '../lib/useCountUp';
+import FollowList from '../components/FollowList';
 import '../components/profile/profile.css';
 import '../components/profile/portfolio.css';
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const compact = (n) => (n >= 10000 ? `${(n / 1000).toFixed(0)}k` : n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(n));
 
-function BigStat({ value, label }) {
+function BigStat({ value, label, onClick }) {
   const n = useCountUp(value, true, 1500);
+  if (onClick) return <div><button type="button" className="stat-btn" onClick={onClick} aria-label={`View ${label.toLowerCase()}`}><b>{compact(n)}</b><span>{label}</span></button></div>;
   return <div><b>{compact(n)}</b><span>{label}</span></div>;
 }
 
@@ -62,6 +64,7 @@ export default function Profile() {
   const [notFound, setNotFound] = useState(false);
   const [feedPosts, setFeedPosts] = useState([]);
   const [following, setFollowing] = useState(false);
+  const [followList, setFollowList] = useState(null); // 'followers' | 'following'
   const [editing, setEditing] = useState(false);
   const [epkOpen, setEpkOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -256,8 +259,8 @@ export default function Profile() {
             )}
           </div>
           <div className="pfo-stats">
-            <BigStat value={followers} label="Followers" />
-            <BigStat value={person._count?.following ?? 0} label="Following" />
+            <BigStat value={followers} label="Followers" onClick={() => setFollowList('followers')} />
+            <BigStat value={person._count?.following ?? 0} label="Following" onClick={() => setFollowList('following')} />
             <BigStat value={postsCount} label="Posts" />
             {rv?.count > 0 && <div><b>{rv.average}</b><span>Rating</span></div>}
           </div>
@@ -327,6 +330,7 @@ export default function Profile() {
         {editing && <EditProfile person={person} onClose={() => setEditing(false)} onSaved={async () => { await load(); await refreshProfile(); setEditing(false); }} />}
         {shareCard && <ShareModal card={shareCard} title={isSelf ? 'Share your profile' : `Share ${first}`} onClose={() => setShareCard(null)} />}
       </AnimatePresence>
+      {followList && <FollowList personId={person.id} name={isSelf ? '' : person.name} kind={followList} onClose={() => setFollowList(null)} />}
     </div>
   );
 }
