@@ -20,13 +20,25 @@ export default function AdminPage() {
   const [preset, setPreset] = useState({});
   const [reports, setReports] = useState(null);
   const tab = TABS.some(([t]) => t === sp.get('tab')) ? sp.get('tab') : 'overview';
-  useEffect(() => { Admin.me().then(() => setOk(true)).catch(() => setOk(false)); }, []);
+  const [slow, setSlow] = useState(false);
+  const [why, setWhy] = useState('');
+  // The console opens straight away; this check only turns people away who are not admins (403).
+  // Anything else (server asleep, network) is shown instead of leaving a blank page.
+  useEffect(() => {
+    let alive = true;
+    const t = setTimeout(() => { if (alive) setSlow(true); }, 6000);
+    Admin.me()
+      .then(() => { if (alive) { setOk(true); setWhy(''); } })
+      .catch((e) => { if (!alive) return; if (e?.status === 403 || e?.status === 401) setOk(false); else setWhy(e?.message || 'Could not reach the server.'); });
+    return () => { alive = false; clearTimeout(t); };
+  }, []);
   const go = (t, p = {}) => { setPreset(p); setSp({ tab: t }, { replace: true }); window.scrollTo({ top: 0 }); };
   if (ok === false) return <Navigate to="/home" replace />;
-  if (ok == null) return <div className="page-loading"><span className="spinner" /></div>;
   return (
     <div className="ad">
       <div className="ad-head"><ShieldCheck size={22} /><div><h1>Admin console</h1><p>You can see and change anything here. Every change is recorded.</p></div></div>
+      {why && <p className="ad-empty" role="alert">Could not confirm your admin access: {why} <button className="btn btn-ghost btn-sm" onClick={() => window.location.reload()}>Try again</button></p>}
+      {!why && ok == null && slow && <p className="ad-empty">The server is waking up. This can take up to a minute.</p>}
       <div className="ad-tabs" role="tablist">
         {TABS.map(([t, label, Icon]) => (
           <button key={t} role="tab" aria-selected={tab === t} className={tab === t ? 'on' : ''} onClick={() => go(t)}><Icon size={15} />{label}{t === 'reports' && reports > 0 && <em>{reports}</em>}</button>
