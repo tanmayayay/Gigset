@@ -107,6 +107,7 @@ export default function People({ preset }) {
       </div>
       <div className="adm-chips">{FILTERS.map(([v, l]) => <button key={v} className={filter === v ? 'on' : ''} onClick={() => reset(setFilter)(v)}>{l}</button>)}{(type || q || filter) && <button onClick={() => { setQ(''); setFilter(''); setType(''); setSkip(0); }}><X size={12} /> Clear</button>}</div>
       <div className="adm-table">
+        <div className="adm-thead"><span /><span>Person</span><span>Role · City</span><span>Activity</span><span>Joined</span><span /></div>
         {!data ? <div className="shimmer-strip" style={{ height: 200, borderRadius: 12 }} /> : data.items.length === 0 ? <p className="adm-empty">Nobody matches.</p> : data.items.map((u) => (
           <button key={u.id} className="adm-trow" onClick={() => setOpen(u.id)}>
             <Avatar name={u.name} src={u.avatarUrl} size={36} />
