@@ -16,8 +16,8 @@ function Kpi({ label, value, hint, values, color, onClick, warn }) {
   return (
     <button className={`adm-kpi${warn ? ' warn' : ''}`} onClick={onClick} disabled={!onClick}>
       <span>{label}</span><b>{fmt(value)}</b>
+      <em className={d > 0 ? 'up' : d < 0 ? 'down' : ''}>{d != null ? (d === 0 ? 'No change' : `${d > 0 ? '+' : '−'}${Math.abs(d)}%`) : hint}</em>
       {values && <Spark values={values} color={color} />}
-      <em className={d > 0 ? 'up' : d < 0 ? 'down' : ''}>{d != null ? `${d > 0 ? '▲' : d < 0 ? '▼' : '–'} ${Math.abs(d)}% vs earlier half` : hint}</em>
     </button>
   );
 }
@@ -39,7 +39,7 @@ export default function Overview({ go }) {
   return (
     <div className="adm-stack">
       <div className="adm-row-head">
-        <div><h2>How TheGigSet is doing</h2><p>Live numbers from your database. Click anything with a hover effect to dig in.</p></div>
+        <div><h2>How TheGigSet is doing</h2><p>Live from your database. Click a tile or chart to dig in.</p></div>
         <div className="adm-seg">{RANGES.map((r) => <button key={r} className={days === r ? 'on' : ''} onClick={() => setDays(r)}>{r} days</button>)}</div>
       </div>
 
@@ -58,7 +58,7 @@ export default function Overview({ go }) {
 
       <section className="adm-card">
         <h3>Trends</h3>
-        <p className="adm-sub">Click a name below the title to hide or show that line. Move your mouse over the chart for exact numbers.</p>
+        <p className="adm-sub">Click a name to show or hide it. Hover for exact numbers.</p>
         <LineChart labels={d.labels} series={SERIES.map(([key, name, color]) => ({ key, name, color, values: s[key] })).filter((x, i) => i < 5 || sum(x.values) > 0)} />
       </section>
 
@@ -74,9 +74,9 @@ export default function Overview({ go }) {
       <div className="adm-grid2">
         <section className="adm-card"><h3>When people are active</h3><p className="adm-sub">Posts, comments and messages by day and hour. Good times to announce something.</p><Heatmap cells={d.heat} /></section>
         <section className="adm-card"><h3>Marketplace health</h3>
-          <p className="adm-sub">Booking requests by outcome</p><Bars rows={d.breakdowns.bookings} color={PALETTE[2]} format={(r) => ({ PENDING: 'Waiting', CONFIRMED: 'Confirmed', CANCELLED: 'Cancelled' }[r.key] || r.key)} />
-          <p className="adm-sub" style={{ marginTop: 16 }}>Gigs posted</p><Bars rows={d.breakdowns.opportunities} color={PALETTE[3]} />
-          <p className="adm-sub" style={{ marginTop: 16 }}>Verification</p><Bars rows={d.breakdowns.verification} color={PALETTE[4]} onPick={(r) => go('people', { filter: r.key === 'VERIFIED' ? 'verified' : r.key === 'PENDING' ? 'pending' : '' })} />
+          <p className="adm-sub">Booking requests by outcome</p><Bars rows={d.breakdowns.bookings} color={PALETTE[0]} format={(r) => ({ PENDING: 'Waiting', CONFIRMED: 'Confirmed', CANCELLED: 'Cancelled' }[r.key] || r.key)} />
+          <p className="adm-sub" style={{ marginTop: 16 }}>Gigs posted</p><Bars rows={d.breakdowns.opportunities} color={PALETTE[0]} />
+          <p className="adm-sub" style={{ marginTop: 16 }}>Verification</p><Bars rows={d.breakdowns.verification} color={PALETTE[0]} onPick={(r) => go('people', { filter: r.key === 'VERIFIED' ? 'verified' : r.key === 'PENDING' ? 'pending' : '' })} />
         </section>
       </div>
 

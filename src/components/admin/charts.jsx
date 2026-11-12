@@ -1,28 +1,31 @@
 import { useMemo, useState } from 'react';
 
-export const PALETTE = ['#FFB020', '#FFD166', '#E89A00', '#f59e0b', '#10b981', '#CC8400', '#ef4444', '#FFB020'];
+export const PALETTE = ['#FFB020', '#8E8E93', '#D9951A', '#BDBDC2', '#5FA777', '#E8C27A', '#D9685C', '#6E6E73'];
 export const fmt = (n) => (n == null ? '–' : n >= 10000 ? `${(n / 1000).toFixed(n >= 100000 ? 0 : 1)}k` : n.toLocaleString('en-IN'));
 const niceMax = (m) => { if (m <= 4) return 4; const p = 10 ** Math.floor(Math.log10(m)); const f = m / p; return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 5 ? 5 : 10) * p; };
 const shortDay = (d) => new Date(`${d}T00:00:00Z`).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', timeZone: 'UTC' });
 
 /** Tiny trend line for KPI tiles. */
-export function Spark({ values, color = PALETTE[0], w = 96, h = 30 }) {
+export function Spark({ values, color = PALETTE[0], w = 120, h = 24 }) {
   if (!values?.length) return null;
   const max = Math.max(...values, 1);
-  const pts = values.map((v, i) => `${(i / Math.max(values.length - 1, 1)) * w},${h - 2 - (v / max) * (h - 5)}`).join(' ');
-  return <svg className="adm-spark" width={w} height={h} viewBox={`0 0 ${w} ${h}`} aria-hidden="true"><polyline points={pts} fill="none" stroke={color} strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" /></svg>;
+  const px = (i) => 2 + (i / Math.max(values.length - 1, 1)) * (w - 4);
+  const py = (v) => h - 3 - (v / max) * (h - 7);
+  const pts = values.map((v, i) => `${px(i)},${py(v)}`).join(' ');
+  const last = values.length - 1;
+  return <svg className="adm-spark" width="100%" height={h} viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" aria-hidden="true"><polyline points={pts} fill="none" stroke={color} strokeWidth="1.25" strokeLinejoin="round" strokeLinecap="round" vectorEffect="non-scaling-stroke" opacity=".85" /><circle cx={px(last)} cy={py(values[last])} r="2" fill={color} /></svg>;
 }
 
 /** Multi-series line/area chart. Hover for a crosshair and every value for that day; click the legend to hide a line. */
 export function LineChart({ labels, series, height = 260 }) {
-  const [off, setOff] = useState(() => new Set());
+  const [off, setOff] = useState(() => new Set(series.slice(2).map((x) => x.key)));
   const [hover, setHover] = useState(null);
   const W = 800, H = height, L = 40, R = 14, T = 14, B = 28;
   const shown = series.filter((s) => !off.has(s.key));
   const max = niceMax(Math.max(1, ...shown.flatMap((s) => s.values)));
   const x = (i) => L + (i / Math.max(labels.length - 1, 1)) * (W - L - R);
   const y = (v) => T + (1 - v / max) * (H - T - B);
-  const ticks = [0, 0.25, 0.5, 0.75, 1].map((t) => Math.round(max * t));
+  const ticks = [0, 0.5, 1].map((t) => Math.round(max * t));
   const step = Math.ceil(labels.length / 7);
   const onMove = (e) => {
     const r = e.currentTarget.getBoundingClientRect();
@@ -46,14 +49,14 @@ export function LineChart({ labels, series, height = 260 }) {
             const pts = s.values.map((v, i) => `${x(i)},${y(v)}`);
             return (
               <g key={s.key}>
-                {k === 0 && <polygon points={`${x(0)},${y(0)} ${pts.join(' ')} ${x(labels.length - 1)},${y(0)}`} fill={s.color} opacity="0.1" />}
-                <polyline points={pts.join(' ')} fill="none" stroke={s.color} strokeWidth="2.4" strokeLinejoin="round" strokeLinecap="round" />
+                {k === 0 && <polygon points={`${x(0)},${y(0)} ${pts.join(' ')} ${x(labels.length - 1)},${y(0)}`} fill={s.color} opacity="0.07" />}
+                <polyline points={pts.join(' ')} fill="none" stroke={s.color} strokeWidth="1.75" strokeLinejoin="round" strokeLinecap="round" />
               </g>
             );
           })}
           {hover != null && <>
             <line x1={x(hover)} x2={x(hover)} y1={T} y2={H - B} className="adm-cross" />
-            {shown.map((s) => <circle key={s.key} cx={x(hover)} cy={y(s.values[hover])} r="4.5" fill={s.color} stroke="var(--panel,#fff)" strokeWidth="2" />)}
+            {shown.map((s) => <circle key={s.key} cx={x(hover)} cy={y(s.values[hover])} r="3.5" fill={s.color} stroke="var(--panel,#fff)" strokeWidth="1.5" />)}
           </>}
         </svg>
         {hover != null && (
@@ -89,15 +92,15 @@ export function Bars({ rows, onPick, color = PALETTE[0], format = (r) => r.key }
 export function Donut({ rows, format = (r) => r.key, onPick }) {
   const [hi, setHi] = useState(null);
   const total = rows.reduce((a, r) => a + r.n, 0);
-  const R = 52, C = 2 * Math.PI * R;
+  const R = 56, C = 2 * Math.PI * R;
   let acc = 0;
   return (
     <div className="adm-donut">
       <svg viewBox="0 0 140 140" width="150" height="150">
-        <circle cx="70" cy="70" r={R} fill="none" stroke="var(--border)" strokeWidth="18" opacity=".35" />
+        <circle cx="70" cy="70" r={R} fill="none" stroke="var(--border)" strokeWidth="9" opacity=".5" />
         {rows.map((r, i) => {
           const len = total ? (r.n / total) * C : 0;
-          const el = <circle key={r.key} cx="70" cy="70" r={R} fill="none" stroke={PALETTE[i % PALETTE.length]} strokeWidth={hi === i ? 22 : 18} strokeDasharray={`${len} ${C - len}`} strokeDashoffset={-acc} transform="rotate(-90 70 70)" style={{ cursor: onPick ? 'pointer' : 'default', transition: 'stroke-width .15s' }} onMouseEnter={() => setHi(i)} onMouseLeave={() => setHi(null)} onClick={() => onPick?.(r)} />;
+          const el = <circle key={r.key} cx="70" cy="70" r={R} fill="none" stroke={PALETTE[i % PALETTE.length]} strokeWidth={hi === i ? 12 : 9} strokeDasharray={`${len} ${C - len}`} strokeDashoffset={-acc} transform="rotate(-90 70 70)" style={{ cursor: onPick ? 'pointer' : 'default', transition: 'stroke-width .15s' }} onMouseEnter={() => setHi(i)} onMouseLeave={() => setHi(null)} onClick={() => onPick?.(r)} />;
           acc += len;
           return el;
         })}
@@ -118,8 +121,8 @@ export function Funnel({ steps }) {
         const prev = i ? steps[i - 1].n : null;
         return (
           <div key={s.key} className="adm-fstep">
-            <div className="adm-fbar" style={{ width: `${Math.max(6, (s.n / top) * 100)}%`, background: PALETTE[i % PALETTE.length] }}><b>{fmt(s.n)}</b></div>
-            <span>{s.key}{prev != null && prev > 0 && <em>{Math.round((s.n / prev) * 100)}% of previous</em>}</span>
+            <span><b>{s.key}</b><em>{prev != null && prev > 0 ? `${Math.round((s.n / prev) * 100)}% of previous` : ''}</em><strong>{fmt(s.n)}</strong></span>
+            <div className="adm-fbar" style={{ width: `${Math.max(2, (s.n / top) * 100)}%`, background: PALETTE[0], opacity: 1 - i * 0.18 }} />
           </div>
         );
       })}
