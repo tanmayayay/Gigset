@@ -22,7 +22,7 @@ export default function Reports({ onCount }) {
         {!data ? <div className="shimmer-strip" style={{ height: 140, borderRadius: 12 }} /> : data.items.length === 0 ? <p className="adm-empty">{tab === 'OPEN' ? 'All clear. Nothing waiting.' : 'Nothing here.'}</p> : data.items.map((r) => (
           <div key={r.id} className="adm-item">
             <div className="adm-item-main">
-              <b>{WHY[r.reason] || r.reason}: {WHAT[r.targetType] || r.targetType}</b>
+              <b>{WHY[r.reason] || r.reason}: {WHAT[r.targetType] || r.targetType}{r.status === 'REVIEWED' && <i className="adm-seen">Seen</i>}</b>
               <p className="adm-quote">{r.gone ? 'This has already been removed.' : r.preview}</p>
               {r.details && <p>“{r.details}”</p>}
               <span>Reported by {r.reporter?.name} · {new Date(r.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</span>

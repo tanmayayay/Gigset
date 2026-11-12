@@ -285,9 +285,11 @@ router.delete('/content/opportunities/:id', asyncHandler(async (req, res) => {
 router.get('/reports', asyncHandler(async (req, res) => {
   const { take, skip } = pagination(req);
   const status = ['OPEN', 'REVIEWED', 'ACTIONED', 'DISMISSED'].includes(req.query.status) ? req.query.status : 'OPEN';
+  // "Mark seen" (REVIEWED) reports are listed under Dismissed, flagged as seen.
+  const where = { status: status === 'DISMISSED' ? { in: ['DISMISSED', 'REVIEWED'] } : status };
   const [rows, total] = await Promise.all([
-    prisma.report.findMany({ where: { status }, orderBy: { createdAt: 'desc' }, take, skip, include: { reporter: { select: { id: true, name: true } } } }),
-    prisma.report.count({ where: { status } }),
+    prisma.report.findMany({ where, orderBy: { createdAt: 'desc' }, take, skip, include: { reporter: { select: { id: true, name: true } } } }),
+    prisma.report.count({ where }),
   ]);
   // Show what was reported so nobody has to hunt for it.
   const items = await Promise.all(rows.map(async (r) => {
