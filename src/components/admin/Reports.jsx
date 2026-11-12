@@ -15,20 +15,20 @@ export default function Reports({ onCount }) {
   useEffect(() => { load(); }, [load]);
   const act = async (r, action) => { try { await Admin.resolveReport(r.id, action, r.authorId); pushToast('Done.'); load(); } catch (e) { pushToast(e.message, 'error'); } };
   return (
-    <div className="ad-stack">
-      <div className="ad-row-head"><div><h2>Reports</h2><p>Things members flagged. Look at what was reported, then pick one button.</p></div></div>
-      <div className="ad-seg">{TABS.map(([v, l]) => <button key={v} className={tab === v ? 'on' : ''} onClick={() => setTab(v)}>{l}</button>)}</div>
-      <div className="ad-list">
-        {!data ? <div className="shimmer-strip" style={{ height: 140, borderRadius: 12 }} /> : data.items.length === 0 ? <p className="ad-empty">{tab === 'OPEN' ? 'All clear. Nothing waiting.' : 'Nothing here.'}</p> : data.items.map((r) => (
-          <div key={r.id} className="ad-item">
-            <div className="ad-item-main">
+    <div className="adm-stack">
+      <div className="adm-row-head"><div><h2>Reports</h2><p>Things members flagged. Look at what was reported, then pick one button.</p></div></div>
+      <div className="adm-seg">{TABS.map(([v, l]) => <button key={v} className={tab === v ? 'on' : ''} onClick={() => setTab(v)}>{l}</button>)}</div>
+      <div className="adm-list">
+        {!data ? <div className="shimmer-strip" style={{ height: 140, borderRadius: 12 }} /> : data.items.length === 0 ? <p className="adm-empty">{tab === 'OPEN' ? 'All clear. Nothing waiting.' : 'Nothing here.'}</p> : data.items.map((r) => (
+          <div key={r.id} className="adm-item">
+            <div className="adm-item-main">
               <b>{WHY[r.reason] || r.reason}: {WHAT[r.targetType] || r.targetType}</b>
-              <p className="ad-quote">{r.gone ? 'This has already been removed.' : r.preview}</p>
+              <p className="adm-quote">{r.gone ? 'This has already been removed.' : r.preview}</p>
               {r.details && <p>“{r.details}”</p>}
               <span>Reported by {r.reporter?.name} · {new Date(r.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</span>
             </div>
             {tab === 'OPEN' && (
-              <div className="ad-item-act">
+              <div className="adm-item-act">
                 {r.targetType !== 'USER' && r.targetType !== 'MESSAGE' && !r.gone && <button className="btn btn-danger btn-sm" onClick={() => act(r, 'HIDE')}><EyeOff size={14} /> Remove it</button>}
                 {r.authorId && <button className="btn btn-danger btn-sm" onClick={() => act(r, 'SUSPEND')}><ShieldOff size={14} /> Suspend the person</button>}
                 <button className="btn btn-ghost btn-sm" onClick={() => act(r, 'DISMISS')}><X size={14} /> It’s fine</button>

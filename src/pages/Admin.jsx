@@ -35,11 +35,11 @@ export default function AdminPage() {
   const go = (t, p = {}) => { setPreset(p); setSp({ tab: t }, { replace: true }); window.scrollTo({ top: 0 }); };
   if (ok === false) return <Navigate to="/home" replace />;
   return (
-    <div className="ad">
-      <div className="ad-head"><ShieldCheck size={22} /><div><h1>Admin console</h1><p>You can see and change anything here. Every change is recorded.</p></div></div>
-      {why && <p className="ad-empty" role="alert">Could not confirm your admin access: {why} <button className="btn btn-ghost btn-sm" onClick={() => window.location.reload()}>Try again</button></p>}
-      {!why && ok == null && slow && <p className="ad-empty">The server is waking up. This can take up to a minute.</p>}
-      <div className="ad-tabs" role="tablist">
+    <div className="adm">
+      <div className="adm-head"><ShieldCheck size={22} /><div><h1>Admin console</h1><p>You can see and change anything here. Every change is recorded.</p></div></div>
+      {why && <p className="adm-empty" role="alert">Could not confirm your admin access: {why} <button className="btn btn-ghost btn-sm" onClick={() => window.location.reload()}>Try again</button></p>}
+      {!why && ok == null && slow && <p className="adm-empty">The server is waking up. This can take up to a minute.</p>}
+      <div className="adm-tabs" role="tablist">
         {TABS.map(([t, label, Icon]) => (
           <button key={t} role="tab" aria-selected={tab === t} className={tab === t ? 'on' : ''} onClick={() => go(t)}><Icon size={15} />{label}{t === 'reports' && reports > 0 && <em>{reports}</em>}</button>
         ))}
