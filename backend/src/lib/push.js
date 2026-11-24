@@ -8,7 +8,7 @@ function init() {
   if (ready !== null) return ready;
   const { VAPID_PUBLIC_KEY: pub, VAPID_PRIVATE_KEY: priv, VAPID_SUBJECT: subj } = process.env;
   ready = !!(pub && priv);
-  if (ready) webpush.setVapidDetails(subj || 'mailto:hello@strings.app', pub, priv);
+  if (ready) webpush.setVapidDetails(subj || 'mailto:hello@thegigset.com', pub, priv);
   return ready;
 }
 export const pushEnabled = () => init();

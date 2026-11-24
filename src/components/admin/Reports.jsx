@@ -4,7 +4,7 @@ import { Admin } from '../../lib/api';
 import { useStore } from '../../store/store';
 
 const TABS = [['OPEN', 'Needs a look'], ['ACTIONED', 'Acted on'], ['DISMISSED', 'Dismissed']];
-const WHAT = { USER: 'a person', POST: 'a post', MESSAGE: 'a message', OPPORTUNITY: 'a gig', COMMUNITY_POST: 'a community post', COMMUNITY_COMMENT: 'a community comment' };
+const WHAT = { APP: 'a problem with the app', USER: 'a person', POST: 'a post', MESSAGE: 'a message', OPPORTUNITY: 'a gig', COMMUNITY_POST: 'a community post', COMMUNITY_COMMENT: 'a community comment' };
 const WHY = { SPAM: 'Spam', HARASSMENT: 'Harassment', FAKE: 'Fake account', INAPPROPRIATE: 'Inappropriate', SCAM: 'Scam', OTHER: 'Other' };
 
 export default function Reports({ onCount }) {

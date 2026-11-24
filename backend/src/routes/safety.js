@@ -6,7 +6,8 @@ import { notify } from '../lib/notify.js';
 
 const router = Router();
 
-const TARGETS = ['USER', 'POST', 'MESSAGE', 'OPPORTUNITY', 'COMMUNITY_POST', 'COMMUNITY_COMMENT'];
+// APP: a problem with TheGigSet itself, sent from Help & Legal (targetId is the page it came from).
+const TARGETS = ['USER', 'POST', 'MESSAGE', 'OPPORTUNITY', 'COMMUNITY_POST', 'COMMUNITY_COMMENT', 'APP'];
 const REASONS = ['SPAM', 'HARASSMENT', 'FAKE', 'INAPPROPRIATE', 'SCAM', 'OTHER'];
 
 // POST /api/reports  { targetType, targetId, reason, details? }
@@ -47,8 +48,11 @@ async function alertAdmins(reporterId, { targetType, targetId, reason, details }
   ]);
   const what = targetType.replace('_', ' ').toLowerCase();
   const reasonText = reason.charAt(0) + reason.slice(1).toLowerCase();
-  const title = `New report: ${what} (${reasonText})`;
-  const body = `${reporter?.name || 'Someone'} reported a ${what} for ${reasonText.toLowerCase()}.${details ? ` “${details.slice(0, 280)}”` : ''} ID: ${targetId}`;
+  const app = targetType === 'APP';
+  const title = app ? 'New problem report about the app' : `New report: ${what} (${reasonText})`;
+  const body = app
+    ? `${reporter?.name || 'Someone'} reported a problem from ${targetId}.${details ? ` “${details.slice(0, 280)}”` : ''}`
+    : `${reporter?.name || 'Someone'} reported a ${what} for ${reasonText.toLowerCase()}.${details ? ` “${details.slice(0, 280)}”` : ''} ID: ${targetId}`;
   await Promise.all(admins.filter((a) => a.id !== reporterId).map((a) => notify(a.id, {
     type: 'admin', title, body, link: '/admin?tab=reports',
     email: { subject: title, intro: body, cta: 'Review report' },

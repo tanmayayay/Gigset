@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import { reportError } from '../lib/crash';
 
 const RELOAD_KEY = 'gigset.chunkReload';
 const isChunkError = (e) => /Loading chunk|dynamically imported module|Importing a module script failed|Failed to fetch/i.test(String(e?.message || e));
@@ -13,6 +14,7 @@ export default class ErrorBoundary extends Component {
 
   componentDidCatch(error) {
     console.error('TheGigSet crashed:', error);
+    reportError(error, 'render');
     if (!isChunkError(error)) return;
     try {
       const last = Number(sessionStorage.getItem(RELOAD_KEY) || 0);

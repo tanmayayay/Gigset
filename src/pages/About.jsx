@@ -16,10 +16,10 @@ export default function About() {
 
       <div className="post-card" style={{ padding: 28 }}>
         <h4 style={{ fontSize: 16, marginBottom: 10, display: 'flex', alignItems: 'center', gap: 8 }}><Layers size={17} style={{ color: 'var(--blue)' }} /> Where we are</h4>
-        <p style={{ color: 'var(--text-dim)', fontSize: 14.5, lineHeight: 1.7, marginBottom: 16 }}>This is the Phase 1 prototype of the TheGigSet concept — built to demonstrate the sitemap, feature set, and stakeholder model. The build ships in three phases:</p>
+        <p style={{ color: 'var(--text-dim)', fontSize: 14.5, lineHeight: 1.7, marginBottom: 16 }}>TheGigSet is in Phase 1 and preparing for its first pilot with artists, venues and organisers. It is being built in three phases:</p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {[
-            ['Phase 1 — Network (this prototype)', 'Profiles, feeds, Gighub discovery, Collab marketplace, communities, daily news, messaging.', 'blue'],
+            ['Phase 1 — Network (live now)', 'Profiles, feeds, Gighub discovery, Collab marketplace, communities, daily news, messaging.', 'blue'],
             ['Phase 2 — Marketplace depth', 'Applicant review, subscriptions, profile analytics, expanded search, brand placements.', 'sky'],
             ['Phase 3 — Services', 'Structured booking workflow, live streaming, artist management & broker services.', 'indigo'],
           ].map(([t, d, c]) => (

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { motion, AnimatePresence, useInView, useScroll, useTransform, useMotionValueEvent } from 'framer-motion';
+import { motion, AnimatePresence, useScroll, useTransform, useMotionValueEvent } from 'framer-motion';
 import {
   Mic, Building2, Briefcase, SlidersHorizontal, GraduationCap, ArrowRight, ChevronRight, ChevronLeft,
   BadgeCheck, Sparkles, Plus, Play, Heart, MapPin, CalendarCheck, Radio,
@@ -137,7 +137,7 @@ function Device({ screen = 'profile', style }) {
   const Screen = SCREENS[screen];
   return (
     <div className="dv" style={style}>
-      <div className="dv-bar"><i /><i /><i /><span>gigset.app</span></div>
+      <div className="dv-bar"><i /><i /><i /><span>Sample profile · thegigset.com</span></div>
       <AnimatePresence mode="wait">
         <motion.div key={screen} initial={{ opacity: 0, y: 14, scale: 0.985 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.4, ease }}>
           <Screen />
@@ -255,29 +255,6 @@ function Roles({ onJoin }) {
 }
 
 /* ============================================================
-   Numbers
-   ============================================================ */
-function Stat({ value, suffix, label }) {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: '-60px' });
-  const n = useCountUp(value, inView);
-  return <div className="ap-stat" ref={ref}><b>{n.toLocaleString('en-IN')}{suffix}</b><span>{label}</span></div>;
-}
-function Stats() {
-  return (
-    <section className="ap-stats">
-      <Reveal className="ap-stats-grid">
-        <Stat value={2400} suffix="+" label="Artists and crew" />
-        <Stat value={120} suffix="+" label="Venues and spaces" />
-        <Stat value={8} suffix="" label="Launch cities" />
-        <Stat value={10} suffix="k+" label="Gigs matched" />
-      </Reveal>
-      <p className="ap-fine">Illustrative early-traction targets. Demo figures, not verified metrics.</p>
-    </section>
-  );
-}
-
-/* ============================================================
    Match demo (interactive)
    ============================================================ */
 const ROLE_OPTIONS = ['Performer', 'Venue', 'Crew', 'Buyer', 'Institution'];
@@ -327,44 +304,6 @@ function MatchWidget() {
   );
 }
 
-/* ============================================================
-   Stories
-   ============================================================ */
-const QUOTES = [
-  {
-    quote: 'I stopped losing gig leads to WhatsApp chaos. On TheGigSet every enquiry lands on my profile with a budget and a date attached — I booked three sessions in my first week.',
-    name: 'Meera Iyer', meta: 'Vocalist · Mumbai',
-  },
-  {
-    quote: 'We filled a full December crew roster in four days. The match scores pointed us at engineers we would never have found through our usual networks.',
-    name: 'Depot 48', meta: 'Venue · Delhi-NCR',
-  },
-  {
-    quote: 'The AI match scores are scary accurate. I get session briefs that actually fit my style instead of wading through group-chat noise.',
-    name: 'Anjali Kulkarni', meta: 'Session guitarist · Pune',
-  },
-];
-function Testimonials() {
-  const [idx, setIdx] = useState(0);
-  useEffect(() => {
-    const t = setInterval(() => setIdx((i) => (i + 1) % QUOTES.length), 6500);
-    return () => clearInterval(t);
-  }, []);
-  const q = QUOTES[idx];
-  const person = PEOPLE.find((p) => p.name === q.name);
-  return (
-    <section className="ap-quotes">
-      <AnimatePresence mode="wait">
-        <motion.figure key={idx} initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }} transition={{ duration: 0.55, ease }}>
-          <blockquote>&ldquo;{q.quote}&rdquo;</blockquote>
-          <figcaption><i style={{ background: person?.heroGradient || avatarColor(q.name) }}>{initials(q.name)}</i><b>{q.name}</b><span>{q.meta}</span></figcaption>
-        </motion.figure>
-      </AnimatePresence>
-      <div className="ap-dots">{QUOTES.map((_, i) => <button key={i} className={i === idx ? 'on' : ''} onClick={() => setIdx(i)} aria-label={`Story ${i + 1}`} />)}</div>
-    </section>
-  );
-}
-
 const FAQS = [
   {
     q: 'Is TheGigSet free?',
@@ -376,11 +315,11 @@ const FAQS = [
   },
   {
     q: 'How is this different from Instagram or WhatsApp?',
-    a: 'Instagram is for audiences; WhatsApp is for chaos. TheGigSet is for work: verified profiles with real skills and gig history, structured briefs with budgets and dates, AI match scores so the right people see the right opportunities, and outreach that arrives spam-free — no broadcast groups, no buried leads.',
+    a: 'Instagram is for audiences; WhatsApp is for chaos. TheGigSet is for work: verified profiles with real skills and gig history, structured briefs with budgets and dates, match scores so the right people see the right opportunities, and outreach that arrives spam-free — no broadcast groups, no buried leads.',
   },
   {
     q: 'What does Phase 1 include?',
-    a: 'Three things: the Network (verified profiles and connections), Discovery & collab (the gig board with AI match scores), and the Newsroom (a daily briefing on the Indian music industry). That\'s the foundation everything else — bookings, payments, ticketing — will be built on.',
+    a: 'Three things: the Network (verified profiles and connections), Discovery & collab (the gig board with match scores), and the Newsroom (a daily briefing on the Indian music industry). That\'s the foundation everything else — bookings, payments, ticketing — will be built on.',
   },
   {
     q: 'When do bookings go live?',
@@ -453,9 +392,7 @@ export default function Landing() {
       <Hero onJoin={onJoin} onDemo={onDemo} />
       <StoryScroll />
       <Roles onJoin={onJoin} />
-      <Stats />
       <MatchWidget />
-      <Testimonials />
       <Faq />
       <BigCta onJoin={onJoin} />
       <Footer />

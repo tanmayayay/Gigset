@@ -5,6 +5,7 @@ import './future.css'
 import App from './App.jsx'
 import { warmUpApi, prefetchBoot } from './lib/api'
 import { captureRef } from './lib/ref'
+import { installCrashReporting } from './lib/crash'
 
 // Rebrand: carry saved local data over from the old "strings." keys, once.
 try {
@@ -25,6 +26,7 @@ window.addEventListener('hashchange', () => {
   if (window.location.hash.startsWith('#/')) window.location.replace(window.location.hash.slice(1) || '/')
 })
 
+installCrashReporting() // send errors from our own code to the server log
 captureRef() // remember ?ref=CODE from an invite link
 warmUpApi()
 prefetchBoot()

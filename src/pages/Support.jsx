@@ -3,6 +3,7 @@ import { HelpCircle, Flag, FileText, ShieldCheck } from 'lucide-react';
 import { PageHead } from '../components/ui';
 import { useStore } from '../store/store';
 import { useSeo } from '../lib/seo';
+import { Safety } from '../lib/api';
 
 const TABS = [
   ['help', 'Help centre', HelpCircle],
@@ -14,7 +15,18 @@ const TABS = [
 export default function Support() {
   useSeo({ title: 'Help & Legal', description: 'Help, reporting, Terms of Service and Privacy Policy for TheGigSet.', path: '/support' });
   const [tab, setTab] = useState('help');
-  const { pushToast } = useStore();
+  const { pushToast, user } = useStore();
+  const [problem, setProblem] = useState('');
+  const [sending, setSending] = useState(false);
+  const sendProblem = async () => {
+    setSending(true);
+    try {
+      await Safety.report({ targetType: 'APP', targetId: window.location.pathname.slice(0, 60) || '/', reason: 'OTHER', details: problem.trim() });
+      setProblem('');
+      pushToast('Thanks. The team has your report and will look at it.');
+    } catch (e) { pushToast(e.message || 'Could not send the report.', 'error'); }
+    setSending(false);
+  };
 
   return (
     <div>
@@ -46,15 +58,18 @@ export default function Support() {
 
       {tab === 'report' && (
         <div className="post-card" style={{ padding: 24 }}>
-          <h4 style={{ marginBottom: 10 }}>Report a user or a piece of content</h4>
-          <p style={{ color: 'var(--text-dim)', fontSize: 13.5, marginBottom: 14 }}>Use this if a profile, post, or message violates community guidelines — impersonation, harassment, or misleading booking claims.</p>
-          <label>What are you reporting?</label>
-          <select style={{ width: '100%', background: 'var(--panel-2)', border: '1px solid var(--border)', borderRadius: 10, color: 'var(--text)', padding: '10px 12px', fontSize: 13.5, marginBottom: 12 }}>
-            <option>A profile</option><option>A post</option><option>A message</option><option>An opportunity listing</option>
-          </select>
-          <label>Describe what happened</label>
-          <textarea id="report-body" style={{ width: '100%', minHeight: 90, background: 'var(--panel-2)', border: '1px solid var(--border)', borderRadius: 10, color: 'var(--text)', padding: '10px 12px', fontSize: 13.5 }} placeholder="Describe what happened…" />
-          <button className="btn btn-blue btn-sm" style={{ marginTop: 12 }} onClick={() => pushToast('Report submitted — our team reviews every report within 48 hours.')}>Submit report</button>
+          <h4 style={{ marginBottom: 10 }}>Report a person, post or message</h4>
+          <p style={{ color: 'var(--text-dim)', fontSize: 13.5, lineHeight: 1.65, marginBottom: 18 }}>Open the ⋯ menu on the profile, post, message or community thread and choose Report. It goes straight to our team with a link to what you reported, and you can block the person from the same menu.</p>
+          <h4 style={{ marginBottom: 10 }}>Report a problem with TheGigSet</h4>
+          {user ? (
+            <>
+              <p style={{ color: 'var(--text-dim)', fontSize: 13.5, marginBottom: 12 }}>Something broken, confusing or wrong? Tell us what you were doing and what happened.</p>
+              <textarea value={problem} onChange={(e) => setProblem(e.target.value)} maxLength={1000} style={{ width: '100%', minHeight: 110, background: 'var(--panel-2)', border: '1px solid var(--border)', borderRadius: 10, color: 'var(--text)', padding: '10px 12px', fontSize: 13.5 }} placeholder="For example: I tapped Apply on a gig and nothing happened." />
+              <button className="btn btn-blue btn-sm" style={{ marginTop: 12 }} disabled={sending || problem.trim().length < 10} onClick={sendProblem}>{sending ? 'Sending…' : 'Send to the team'}</button>
+            </>
+          ) : (
+            <p style={{ color: 'var(--text-dim)', fontSize: 13.5 }}>Sign in to send a report, so we can follow up with you.</p>
+          )}
         </div>
       )}
 
@@ -68,7 +83,7 @@ export default function Support() {
       {tab === 'privacy' && (
         <div className="post-card" style={{ padding: 24 }}>
           <h4 style={{ marginBottom: 10 }}>Privacy Policy (summary)</h4>
-          <p style={{ color: 'var(--text-dim)', fontSize: 13.5, lineHeight: 1.7 }}>We store only what your profile visibility setting allows others to see. Login credentials and private contact details are encrypted and never shown publicly unless you choose to disclose them. This is a working prototype — no real personal data is collected, and everything is stored locally in your browser.</p>
+          <p style={{ color: 'var(--text-dim)', fontSize: 13.5, lineHeight: 1.7 }}>We store your account details, your profile, what you post and upload, and your messages, with our hosting providers (Supabase and Render). Other people see only what your profile visibility setting allows. Your email address and date of birth are never shown on your profile. Passwords are handled by our sign-in provider and we never see them. You can delete your account, with your posts, stories and messages, at any time from Settings. A full Privacy Policy will be published before launch.</p>
         </div>
       )}
     </div>

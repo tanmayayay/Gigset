@@ -294,6 +294,7 @@ router.get('/reports', asyncHandler(async (req, res) => {
   // Show what was reported so nobody has to hunt for it.
   const items = await Promise.all(rows.map(async (r) => {
     let preview = null, authorId = null;
+    if (r.targetType === 'APP') return { ...r, preview: `Problem reported from ${r.targetId}`, gone: false, authorId: null };
     try {
       if (r.targetType === 'USER') { const u = await prisma.user.findUnique({ where: { id: r.targetId }, select: { id: true, name: true, bio: true } }); preview = u && `${u.name}${u.bio ? ' · ' + u.bio.slice(0, 100) : ''}`; authorId = u?.id; }
       else if (r.targetType === 'POST') { const p = await prisma.post.findUnique({ where: { id: r.targetId }, select: { body: true, authorId: true } }); preview = p?.body.slice(0, 200); authorId = p?.authorId; }
