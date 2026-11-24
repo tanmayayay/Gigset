@@ -4,7 +4,8 @@
 //   EMAIL_FROM      e.g. "Gigset <hello@yourdomain.in>"
 //   EMAIL_SECRET    random string used to sign unsubscribe links
 //   API_PUBLIC_URL  public API origin, e.g. https://strings-web.onrender.com
-//   FRONTEND_URL    where the app lives (links in emails)
+//   SITE_URL        public address of the website, used in email links (default https://thegigset.com)
+//   FRONTEND_URL    allowed browser origins for CORS (comma-separated)
 import crypto from 'node:crypto';
 
 const key = () => process.env.RESEND_API_KEY;
@@ -20,7 +21,7 @@ export function unsubUrl(userId, kind) {
   const base = (process.env.API_PUBLIC_URL || '').replace(/\/+$/, '');
   return `${base}/api/email/unsubscribe?u=${encodeURIComponent(userId)}&k=${kind}&t=${unsubToken(userId, kind)}`;
 }
-export const appUrl = (path = '') => `${(process.env.FRONTEND_URL || '').replace(/\/+$/, '')}/#${path}`;
+export const appUrl = (path = '') => `${(process.env.SITE_URL || 'https://thegigset.com').replace(/\/+$/, '')}${path.startsWith('/') ? path : `/${path}`}`;
 
 /** Shared, simple, dark-header layout that renders fine in Gmail/Outlook. */
 export function layout({ title, intro, rows = [], cta, ctaUrl, unsubscribe }) {

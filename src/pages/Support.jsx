@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { HelpCircle, Flag, FileText, ShieldCheck } from 'lucide-react';
 import { PageHead } from '../components/ui';
 import { useStore } from '../store/store';
+import { useSeo } from '../lib/seo';
 
 const TABS = [
   ['help', 'Help centre', HelpCircle],
@@ -11,6 +12,7 @@ const TABS = [
 ];
 
 export default function Support() {
+  useSeo({ title: 'Help & Legal', description: 'Help, reporting, Terms of Service and Privacy Policy for TheGigSet.', path: '/support' });
   const [tab, setTab] = useState('help');
   const { pushToast } = useStore();
 

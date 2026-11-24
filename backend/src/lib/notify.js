@@ -13,7 +13,7 @@ export async function notify(userId, { type, title, body, link, from, email }) {
   try {
     if (from && (await isBlockedBetween(userId, from))) return;
     await prisma.notification.create({ data: { userId, type, title, body: body ?? null, link: link ?? null } });
-    pushTo(userId, { title, body, url: link ? `#${link}` : '#/notifications', tag: type });
+    pushTo(userId, { title, body, url: link || '/notifications', tag: type });
     if (email && emailEnabled()) {
       const u = await prisma.user.findUnique({ where: { id: userId }, select: { email: true, emailAlerts: true } });
       if (u?.email && u.emailAlerts) {

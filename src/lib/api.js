@@ -16,8 +16,8 @@ export function apiBaseUrl() {
 export function prefetchBoot() {
   try {
     const signedIn = Object.keys(localStorage).some((k) => /^sb-.*-auth-token$/.test(k));
-    const h = window.location.hash;
-    if (!signedIn || !(h === '' || h === '#/' || h.startsWith('#/home'))) return;
+    const p = window.location.pathname;
+    if (!signedIn || !(p === '/' || p.startsWith('/home'))) return;
     const quiet = (p) => p.catch(() => {});
     quiet(import('../pages/Home')); // fetch the Home screen's code in parallel with its data
     quiet(api('/api/profiles/me', { fresh: true }));

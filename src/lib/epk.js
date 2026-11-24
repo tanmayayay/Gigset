@@ -10,7 +10,7 @@ export const isTemplate = (t) => EPK_TEMPLATES.some((x) => x.id === t);
 /** The look of someone's press kit is chosen by its owner (saved on their profile). Everyone else just sees it. */
 export const ownerTemplate = (person) => { const t = person?.detail?.data?.epkTemplate; return isTemplate(t) ? t : 'classic'; };
 /** Public link to someone's press kit (HashRouter). */
-export const epkUrl = (id) => `${location.origin}${location.pathname}#/epk/${id}`;
+export const epkUrl = (id) => `${location.origin}/epk/${id}`;
 
 const safeHref = (u) => { try { const x = new URL(u); return /^https?:$/.test(x.protocol) ? x.href : null; } catch { return null; } };
 

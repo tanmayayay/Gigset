@@ -14,16 +14,16 @@ self.addEventListener('push', (event) => {
       tag: data.tag || 'gigset',
       icon: './brand/icon-192.png',
       badge: './brand/favicon-32.png',
-      data: { url: data.url || '#/notifications' },
+      data: { url: data.url || '/notifications' },
     });
   })());
 });
 
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  const hash = (event.notification.data && event.notification.data.url) || '#/notifications';
-  const target = new URL(self.registration.scope);
-  target.hash = hash.replace(/^#/, '');
+  // New notifications carry a path (/messages?c=…); older ones a hash (#/messages?c=…).
+  const link = ((event.notification.data && event.notification.data.url) || '/notifications').replace(/^#/, '');
+  const target = new URL(link, self.registration.scope);
   event.waitUntil((async () => {
     const wins = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
     for (const w of wins) {

@@ -1,0 +1,21 @@
+# TheGigSet: public pages are the home page, press kits (/epk/…), About and Help & Legal.
+# Everything else needs an account, so crawlers skip it.
+User-agent: *
+Allow: /
+Disallow: /home
+Disallow: /gighub
+Disallow: /collab
+Disallow: /community
+Disallow: /news
+Disallow: /messages
+Disallow: /saved
+Disallow: /uploads
+Disallow: /profile/
+Disallow: /search
+Disallow: /notifications
+Disallow: /settings
+Disallow: /admin
+Disallow: /onboarding
+Disallow: /live
+
+Sitemap: https://strings-web.onrender.com/sitemap.xml

@@ -6,6 +6,7 @@ import { useStore } from '../store/store';
 import EpkView from '../components/epk/EpkView';
 import useKit from '../components/epk/useKit';
 import { ownerTemplate } from '../lib/epk';
+import { useSeo, clip, SITE_URL } from '../lib/seo';
 import './epk.css';
 
 /** Press kit page. Public (outside RequireAuth). It always uses the look its owner chose; `?print=1` opens the print dialog. */
@@ -18,7 +19,26 @@ export default function Epk() {
   const print = sp.get('print') === '1';
 
   useEffect(() => { if (print && kit) { const h = setTimeout(() => window.print(), 600); return () => clearTimeout(h); } return undefined; }, [print, kit]);
-  useEffect(() => { document.title = kit ? `${kit.name} · Press kit` : 'Press kit'; }, [kit]);
+  // Index only public, adult profiles that loaded; everything else asks search engines to skip it.
+  const where = kit?.city ? ` in ${kit.city}` : '';
+  useSeo(kit ? {
+    title: `${kit.name} · ${kit.label}${where}`,
+    description: clip(`${kit.headline && kit.headline !== kit.label ? `${kit.headline}. ` : ''}${kit.about}`),
+    path: `/epk/${id}`,
+    image: kit.avatarUrl || undefined,
+    noindex: person?.seoIndex !== true,
+    jsonLd: {
+      '@context': 'https://schema.org',
+      '@type': person?.stakeholderType === 'VENUE' ? 'MusicVenue' : 'Person',
+      name: kit.name,
+      url: `${SITE_URL}/epk/${id}`,
+      ...(kit.avatarUrl ? { image: kit.avatarUrl } : {}),
+      description: clip(kit.about, 300),
+      ...(kit.city ? { address: { '@type': 'PostalAddress', addressLocality: kit.city, addressCountry: 'IN' } } : {}),
+      ...(person?.stakeholderType === 'VENUE' ? {} : { jobTitle: kit.label }),
+      ...(kit.links?.length ? { sameAs: kit.links.map((l) => l.href).filter((u) => /^https?:\/\//.test(u || '')) } : {}),
+    },
+  } : { title: 'Press kit', noindex: true });
 
   const share = async () => { try { await navigator.clipboard.writeText(location.href.replace(/[?&]print=1/, '')); } catch { /* ignore */ } pushToast('Press-kit link copied.'); };
 

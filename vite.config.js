@@ -19,9 +19,9 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
   return {
     plugins: [react(), preconnect(env)],
-    // Relative asset paths so the static build works from any sub-path
-    // (e.g. a GitHub Pages project site) with no server config.
-    base: './',
+    // Absolute asset paths: pages live at clean addresses like /epk/123,
+    // so assets must load from the site root, not relative to the page.
+    base: '/',
     build: {
       rolldownOptions: {
         output: {

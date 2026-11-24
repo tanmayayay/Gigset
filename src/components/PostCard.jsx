@@ -164,7 +164,7 @@ export default function PostCard({ post, onLike, onHide, following, onFollowChan
     } catch (e) { pushToast(e.message || 'Could not delete the comment.', 'error'); }
   };
 
-  const shareLink = `${window.location.origin}${window.location.pathname}#/profile/${author.id || ''}`;
+  const shareLink = `${window.location.origin}/profile/${author.id || ''}`;
   const share = async () => {
     const text = `${author.name || 'Someone'} on TheGigSet: “${(post.body || '').slice(0, 120)}”`;
     try {

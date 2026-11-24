@@ -1,12 +1,13 @@
 import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
 import AgeGate from './components/AgeGate';
-import { HashRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Outlet, Link, useLocation } from 'react-router-dom';
 import { StoreProvider, useStore } from './store/store';
 import Shell from './components/Shell';
 import CommandPalette from './components/CommandPalette';
 import { Toasts } from './components/widgets';
 import { PostModal, OppModal } from './components/ComposerModals';
 import Landing from './pages/Landing';
+import { Logo } from './components/ui';
 const Onboarding = lazy(() => import('./pages/Onboarding'));
 const Epk = lazy(() => import('./pages/Epk'));
 const Home = lazy(() => import('./pages/Home'));
@@ -33,8 +34,7 @@ import ErrorBoundary from './components/ErrorBoundary';
    session tokens in the URL fragment:
      #access_token=…&refresh_token=…&type=signup
    (or #error=… when the link is expired/invalid).
-   Catch that here BEFORE HashRouter mounts — HashRouter would read
-   `#access_token=…` as a route path and bounce to "/". */
+   Catch that here before the router mounts, and show the matching screen. */
 function getEmailCallback() {
   const hash = window.location.hash || '';
   if (!hash || hash.startsWith('#/')) return null; // ordinary in-app route
@@ -73,6 +73,20 @@ function LandingGate() {
   if (authLoading || (session && profileLoading)) return <div className="auth-boot"><span className="spinner" /></div>;
   if (user) return <Navigate to="/home" replace />;
   return <Landing />;
+}
+
+/* About and Help & Legal are public so search engines and visitors can read them.
+   Signed in, they open inside the app as before; signed out, in a light public frame. */
+function PublicOrApp({ shellProps }) {
+  const { user, session, authLoading, profileLoading } = useStore();
+  if (authLoading || (session && profileLoading)) return <div className="auth-boot"><span className="spinner" /></div>;
+  if (user && !(user.content && !user.content.hasBirthDate)) return <Shell {...shellProps} />;
+  return (
+    <div className="pub-page">
+      <header className="pub-top"><Link to="/" aria-label="TheGigSet home"><Logo /></Link><Link className="btn btn-blue btn-sm" to="/">Join TheGigSet</Link></header>
+      <main className="pub-main"><Outlet /></main>
+    </div>
+  );
 }
 
 function AppShell() {
@@ -132,9 +146,11 @@ function AppShell() {
           <Route path="/search" element={<Search />} />
           <Route path="/notifications" element={<Notifications />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/admin" element={<AdminPage />} />
+        </Route>
+        <Route element={<PublicOrApp shellProps={{ onOpenPalette: openPalette, onNewPost: openPost, onNewOpp: openOpp }} />}>
           <Route path="/about" element={<About />} />
           <Route path="/support" element={<Support />} />
-          <Route path="/admin" element={<AdminPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
@@ -155,7 +171,7 @@ export default function App() {
     // Drop the token fragment, then hand control to the router.
     // The session is already persisted by supabase-js, so the user lands
     // signed in (fresh signups flow into onboarding via LandingGate).
-    window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}#/`);
+    window.history.replaceState(null, '', '/');
     setEmailCallback(null);
   }, []);
 
@@ -166,11 +182,11 @@ export default function App() {
 
   return (
     <ErrorBoundary>
-      <HashRouter>
+      <BrowserRouter>
         <StoreProvider>
           <AppShell />
         </StoreProvider>
-      </HashRouter>
+      </BrowserRouter>
     </ErrorBoundary>
   );
 }

@@ -42,7 +42,7 @@ export function StoreProvider({ children }) {
   const [profileLoading, setProfileLoading] = useState(false);
   // Which auth user the current `profile` was fetched for. Until it matches the
   // live session, the profile is still "loading" — this stops route guards from
-  // bouncing deep links (e.g. a reload on /#/news) to the landing page.
+  // bouncing deep links (e.g. a reload on /news) to the landing page.
   const [profileFor, setProfileFor] = useState(null);
 
   useEffect(() => {
@@ -119,7 +119,7 @@ export function StoreProvider({ children }) {
 
   // Sends the "reset your password" email. The link brings the person back here to choose a new one.
   const resetPassword = useCallback(async (email) => {
-    const redirectTo = `${window.location.origin}${window.location.pathname}`;
+    const redirectTo = `${window.location.origin}/`;
     const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
     if (error) throw error;
   }, []);

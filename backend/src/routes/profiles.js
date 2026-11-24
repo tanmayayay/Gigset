@@ -7,6 +7,7 @@ import { notify } from '../lib/notify.js';
 import { isBlockedBetween, blockedIdsFor } from '../lib/blocks.js';
 import { connectionIds, relationBetween } from '../lib/connections.js';
 import { contentInfo, parseBirthDate } from '../lib/contentRating.js';
+import { isIndexable } from './seo.js';
 
 // The caller's own content settings (computed; the birth date itself is never sent back).
 async function withContent(user) {
@@ -391,13 +392,18 @@ router.get(
           take: 5,
         },
         _count: { select: { posts: true, followers: true, following: true } },
+        birthDate: true,
+        suspendedAt: true,
       },
     });
     if (!user) return notFound(res, 'Profile');
+    // seoIndex: may search engines list this press kit? Only the yes/no leaves the server, never the age.
+    const seoIndex = isIndexable(user);
+    delete user.birthDate; delete user.suspendedAt;
     // Private profiles are visible only to their owner.
     if (user.visibility === 'PRIVATE' && req.user?.id !== user.id) return notFound(res, 'Profile');
     if (req.user?.id !== user.id) recordView(user.id, req.user?.id || req.ip || 'anon');
-    res.json({ ...user, relation: await relationBetween(req.user?.id, user.id) });
+    res.json({ ...user, seoIndex, relation: await relationBetween(req.user?.id, user.id) });
   })
 );
 

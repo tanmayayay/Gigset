@@ -18,7 +18,7 @@ function Row({ b, who, incoming, onStatus, hot, onShare }) {
         <b>{who}</b>
         <div>{[b.timeSlot, b.budget].filter(Boolean).join(' · ') || 'No details added'}</div>
         {b.message && <q>{b.message}</q>}
-        {incoming && b.requester?.id && <a className="pf-epklink" href={`#/epk/${b.requester.id}?t=${b.epkTemplate || 'classic'}`} target="_blank" rel="noopener noreferrer"><FileText size={13} /> View their press kit</a>}
+        {incoming && b.requester?.id && <a className="pf-epklink" href={`/epk/${b.requester.id}?t=${b.epkTemplate || 'classic'}`} target="_blank" rel="noopener noreferrer"><FileText size={13} /> View their press kit</a>}
       </div>
       {b.status === 'PENDING' ? (
         <div className="pf-reqbtns">

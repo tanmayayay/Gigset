@@ -15,6 +15,16 @@ try {
   });
 } catch { /* storage unavailable */ }
 
+// Old links used /#/path. Turn them into clean /path addresses before anything reads the URL.
+// (Supabase sign-in links use #access_token=…, which start without a slash and are left alone.)
+if (window.location.hash.startsWith('#/')) {
+  window.history.replaceState(null, '', window.location.hash.slice(1) || '/')
+}
+// An old link opened while the site is already open only changes the hash: load the clean address.
+window.addEventListener('hashchange', () => {
+  if (window.location.hash.startsWith('#/')) window.location.replace(window.location.hash.slice(1) || '/')
+})
+
 captureRef() // remember ?ref=CODE from an invite link
 warmUpApi()
 prefetchBoot()

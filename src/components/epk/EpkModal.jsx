@@ -102,7 +102,7 @@ export default function EpkModal({ personId, person: given, onClose }) {
                 ? <TemplatePicker kit={kit} value={tpl} onChange={pick} />
                 : <TemplatePicker kit={kit} value={tpl} onChange={() => {}} readOnly />}
               <div className="ekm-actions">
-                <a className="btn btn-blue" href={`#/epk/${personId}`} target="_blank" rel="noopener noreferrer"><ExternalLink size={15} /> Open full size</a>
+                <a className="btn btn-blue" href={`/epk/${personId}`} target="_blank" rel="noopener noreferrer"><ExternalLink size={15} /> Open full size</a>
                 <button className="btn btn-ghost" onClick={copy}><Copy size={15} /> Copy link</button>
                 <button className="btn btn-ghost" onClick={print}><Printer size={15} /> Save as PDF</button>
                 {draft && mine && <button className="btn btn-ghost" onClick={() => setTab('edit')}>Unsaved edits</button>}

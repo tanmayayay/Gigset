@@ -28,14 +28,29 @@ VITE_SUPABASE_ANON_KEY=<anon public key>   # public — safe in the bundle
 VITE_API_URL=https://strings-api.onrender.com
 ```
 
-Then build + deploy to GitHub Pages:
+## 2b. Host the website on Render (clean URLs for search engines)
 
-```bash
-cd /Users/tanmayayay/Downloads/Gigset/gigset-web
-nvm use 22
-npm run build
-npx gh-pages -d dist
-```
+The site uses clean addresses (thegigset.com/epk/123, not /#/epk/123), so the host must send
+every address to `index.html`. GitHub Pages can't; a Render Static Site can, for free.
+
+1. Render dashboard → **New → Static Site** → connect the same GitHub repo.
+   - Root directory: *(leave empty, the repo root)*
+   - Build command: `npm ci && npm run build`
+   - Publish directory: `dist`
+2. **Environment**: add `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_API_URL` (same values as `.env`).
+3. **Redirects/Rewrites** → add one rule: Source `/*`, Destination `/index.html`, Action **Rewrite**.
+   Real files (robots.txt, sw.js, assets) are still served as files.
+4. Deploy, then open the `…onrender.com` address and check `/epk/<an id>` loads after a reload.
+5. **Settings → Custom Domains** → add `thegigset.com` (Render adds `www` as a redirect).
+6. At the domain registrar: A record `@` → `216.24.57.1`, CNAME `www` → `<site>.onrender.com`.
+   Delete the old GitHub Pages A records (185.199.108–111.153) and any AAAA records.
+   Render issues the HTTPS certificate once DNS checks out.
+7. Backend env on Render: add `SITE_URL=https://thegigset.com`. Keep `FRONTEND_URL` including `https://thegigset.com`.
+8. Supabase → Authentication → URL Configuration: Site URL `https://thegigset.com`, and add
+   `https://thegigset.com/**` to Redirect URLs.
+9. Google Search Console: add the domain, then submit `https://strings-web.onrender.com/sitemap.xml`.
+
+From now on every `git push` to main redeploys the site. `npx gh-pages` is no longer needed.
 
 ## 3. Post-deploy checks (two accounts)
 

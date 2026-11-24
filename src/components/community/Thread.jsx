@@ -136,7 +136,7 @@ export default function Thread({ postId, onClose, onChanged, onOpenCommunity }) 
     try { await Communities.removePost(post.id); pushToast('Post removed.'); onChanged?.({ ...post, removed: true }); onClose(); } catch (e) { pushToast(e.message, 'error'); }
   };
   const share = async () => {
-    const url = `${location.origin}${location.pathname}#/community?p=${post.id}`;
+    const url = `${location.origin}/community?p=${post.id}`;
     try { await navigator.clipboard.writeText(url); pushToast('Link copied.'); } catch { pushToast(url); }
   };
 

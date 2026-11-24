@@ -92,7 +92,7 @@ export function PostItem({ post, showCommunity, myId, canMod, onOpen, onOpenComm
   const { pushToast } = useStore();
   const share = async (e) => {
     e.stopPropagation();
-    const url = `${location.origin}${location.pathname}#/community?p=${post.id}`;
+    const url = `${location.origin}/community?p=${post.id}`;
     try { await navigator.clipboard.writeText(url); pushToast('Link copied.'); } catch { pushToast(url); }
   };
   return (

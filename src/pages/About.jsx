@@ -2,8 +2,10 @@ import { Link } from 'react-router-dom';
 import { Target, Layers, MapPin, ArrowRight } from 'lucide-react';
 import { PageHead, Tag } from '../components/ui';
 import { STAKEHOLDER_GROUPS } from '../data/demo';
+import { useSeo } from '../lib/seo';
 
 export default function About() {
+  useSeo({ title: 'About', description: 'TheGigSet gives every music professional in India one verified profile, one place to be discovered, and the news and gigs that matter to them.', path: '/about' });
   return (
     <div>
       <PageHead title="About TheGigSet" sub="Tying the music industry together." />

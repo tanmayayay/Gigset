@@ -24,6 +24,7 @@ import reviewsRouter from './routes/reviews.js';
 import pushRouter from './routes/push.js';
 import mailRouter from './routes/mail.js';
 import collabsRouter from './routes/collabs.js';
+import seoRouter from './routes/seo.js';
 import mineRouter from './routes/mine.js';
 import adminRouter, { publicRouter as announcementsRouter } from './routes/admin.js';
 import { isSupabaseMode, isSet } from './middleware/auth.js';
@@ -120,6 +121,8 @@ app.use(['/api/profiles', '/api/opportunities', '/api/venues', '/api/events', '/
 });
 
 // Health — no auth, used by uptime checks and the smoke test.
+app.use(seoRouter); // /sitemap.xml
+
 app.get('/api/health', (req, res) => {
   res.json({
     ok: true,

@@ -30,8 +30,7 @@ export default class ErrorBoundary extends Component {
     const hardReload = () => window.location.reload();
     const fresh = () => {
       try { Object.keys(localStorage).filter((k) => k.startsWith('sb-')).forEach((k) => localStorage.removeItem(k)); } catch { /* ignore */ }
-      window.location.hash = '#/';
-      window.location.reload();
+      window.location.assign('/');
     };
     return (
       <div style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', padding: 24, background: 'var(--bg, #0A0A0A)', color: 'var(--text, #fff)', fontFamily: 'inherit' }}>
