@@ -2,7 +2,10 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" sizes="32x32" href="/brand/favicon-32.png" />
+    <!-- Google shows the first icon whose size is a multiple of 48px in search results. -->
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="icon" type="image/png" sizes="96x96" href="/brand/favicon-96.png" />
+    <link rel="icon" type="image/png" sizes="48x48" href="/brand/favicon-48.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="/brand/icon-192.png" />
     <link rel="apple-touch-icon" href="/brand/apple-touch-icon.png" />
     <meta name="theme-color" content="#0A0A0A" />
@@ -17,6 +20,13 @@
     <meta property="og:url" content="https://thegigset.com/" />
     <meta property="og:image" content="https://thegigset.com/brand/share.png" />
     <meta name="twitter:card" content="summary_large_image" />
+    <!-- Tells Google the site's name (and how people spell it) and its logo, without running the app. -->
+    <script type="application/ld+json">
+      {"@context":"https://schema.org","@graph":[
+        {"@type":"WebSite","@id":"https://thegigset.com/#website","name":"TheGigSet","alternateName":["The GigSet","Gigset","GigSet India"],"url":"https://thegigset.com/"},
+        {"@type":"Organization","@id":"https://thegigset.com/#org","name":"TheGigSet","alternateName":"Gigset","url":"https://thegigset.com/","logo":"https://thegigset.com/brand/favicon-512.png","description":"The professional network, discovery marketplace and newsroom for India's music and live-event industry."}
+      ]}
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <!-- Fonts load without blocking first paint; system fonts show until they arrive. -->

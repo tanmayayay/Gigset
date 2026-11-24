@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { useStore } from '../store/store';
 import { Logo } from '../components/ui';
-import { useSeo, SITE_URL } from '../lib/seo';
+import { useSeo } from '../lib/seo';
 import AuthModal from '../components/AuthModal';
 import { PEOPLE, CITIES, initials, avatarColor } from '../data/demo';
 import '../landing.css';
@@ -369,16 +369,9 @@ function Footer() {
   );
 }
 
-const ORG_LD = {
-  '@context': 'https://schema.org',
-  '@graph': [
-    { '@type': 'Organization', name: 'TheGigSet', url: `${SITE_URL}/`, logo: `${SITE_URL}/brand/app-icon-512.png` },
-    { '@type': 'WebSite', name: 'TheGigSet', url: `${SITE_URL}/` },
-  ],
-};
 
 export default function Landing() {
-  useSeo({ path: '/', jsonLd: ORG_LD });
+  useSeo({ path: '/' }); // site name and logo data live in index.html, so Google reads them without the app
   const navigate = useNavigate();
   const { user } = useStore();
   const [authOpen, setAuthOpen] = useState(false);
