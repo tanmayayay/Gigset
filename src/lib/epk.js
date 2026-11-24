@@ -9,7 +9,7 @@ export const EPK_TEMPLATES = [
 export const isTemplate = (t) => EPK_TEMPLATES.some((x) => x.id === t);
 /** The look of someone's press kit is chosen by its owner (saved on their profile). Everyone else just sees it. */
 export const ownerTemplate = (person) => { const t = person?.detail?.data?.epkTemplate; return isTemplate(t) ? t : 'classic'; };
-/** Public link to someone's press kit (HashRouter). */
+/** Public link to someone's press kit. */
 export const epkUrl = (id) => `${location.origin}/epk/${id}`;
 
 const safeHref = (u) => { try { const x = new URL(u); return /^https?:$/.test(x.protocol) ? x.href : null; } catch { return null; } };
@@ -103,6 +103,6 @@ export function buildEpk(person, { reviews = null, edits = null } = {}) {
   return {
     id: person.id, name: person.name, first, label, tint: ed.accent || meta.tint, city: person.city || '', avatarUrl: person.avatarUrl || '',
     verified: person.verificationStatus === 'VERIFIED', headline, about, aboutIsAuto: !bio && !ed.about, tags: uniqueTags, stats, details, links,
-    samples, quotes, milestones: ed.milestones, email: ed.email, phone: ed.phone, hide: ed.hide, edits: ed, strength, bookable: meta.bookable, profilePath: `/profile/${person.id}`,
+    samples, quotes, milestones: ed.milestones, email: ed.email, phone: ed.phone, hide: ed.hide, edits: ed, strength, bookable: meta.bookable, since: person.createdAt ? new Date(person.createdAt).getFullYear() : null, followers: person._count?.followers ?? 0, profilePath: `/profile/${person.id}`,
   };
 }
