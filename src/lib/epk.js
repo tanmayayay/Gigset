@@ -4,7 +4,7 @@ import { samplesOf } from '../components/profile/Samples';
 export const EPK_TEMPLATES = [
   { id: 'classic', name: 'Pop', blurb: 'Bright, chunky and playful. Stands out in an inbox.' },
   { id: 'stage', name: 'Neon', blurb: 'Dark with glowing colour. Built for DJs and live acts.' },
-  { id: 'minimal', name: 'Mono', blurb: 'Black and white, huge type. Straight to the point.' },
+  { id: 'minimal', name: 'Clean', blurb: 'Soft, light and modern. Lets your photo do the talking.' },
 ];
 export const isTemplate = (t) => EPK_TEMPLATES.some((x) => x.id === t);
 /** The look of someone's press kit is chosen by its owner (saved on their profile). Everyone else just sees it. */
